@@ -1,0 +1,129 @@
+import Link from "next/link";
+import { requireTenantContext } from "@/lib/auth/tenant";
+import {
+  effectiveLimits,
+  hasActiveSubscription,
+  subscriptionLabel,
+} from "@/lib/subscription";
+import { createClient } from "@/lib/supabase/server";
+import { Badge } from "@/components/ui/badge";
+
+export const metadata = { title: "Usage · Sitexa" };
+
+export default async function UsagePage() {
+  const ctx = await requireTenantContext();
+  const limits = effectiveLimits(
+    ctx.planId,
+    ctx.subscriptionStatus,
+    ctx.isPlatformAdmin,
+  );
+  const active =
+    hasActiveSubscription(ctx.subscriptionStatus) || ctx.isPlatformAdmin;
+  const supabase = await createClient();
+
+  const now = new Date();
+  const startOfMonth = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1),
+  ).toISOString();
+
+  const [{ count: searchCount }, { count: siteGenCount }, videoUsage] =
+    await Promise.all([
+      supabase
+        .from("usage_events")
+        .select("*", { count: "exact", head: true })
+        .eq("kind", "lead_search")
+        .gte("created_at", startOfMonth),
+      supabase
+        .from("usage_events")
+        .select("*", { count: "exact", head: true })
+        .eq("kind", "site_generation")
+        .gte("created_at", startOfMonth),
+      supabase
+        .from("usage_events")
+        .select("quantity")
+        .eq("kind", "avatar_video")
+        .gte("created_at", startOfMonth),
+    ]);
+  // Video renders are metered with quantity = videos queued per event.
+  const videoCount = (videoUsage.data ?? []).reduce(
+    (sum, e) => sum + ((e.quantity as number) ?? 1),
+    0,
+  );
+
+  return (
+    <div className="space-y-8">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-zinc-900">Usage</h1>
+          <p className="mt-1 text-sm text-zinc-500">
+            Resets at the start of each month.
+          </p>
+        </div>
+        <Badge variant={active ? "success" : "default"}>
+          {subscriptionLabel(ctx.subscriptionStatus, ctx.trialEnd)}
+        </Badge>
+      </div>
+
+      {!active ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          <span>
+            Your workspace is read-only. Start your 7-day free trial to run
+            searches and build sites.
+          </span>
+          <Link
+            href="/dashboard/billing"
+            className="rounded-lg bg-zinc-900 px-3 py-1.5 font-medium text-white transition hover:bg-zinc-800"
+          >
+            Start free trial
+          </Link>
+        </div>
+      ) : null}
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Meter
+          label="Lead searches"
+          used={searchCount ?? 0}
+          limit={limits.searches}
+        />
+        <Meter
+          label="Websites generated"
+          used={siteGenCount ?? 0}
+          limit={limits.sites}
+        />
+        <Meter
+          label="Avatar videos rendered"
+          used={videoCount}
+          limit={limits.videos}
+        />
+      </div>
+    </div>
+  );
+}
+
+function Meter({
+  label,
+  used,
+  limit,
+}: {
+  label: string;
+  used: number;
+  limit: number;
+}) {
+  const pct = Math.min(100, Math.round((used / Math.max(1, limit)) * 100));
+  return (
+    <div className="rounded-xl border border-zinc-200/70 bg-white p-5 shadow-sm">
+      <div className="flex items-baseline justify-between">
+        <p className="text-sm font-medium text-zinc-700">{label}</p>
+        <p className="text-sm text-zinc-500">
+          {used} / {limit.toLocaleString()}
+        </p>
+      </div>
+      <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-zinc-100">
+        <div
+          className="h-full rounded-full bg-indigo-500"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  );
+}
