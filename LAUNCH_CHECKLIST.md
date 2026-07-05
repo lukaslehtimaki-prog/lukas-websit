@@ -1,7 +1,7 @@
 # 🚀 Sitexa — Launch Checklist
 
 **Live now:** https://lead-finder-saas.vercel.app
-Hosted on Vercel (team *Giit up*) · Database on Supabase · Payments via Stripe (test mode)
+Hosted on Vercel (team *Giit up*, auto-deploys from **github.com/lukaslehtimaki-prog/lukas-websit**) · Database on Supabase · Payments via Stripe (**live**)
 
 Legend: **[You]** = you do it · **[Claude]** = ask me and I'll do it · ⏱ = rough time
 
@@ -9,63 +9,20 @@ Legend: **[You]** = you do it · **[Claude]** = ask me and I'll do it · ⏱ = r
 
 ## ✅ Already done
 - [x] App deployed & public (deployment protection removed)
-- [x] All env vars (Supabase, Google Places, Anthropic, Stripe **live**) in production
+- [x] All env vars (Supabase, Google Places, Anthropic, Stripe **live**, `DATABASE_URL`) in production
 - [x] Database migration applied (leads, sites, avatar videos)
 - [x] SEO: metadata, social preview image, `robots.txt`, `sitemap.xml`
-- [x] Legal: `/privacy` + `/terms` (sole trader Lukas Lehtimäki), linked from footer + signup
+- [x] Legal: `/privacy` + `/terms` (sole trader Lukas Lehtimäki — pending real Y-tunnus), linked from footer + signup
 - [x] Live Stripe products, prices, and webhook created and verified
+- [x] Stripe Tax enabled (currently €0 VAT — correct, not yet a registered business)
 - [x] Dark mode for the dashboard (Settings → Appearance)
 - [x] Website builder: unique themes, Google reviews, gym/barber sections, images, one-click publish
 - [x] Image upload verified end-to-end (bucket creation + upload + public serving)
-- [x] All code committed to git (was sitting uncommitted since launch — fixed 2026-07-05)
-- [x] Verified: landing, login, signup, dashboard-guard all working
-
----
-
-## 🔲 Step 1 — Point Supabase at the live site **[You]** ⏱ 1 min
-Without this, password-reset emails point to the wrong place. (Login & signup already work.)
-
-1. Open: https://supabase.com/dashboard/project/ttnafrcwvcomqsmqicji/auth/url-configuration
-2. **Site URL** → `https://lead-finder-saas.vercel.app`
-3. **Redirect URLs** → click *Add URL* → `https://lead-finder-saas.vercel.app/**`
-4. **Save**
-
----
-
-## 🔲 Step 2 — Do the first real signup **[You]** ⏱ 2 min
-This is the true end-to-end test.
-
-1. Go to https://lead-finder-saas.vercel.app/signup
-2. Create an account (your email + a password).
-3. You should land in the dashboard. Because your email is a **platform admin**, you get full access regardless of plan.
-4. Try a lead search (e.g. "barbershop" / "Helsinki") to confirm Google Places + the database work in production.
-
-> If anything errors, tell me the message and I'll fix it.
-
----
-
-## ✅ Step 3 — Real Stripe payments — **DONE (live, 2026-07-04)**
-Account activated (FI / EUR, charges + payouts enabled). Live products **Sitexa Standard €20** and **Sitexa Pro €100**, live webhook, and all 5 live keys are in Vercel production and verified. The site now accepts **real** cards.
-
-### 🔲 One thing left for you **[You]** ⏱ 3 min
-- Log into the live site → **Billing** → start a plan with a **real card** and confirm it activates. Because there's a 7-day trial, **no charge happens now** — you can cancel immediately from the billing portal to be safe. This is the one step only you can do (needs your browser + a real card).
-
-### 🔐 Optional hardening **[You]**
-- Your live **secret key** passed through chat. It's working in Vercel, but if you want zero chat exposure: Stripe → Developers → API keys → **roll** `sk_live…`, then paste the new one into **Vercel → Settings → Environment Variables → `STRIPE_SECRET_KEY`**, and tell me to redeploy. (Optional — not urgent.)
-- Same idea for the **Vercel deploy token** you pasted — revoke it at vercel.com/account/settings/tokens once you don't need me deploying for a while (see Step 6).
-
----
-
-## ✅ Step 3b — Stripe Tax / VAT — **DONE (2026-07-05)**
-Checkout now calculates VAT automatically (Stripe Tax enabled, both products tagged with the correct SaaS/business-use tax code, prices set tax-exclusive, VAT-ID collection on for B2B EU customers). Verified with a live dry-run checkout session — no errors.
-
-**Currently charges €0 tax** — correct, because you're not yet a registered/VAT business (see below). The moment a Finland tax registration exists in Stripe, it starts calculating real VAT automatically — no further code changes needed.
-
-### 🔲 When you get your Y-tunnus **[You] + [Claude]**
-You mentioned registering as a sole trader via YTJ today/tomorrow. Once you have the Y-tunnus:
-1. **[You]** Tell me you're registered (share the Y-tunnus if you want it reflected anywhere).
-2. **[Claude]** I'll update the Privacy Policy / Terms footer with your real business ID.
-3. **[You]** *(only if/when you cross Finland's VAT threshold — currently €20,000/year turnover)* register for VAT (ALV) and get your VAT number, then either add it as a Stripe Tax registration yourself (Settings → Tax → Registrations) or give it to me and I'll add it via the API.
+- [x] GitHub auto-deploy — push to `main` deploys automatically, verified end-to-end
+- [x] All code committed to git, full history on GitHub
+- [x] Supabase Site URL + redirect URLs point at the live site
+- [x] Real signup + real-card checkout both tested live and working
+- [x] `DATABASE_URL` wired up — admin analytics page shows real data (2 tenants, 115 leads, 4 sites as of 2026-07-05)
 
 ---
 
@@ -81,29 +38,8 @@ You're on `lead-finder-saas.vercel.app` for now. When you buy a domain (e.g. `si
 
 ---
 
-## ✅ Step 5 — GitHub auto-deploy — **DONE (2026-07-06)**
-Code lives at **github.com/lukaslehtimaki-prog/lukas-websit** (full history, 3+ commits) and the Vercel project is linked to it (`productionBranch: main`). Every push to `main` now auto-deploys — no more manual `vercel --prod` needed. This very edit is the end-to-end test: pushing it should trigger a Vercel deployment with no CLI command from me.
-4. **[You]** In Vercel → your project → **Settings → Git** → **Connect Git Repository** → pick the repo (one click; this is the browser-OAuth step I can't do for you).
-5. **[Claude]** Once connected, all future changes deploy automatically on push — no more manual `vercel --prod` needed.
-
----
-
-## 🔲 Step 6 — Cleanup (once you're happy) **[You]**
-- Revoke the temporary Vercel token: https://vercel.com/account/settings/tokens → delete `sitexa-deploy`.
-  *(Do this only when you don't need me to deploy again for a while — I'd need a fresh one next time.)*
-
----
-
-## 🔲 Step 7 — Admin analytics page — **you picked this** ⏱ 2 min
-Shows a friendly "not configured" notice instead of tenant/usage stats until this is set.
-
-1. **[You]** Supabase → your project → **Connect** button (top of dashboard) → **ORMs / URI** tab → copy the connection string, replace `[YOUR-PASSWORD]` with your DB password. Paste it to me.
-2. **[Claude]** I add it to Vercel as `DATABASE_URL` (+ `DIRECT_URL`) and redeploy. The Admin page will show real tenant/usage data.
-
----
-
-## 🔲 Step 8 — Branded password-reset emails (Resend) — **you picked this** ⏱ ~15 min
-Supabase's built-in mailer is unbranded and rate-limited (~a few emails/hour). This part is entirely in your two dashboards — I don't have API access to either, so I can't do this one for you, but here's the exact path:
+## 🔲 Step 8 — Branded password-reset emails (Resend) — **the last opt-in item** ⏱ ~15 min
+Supabase's built-in mailer is unbranded and rate-limited (~a few emails/hour). This one's entirely in your two dashboards — I don't have API access to either — but here's the exact path:
 
 1. **[You]** Create a free account at resend.com (100 emails/day free, no card needed).
 2. **[You]** Resend → **Domains** → add your domain and verify it (DNS records — if you don't have a domain yet, skip this and use Resend's shared testing domain temporarily).
@@ -115,14 +51,29 @@ Supabase's built-in mailer is unbranded and rate-limited (~a few emails/hour). T
 
 ---
 
+## 🔲 When you get your Y-tunnus **[You] + [Claude]**
+You mentioned registering as a sole trader via YTJ. Once you have it:
+1. **[You]** Tell me — share the Y-tunnus if you want it reflected anywhere.
+2. **[Claude]** I'll update the Privacy Policy / Terms with your real business ID.
+3. **[You]** *(only if/when you cross Finland's VAT threshold — currently €20,000/year turnover)* register for VAT (ALV), then either add it as a Stripe Tax registration yourself (Settings → Tax → Registrations) or give me the number and I'll add it via the API.
+
+---
+
+## 🔐 Optional hardening, no rush **[You]**
+- Your live Stripe **secret key** and the **Vercel deploy token** both passed through this chat. Both still work fine and only grant access to services already wired into your own accounts — low real-world risk. You chose to leave them as-is; revisit anytime via Stripe → API keys (roll) and vercel.com/account/settings/tokens (revoke).
+- Your **GitHub PAT** (used once to push + link the repo) can be revoked now if you like — auto-deploy going forward is driven by Vercel's GitHub App, not that token.
+
+---
+
 ## 📌 Quick reference
 | Item | Value |
 |------|-------|
 | Live URL | https://lead-finder-saas.vercel.app |
+| GitHub repo | github.com/lukaslehtimaki-prog/lukas-websit (auto-deploys `main`) |
 | Vercel project | `giit-up/lead-finder-saas` |
 | Supabase project ref | `ttnafrcwvcomqsmqicji` |
 | Stripe webhook path | `/api/stripe/webhook` |
 | Plan IDs (internal) | `pro` = €20 "Standard" · `premium` = €100 "Pro" |
 | Helper scripts | `scripts/setup-stripe.mjs`, `rename-stripe-products.mjs`, `verify-billing.mjs`, `provision-trial.mjs` |
 
-**Priority order (2026-07-05):** Steps 1 & 2 first (3 min total, genuinely pending). Then whichever of 3b/5/7/8 you want to tackle — all need a few minutes in an external dashboard from you before I can finish my part. Step 4 (custom domain) intentionally paused until this backlog clears.
+**Status (2026-07-05):** the entire original launch backlog is closed. What's left is genuinely optional — a domain (Step 4), branded email (Step 8), and updating legal pages once the business registration lands.
