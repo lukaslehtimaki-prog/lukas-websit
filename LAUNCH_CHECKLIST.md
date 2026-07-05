@@ -25,18 +25,11 @@ Legend: **[You]** = you do it · **[Claude]** = ask me and I'll do it · ⏱ = r
 - [x] Custom domain **sitovai.com** — bought via Porkbun, DNS configured, live and verified: DNS resolves to Vercel, HTTPS 200, SSL issued, all core pages + sitemap + robots checked
 - [x] Stripe webhook moved to `https://sitovai.com/api/stripe/webhook` — same signing secret, verified reachable
 - [x] Supabase Site URL + redirect URLs updated to `https://sitovai.com` (per user, 2026-07-06 — not independently verified via API, no Supabase management access from here; low-stakes if off, only affects reset-link targets)
+- [x] Branded password-reset emails via Resend — domain `contact.sitovai.com` verified (DKIM/SPF/MX), custom SMTP wired in Supabase, branded HTML template + subject line live. Confirmed via Resend's own send log: `subject: "Reset your Sitovai password"`, `last_event: delivered`.
 
 ---
 
 ## 🔲 Optional — pick up anytime, no urgency
-
-### Branded password-reset emails (Resend) ⏱ ~15 min
-Supabase's built-in mailer is unbranded and rate-limited. Entirely in your two dashboards — no API access from here.
-1. Free account at resend.com (100 emails/day free, no card).
-2. Resend → **Domains** → add + verify yours (or use their shared testing domain temporarily).
-3. Resend → **API Keys** → create one.
-4. Supabase → **Project Settings → Auth → SMTP Settings** → enable custom SMTP: host `smtp.resend.com`, port `587`, username `resend`, password = your Resend API key, sender name "Sitovai", sender email from your verified domain.
-5. Save, then trigger a password reset on the live site to confirm the branded email arrives.
 
 ### When you get your Y-tunnus
 1. **[You]** Tell me — share the Y-tunnus if you want it reflected anywhere.
