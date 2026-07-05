@@ -116,9 +116,9 @@ export default async function AdminPage() {
         />
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+      <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-zinc-200 bg-zinc-50 text-xs uppercase tracking-wide text-zinc-500">
+          <thead className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
             <tr>
               <th className="px-4 py-3">Workspace</th>
               <th className="px-4 py-3">Plan</th>
@@ -128,24 +128,24 @@ export default async function AdminPage() {
               <th className="px-4 py-3">Created</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-100">
+          <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
             {tenantsRows.map((t) => (
               <tr key={t.id}>
-                <td className="px-4 py-3 font-medium text-zinc-900">{t.name}</td>
-                <td className="px-4 py-3 text-zinc-600">
+                <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">{t.name}</td>
+                <td className="px-4 py-3 text-zinc-600 dark:text-zinc-300">
                   {planLimits(t.planId).label}
                 </td>
-                <td className="px-4 py-3 text-zinc-600">{members.get(t.id) ?? 0}</td>
-                <td className="px-4 py-3 text-zinc-600">{leads.get(t.id) ?? 0}</td>
-                <td className="px-4 py-3 text-zinc-600">{sites.get(t.id) ?? 0}</td>
-                <td className="px-4 py-3 text-zinc-500">
+                <td className="px-4 py-3 text-zinc-600 dark:text-zinc-300">{members.get(t.id) ?? 0}</td>
+                <td className="px-4 py-3 text-zinc-600 dark:text-zinc-300">{leads.get(t.id) ?? 0}</td>
+                <td className="px-4 py-3 text-zinc-600 dark:text-zinc-300">{sites.get(t.id) ?? 0}</td>
+                <td className="px-4 py-3 text-zinc-500 dark:text-zinc-400">
                   {new Date(t.createdAt).toLocaleDateString()}
                 </td>
               </tr>
             ))}
             {tenantsRows.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-zinc-500">
+                <td colSpan={6} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400">
                   No tenants yet.
                 </td>
               </tr>
@@ -161,8 +161,8 @@ function AdminShell({ children }: { children: ReactNode }) {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-zinc-900">Platform admin</h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Platform admin</h1>
+        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
           Every tenant and their usage. Visible to platform admins only.
         </p>
       </div>
@@ -181,9 +181,9 @@ function Notice({ children }: { children: ReactNode }) {
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-5">
-      <p className="text-sm text-zinc-500">{label}</p>
-      <p className="mt-1 text-3xl font-semibold text-zinc-900">{value}</p>
+    <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5">
+      <p className="text-sm text-zinc-500 dark:text-zinc-400">{label}</p>
+      <p className="mt-1 text-3xl font-semibold text-zinc-900 dark:text-zinc-100">{value}</p>
     </div>
   );
 }

@@ -27,13 +27,13 @@ export default async function NewSitePage({
     <div className="max-w-3xl space-y-6">
       <Link
         href="/dashboard/sites"
-        className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-800"
+        className="inline-flex items-center gap-1.5 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-100"
       >
         <ArrowLeft className="h-4 w-4" /> Back to websites
       </Link>
       <div>
-        <h1 className="text-2xl font-semibold text-zinc-900">Create a website</h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Create a website</h1>
+        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
           Pick a lead or paste a Google Maps link, choose a template, and let AI fill it in.
         </p>
       </div>

@@ -2,6 +2,24 @@
 
 export type SiteService = { title: string; description: string };
 
+export type SiteReview = {
+  author: string;
+  rating: number; // 1–5
+  text: string;
+  relativeTime: string | null; // e.g. "2 months ago"
+};
+
+/** Drives which extra section a generated site gets. */
+export type SiteKind = "standard" | "booking" | "membership";
+
+export type MembershipPlan = {
+  name: string;
+  price: string; // e.g. "29,90 €"
+  period: string; // e.g. "/kk"
+  features: string[];
+  highlight?: boolean;
+};
+
 export type BusinessInfo = {
   name: string;
   category: string | null;
@@ -31,6 +49,18 @@ export type SiteContent = {
     hours: string[] | null;
     mapsQuery: string | null;
   };
+  /** Real Google reviews to show as testimonials (optional). */
+  reviews?: SiteReview[];
+  /** Business type → extra section (booking form for salons, pricing for gyms). */
+  kind?: SiteKind;
+  /** Membership tiers, shown when kind is "membership". */
+  membershipPlans?: MembershipPlan[];
+  /** Public URL of the hero image (optional). */
+  heroImage?: string | null;
+  /** Public URLs of gallery images (optional). */
+  gallery?: string[];
+  /** Seed to reroll the visual design; when unset a hash of the name is used. */
+  designSeed?: number;
   /** Original business data, kept so AI copy can be regenerated later. */
   source?: BusinessInfo;
 };

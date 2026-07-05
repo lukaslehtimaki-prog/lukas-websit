@@ -74,7 +74,7 @@ export function PlanCards({
     <div className="space-y-4">
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       {!isOwner ? (
-        <p className="text-sm text-zinc-500">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
           Only workspace owners can change the plan.
         </p>
       ) : null}
@@ -89,7 +89,7 @@ export function PlanCards({
                 "flex flex-col rounded-2xl border p-6",
                 isCurrent
                   ? "border-zinc-900 shadow-sm"
-                  : "border-zinc-200/70",
+                  : "border-zinc-200/70 dark:border-zinc-800/70",
               )}
             >
               <div className="flex items-center justify-between">
@@ -104,12 +104,12 @@ export function PlanCards({
                 <span className="text-3xl font-semibold tracking-tight">
                   {p.price}
                 </span>
-                <span className="text-sm text-zinc-500">{p.period}</span>
+                <span className="text-sm text-zinc-500 dark:text-zinc-400">{p.period}</span>
               </div>
               <ul className="mt-5 flex-1 space-y-2.5 text-sm">
                 {p.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-zinc-600">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-indigo-600" />
+                  <li key={f} className="flex items-start gap-2 text-zinc-600 dark:text-zinc-300">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-indigo-600 dark:text-indigo-400" />
                     {f}
                   </li>
                 ))}
@@ -119,7 +119,7 @@ export function PlanCards({
                   <button
                     onClick={() => go(openBillingPortal)}
                     disabled={!isOwner || pending}
-                    className="w-full rounded-[10px] border border-zinc-300 bg-white px-4 py-2.5 text-sm font-medium text-zinc-800 transition hover:bg-zinc-50 disabled:opacity-60"
+                    className="w-full rounded-[10px] border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2.5 text-sm font-medium text-zinc-800 dark:text-zinc-100 transition hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-60"
                   >
                     {isCurrent ? "Manage billing" : `Switch to ${p.name}`}
                   </button>
@@ -143,7 +143,7 @@ export function PlanCards({
         <button
           onClick={() => go(openBillingPortal)}
           disabled={pending}
-          className="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-700"
+          className="inline-flex items-center gap-1.5 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
         >
           Manage billing &amp; payment method{" "}
           <ExternalLink className="h-3.5 w-3.5" />

@@ -35,10 +35,10 @@ export default async function DashboardOverview() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-zinc-900">
+        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
           Welcome, {firstName}
         </h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
           A snapshot of {ctx.tenantName || "your workspace"}.
         </p>
       </div>
@@ -76,9 +76,9 @@ export default async function DashboardOverview() {
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-5">
-      <p className="text-sm text-zinc-500">{label}</p>
-      <p className="mt-1 text-3xl font-semibold text-zinc-900">{value}</p>
+    <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5">
+      <p className="text-sm text-zinc-500 dark:text-zinc-400">{label}</p>
+      <p className="mt-1 text-3xl font-semibold text-zinc-900 dark:text-zinc-100">{value}</p>
     </div>
   );
 }
@@ -97,17 +97,17 @@ function ActionCard({
   return (
     <Link
       href={href}
-      className="group flex items-start gap-4 rounded-xl border border-zinc-200 bg-white p-5 transition hover:border-indigo-300 hover:shadow-sm"
+      className="group flex items-start gap-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 transition hover:border-indigo-300 hover:shadow-sm"
     >
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-indigo-50 text-indigo-600">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
         {icon}
       </span>
       <div className="min-w-0">
-        <p className="flex items-center gap-1 font-medium text-zinc-900">
+        <p className="flex items-center gap-1 font-medium text-zinc-900 dark:text-zinc-100">
           {title}
           <ArrowRight className="h-4 w-4 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100" />
         </p>
-        <p className="mt-0.5 text-sm text-zinc-500">{desc}</p>
+        <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">{desc}</p>
       </div>
     </Link>
   );

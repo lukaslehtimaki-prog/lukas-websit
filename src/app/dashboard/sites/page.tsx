@@ -17,8 +17,8 @@ type SiteRow = {
 };
 
 const statusStyles: Record<string, string> = {
-  draft: "bg-zinc-100 text-zinc-600",
-  generated: "bg-indigo-100 text-indigo-700",
+  draft: "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300",
+  generated: "bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300",
   published: "bg-emerald-100 text-emerald-700",
 };
 
@@ -36,8 +36,8 @@ export default async function SitesPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-zinc-900">Websites</h1>
-          <p className="mt-1 text-sm text-zinc-500">
+          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Websites</h1>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             AI-generated single-page sites, each tied to the lead it came from.
           </p>
         </div>
@@ -57,12 +57,12 @@ export default async function SitesPage() {
       ) : null}
 
       {sites.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-zinc-300 bg-white p-10 text-center">
-          <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-indigo-50 text-indigo-600">
+        <div className="rounded-2xl border border-dashed border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-10 text-center">
+          <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
             <Globe className="h-6 w-6" />
           </div>
-          <p className="mt-4 font-medium text-zinc-900">No websites yet</p>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-4 font-medium text-zinc-900 dark:text-zinc-100">No websites yet</p>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             Build one from a lead in the Lead Finder, or start from a Google Maps link.
           </p>
           <Link
@@ -78,7 +78,7 @@ export default async function SitesPage() {
             <Link
               key={s.id}
               href={`/dashboard/sites/${s.id}`}
-              className="rounded-xl border border-zinc-200 bg-white p-5 transition hover:border-indigo-300 hover:shadow-sm"
+              className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 transition hover:border-indigo-300 hover:shadow-sm"
             >
               <div className="flex items-center justify-between">
                 <span
@@ -89,12 +89,12 @@ export default async function SitesPage() {
                 >
                   {s.status}
                 </span>
-                <span className="text-xs text-zinc-400">
+                <span className="text-xs text-zinc-400 dark:text-zinc-500">
                   {templateMeta(s.template_id).name}
                 </span>
               </div>
-              <p className="mt-3 font-medium text-zinc-900">{s.title}</p>
-              <p className="mt-1 text-xs text-zinc-500">
+              <p className="mt-3 font-medium text-zinc-900 dark:text-zinc-100">{s.title}</p>
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
                 Updated {new Date(s.updated_at).toLocaleDateString()}
               </p>
             </Link>

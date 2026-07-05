@@ -1,5 +1,7 @@
-// Creates (idempotently) the Nettisi Pro (€20/mo) and Premium (€100/mo) products +
+// Creates (idempotently) the Sitexa Standard (€20/mo) and Pro (€100/mo) products +
 // prices in your Stripe account, then writes the price IDs into .env.local.
+// Note: product NAMES follow the customer-facing labels (Standard/Pro); the internal
+// plan ids stay `pro` (=€20) and `premium` (=€100) via the lookup keys below.
 //
 // Run from the project root:  node scripts/setup-stripe.mjs
 import { readFileSync, writeFileSync } from "node:fs";
@@ -33,7 +35,7 @@ async function ensurePrice(slug, name, description, amountCents) {
   if (existing.data[0]) return existing.data[0].id;
 
   const product = await stripe.products.create({
-    name: `Nettisi ${name}`,
+    name: `Sitexa ${name}`,
     description,
   });
   const price = await stripe.prices.create({
@@ -48,13 +50,13 @@ async function ensurePrice(slug, name, description, amountCents) {
 
 const proId = await ensurePrice(
   "pro",
-  "Pro",
-  "500 lead searches + 50 AI websites / month",
+  "Standard",
+  "50 lead searches + 15 AI websites / month",
   2000,
 );
 const premiumId = await ensurePrice(
   "premium",
-  "Premium",
+  "Pro",
   "5,000 lead searches + 500 AI websites / month",
   10000,
 );

@@ -20,7 +20,7 @@ type SeriesRow = {
 };
 
 const statusStyles: Record<string, string> = {
-  draft: "bg-zinc-100 text-zinc-600",
+  draft: "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300",
   rendering: "bg-amber-100 text-amber-700",
   complete: "bg-emerald-100 text-emerald-700",
   failed: "bg-red-100 text-red-700",
@@ -40,8 +40,8 @@ export default async function VideosPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-zinc-900">Avatar videos</h1>
-          <p className="mt-1 text-sm text-zinc-500">
+          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Avatar videos</h1>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             Short AI spokesperson videos that sell your product — generate a series of
             variations and post the winners.
           </p>
@@ -69,12 +69,12 @@ export default async function VideosPage() {
       ) : null}
 
       {series.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-zinc-300 bg-white p-10 text-center">
-          <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-indigo-50 text-indigo-600">
+        <div className="rounded-2xl border border-dashed border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-10 text-center">
+          <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
             <Clapperboard className="h-6 w-6" />
           </div>
-          <p className="mt-4 font-medium text-zinc-900">No videos yet</p>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-4 font-medium text-zinc-900 dark:text-zinc-100">No videos yet</p>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             Describe a product, pick a spokesperson, and get a series of short sales videos.
           </p>
           <Link
@@ -92,7 +92,7 @@ export default async function VideosPage() {
               <Link
                 key={s.id}
                 href={`/dashboard/videos/${s.id}`}
-                className="rounded-xl border border-zinc-200 bg-white p-5 transition hover:border-indigo-300 hover:shadow-sm"
+                className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 transition hover:border-indigo-300 hover:shadow-sm"
               >
                 <div className="flex items-center justify-between">
                   <span
@@ -103,14 +103,14 @@ export default async function VideosPage() {
                   >
                     {s.status}
                   </span>
-                  <span className="text-xs text-zinc-400">
+                  <span className="text-xs text-zinc-400 dark:text-zinc-500">
                     {s.count} video{s.count === 1 ? "" : "s"} · {toneLabel(s.tone)}
                   </span>
                 </div>
-                <p className="mt-3 font-medium text-zinc-900">
+                <p className="mt-3 font-medium text-zinc-900 dark:text-zinc-100">
                   {s.avatar_products?.name ?? "Untitled product"}
                 </p>
-                <p className="mt-1 text-xs text-zinc-500">
+                <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
                   {preset.emoji} {preset.name} · updated{" "}
                   {new Date(s.updated_at).toLocaleDateString()}
                 </p>

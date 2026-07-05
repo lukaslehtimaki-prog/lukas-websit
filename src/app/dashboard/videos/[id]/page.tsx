@@ -59,15 +59,15 @@ export default async function SeriesPage({
     <div className="space-y-6">
       <Link
         href="/dashboard/videos"
-        className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-800"
+        className="inline-flex items-center gap-1.5 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-100"
       >
         <ArrowLeft className="h-4 w-4" /> Back to videos
       </Link>
       <div>
-        <h1 className="text-2xl font-semibold text-zinc-900">
+        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
           {s.avatar_products?.name ?? "Untitled product"}
         </h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
           {preset.emoji} {preset.name} · {toneLabel(s.tone)} tone
         </p>
       </div>

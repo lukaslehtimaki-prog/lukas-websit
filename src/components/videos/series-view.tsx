@@ -71,12 +71,12 @@ export function SeriesView({
   return (
     <div className="space-y-6">
       {isDraft ? (
-        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-indigo-200 bg-indigo-50 p-4">
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-indigo-200 bg-indigo-50 dark:bg-indigo-500/10 p-4">
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium text-indigo-900">
               Review the scripts, then render
             </p>
-            <p className="mt-0.5 text-xs text-indigo-700">
+            <p className="mt-0.5 text-xs text-indigo-700 dark:text-indigo-300">
               Edit any script below.{" "}
               {demoMode
                 ? "Demo mode: rendering returns sample clips and costs nothing."
@@ -135,7 +135,7 @@ export function SeriesView({
         ))}
       </div>
 
-      <div className="border-t border-zinc-200 pt-4">
+      <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4">
         <Button
           variant="ghost"
           size="sm"

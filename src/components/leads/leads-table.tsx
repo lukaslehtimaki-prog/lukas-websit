@@ -51,7 +51,7 @@ const CRM_DOT: Record<string, string> = {
 function WebsiteBadge({ status, website }: { status: string; website: string | null }) {
   if (status === "no_website") {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-200">
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/25">
         <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
         No website
       </span>
@@ -62,7 +62,7 @@ function WebsiteBadge({ status, website }: { status: string; website: string | n
       href={website ?? "#"}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-1 rounded-full bg-zinc-50 px-2.5 py-0.5 text-xs font-medium text-zinc-600 ring-1 ring-inset ring-zinc-200 transition hover:text-zinc-900 hover:ring-zinc-300"
+      className="inline-flex items-center gap-1 rounded-full bg-zinc-50 dark:bg-zinc-950 px-2.5 py-0.5 text-xs font-medium text-zinc-600 dark:text-zinc-300 ring-1 ring-inset ring-zinc-200 dark:ring-zinc-700 transition hover:text-zinc-900 dark:hover:text-zinc-100 hover:ring-zinc-300"
     >
       Has site <ExternalLink className="h-3 w-3" />
     </a>
@@ -71,10 +71,12 @@ function WebsiteBadge({ status, website }: { status: string; website: string | n
 
 function RegistryBadge({ status, businessId }: { status: string; businessId: string | null }) {
   const styles: Record<string, string> = {
-    matched: "bg-emerald-50 text-emerald-800 ring-emerald-200",
-    low_confidence: "bg-amber-50 text-amber-800 ring-amber-200",
-    no_match: "bg-zinc-50 text-zinc-500 ring-zinc-200",
-    unchecked: "bg-zinc-50 text-zinc-400 ring-zinc-200",
+    matched:
+      "bg-emerald-50 text-emerald-800 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/25",
+    low_confidence:
+      "bg-amber-50 text-amber-800 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/25",
+    no_match: "bg-zinc-50 dark:bg-zinc-950 text-zinc-500 dark:text-zinc-400 ring-zinc-200 dark:ring-zinc-700",
+    unchecked: "bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-zinc-500 ring-zinc-200 dark:ring-zinc-700",
   };
   const labels: Record<string, string> = {
     matched: businessId ?? "Matched",
@@ -133,13 +135,13 @@ export function LeadsTable({ leads }: { leads: LeadRow[] }) {
   ] as const;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
       {/* toolbar */}
-      <div className="flex flex-wrap items-center gap-3 border-b border-zinc-100 px-4 py-3">
+      <div className="flex flex-wrap items-center gap-3 border-b border-zinc-100 dark:border-zinc-800 px-4 py-3">
         <div
           role="group"
           aria-label="Website status filter"
-          className="inline-flex rounded-lg border border-zinc-200 bg-zinc-50 p-0.5"
+          className="inline-flex rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 p-0.5"
         >
           {segmented.map((seg) => (
             <button
@@ -150,8 +152,8 @@ export function LeadsTable({ leads }: { leads: LeadRow[] }) {
               className={cn(
                 "cursor-pointer rounded-md px-3 py-1.5 text-xs font-medium transition",
                 noWebOnly === seg.value
-                  ? "bg-white text-zinc-900 shadow-sm ring-1 ring-zinc-200"
-                  : "text-zinc-500 hover:text-zinc-800",
+                  ? "bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700"
+                  : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-100",
               )}
             >
               {seg.label}
@@ -160,23 +162,23 @@ export function LeadsTable({ leads }: { leads: LeadRow[] }) {
         </div>
 
         <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Filter by name, area, category…"
             aria-label="Filter leads"
-            className="w-60 rounded-lg border border-zinc-300 bg-white py-1.5 pl-9 pr-3 text-sm outline-none transition placeholder:text-zinc-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+            className="w-60 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 py-1.5 pl-9 pr-3 text-sm text-zinc-900 dark:text-zinc-100 outline-none transition placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
           />
         </div>
 
-        <span className="rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-medium tabular-nums text-zinc-600">
+        <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 text-xs font-medium tabular-nums text-zinc-600 dark:text-zinc-300">
           {filtered.length} / {leads.length}
         </span>
 
         <a
           href="/dashboard/leads/export"
-          className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-700 shadow-sm transition hover:border-zinc-400 hover:bg-zinc-50"
+          className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm text-zinc-700 dark:text-zinc-300 shadow-sm transition hover:border-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800"
         >
           <Download className="h-4 w-4" /> Export CSV
         </a>
@@ -184,7 +186,7 @@ export function LeadsTable({ leads }: { leads: LeadRow[] }) {
 
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-zinc-200 bg-zinc-50/70 text-[11px] uppercase tracking-wider text-zinc-500">
+          <thead className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-950/70 text-[11px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
             <tr>
               <th className="px-4 py-3 font-medium">Business</th>
               <th className="px-4 py-3 font-medium">Website</th>
@@ -195,16 +197,16 @@ export function LeadsTable({ leads }: { leads: LeadRow[] }) {
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-100">
+          <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
             {filtered.map((l) => (
               <tr
                 key={l.id}
                 className="group align-top transition-colors hover:bg-indigo-50/30"
               >
                 <td className="px-4 py-3">
-                  <div className="font-medium text-zinc-900">{l.name}</div>
-                  <div className="text-xs text-zinc-500">{l.address ?? "—"}</div>
-                  <div className="mt-0.5 text-xs text-zinc-400">
+                  <div className="font-medium text-zinc-900 dark:text-zinc-100">{l.name}</div>
+                  <div className="text-xs text-zinc-500 dark:text-zinc-400">{l.address ?? "—"}</div>
+                  <div className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
                     {[l.category, l.phone].filter(Boolean).join(" · ") || "—"}
                   </div>
                 </td>
@@ -227,7 +229,7 @@ export function LeadsTable({ leads }: { leads: LeadRow[] }) {
                       defaultValue={l.crm_status}
                       onChange={(e) => onStatusChange(l.id, e.target.value)}
                       aria-label={`CRM status for ${l.name}`}
-                      className="cursor-pointer appearance-none rounded-lg border border-zinc-200 bg-white py-1.5 pl-7 pr-7 text-xs font-medium capitalize text-zinc-700 shadow-sm outline-none transition hover:border-zinc-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                      className="cursor-pointer appearance-none rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-1.5 pl-7 pr-7 text-xs font-medium capitalize text-zinc-700 dark:text-zinc-300 shadow-sm outline-none transition hover:border-zinc-300 dark:hover:border-zinc-600 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                     >
                       {CRM_STATUSES.map((s) => (
                         <option key={s} value={s} className="capitalize">
@@ -237,7 +239,7 @@ export function LeadsTable({ leads }: { leads: LeadRow[] }) {
                     </select>
                     <ChevronDown
                       aria-hidden
-                      className="pointer-events-none absolute right-2 h-3.5 w-3.5 text-zinc-400"
+                      className="pointer-events-none absolute right-2 h-3.5 w-3.5 text-zinc-400 dark:text-zinc-500"
                     />
                   </div>
                 </td>
@@ -253,7 +255,7 @@ export function LeadsTable({ leads }: { leads: LeadRow[] }) {
                       onClick={() => onDelete(l.id, l.name)}
                       aria-label={`Delete lead ${l.name}`}
                       title="Delete lead"
-                      className="cursor-pointer rounded-lg p-2 text-zinc-400 transition hover:bg-red-50 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40"
+                      className="cursor-pointer rounded-lg p-2 text-zinc-400 dark:text-zinc-500 transition hover:bg-red-50 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -267,27 +269,27 @@ export function LeadsTable({ leads }: { leads: LeadRow[] }) {
         {filtered.length === 0 ? (
           leads.length === 0 ? (
             <div className="flex flex-col items-center px-6 py-16 text-center">
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-indigo-50 text-indigo-500 ring-1 ring-inset ring-indigo-100">
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 ring-1 ring-inset ring-indigo-100 dark:ring-indigo-500/20">
                 <Inbox className="h-6 w-6" />
               </div>
-              <h3 className="mt-4 text-sm font-semibold text-zinc-900">
+              <h3 className="mt-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                 No leads yet
               </h3>
-              <p className="mt-1 max-w-sm text-sm text-zinc-500">
+              <p className="mt-1 max-w-sm text-sm text-zinc-500 dark:text-zinc-400">
                 Run your first search above — try a niche like{" "}
-                <span className="font-medium text-zinc-700">barbershop</span> in
+                <span className="font-medium text-zinc-700 dark:text-zinc-300">barbershop</span> in
                 your city, and leads will land here.
               </p>
             </div>
           ) : (
             <div className="flex flex-col items-center px-6 py-16 text-center">
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-zinc-100 text-zinc-400">
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500">
                 <SearchX className="h-6 w-6" />
               </div>
-              <h3 className="mt-4 text-sm font-semibold text-zinc-900">
+              <h3 className="mt-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                 No leads match your filters
               </h3>
-              <p className="mt-1 text-sm text-zinc-500">
+              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                 Try clearing the filters to see all {leads.length} leads.
               </p>
               <button
@@ -296,7 +298,7 @@ export function LeadsTable({ leads }: { leads: LeadRow[] }) {
                   setQuery("");
                   setNoWebOnly(false);
                 }}
-                className="mt-4 cursor-pointer rounded-lg border border-zinc-300 bg-white px-3.5 py-1.5 text-sm font-medium text-zinc-700 shadow-sm transition hover:bg-zinc-50"
+                className="mt-4 cursor-pointer rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3.5 py-1.5 text-sm font-medium text-zinc-700 dark:text-zinc-300 shadow-sm transition hover:bg-zinc-50 dark:hover:bg-zinc-800"
               >
                 Clear filters
               </button>

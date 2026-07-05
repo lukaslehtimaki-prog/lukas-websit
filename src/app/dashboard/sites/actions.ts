@@ -8,8 +8,21 @@ import { createClient } from "@/lib/supabase/server";
 import { isAIConfigured, isPlacesConfigured } from "@/lib/env";
 import { getPlaceDetails, resolvePlace } from "@/lib/places/client";
 import { generateWebsiteContent, fallbackContent } from "@/lib/ai/website-content";
+import {
+  inferSiteKind,
+  defaultMembershipPlans,
+} from "@/lib/templates/site-kind";
+import { uploadSiteImage } from "@/lib/sites/images";
 import { checkLimit, recordUsage } from "@/lib/usage";
-import type { BusinessInfo, SiteContent } from "@/lib/templates/types";
+import type { BusinessInfo, SiteContent, SiteReview } from "@/lib/templates/types";
+
+/** Tag the site with its business kind + starter data for the extra section. */
+function applyKind(content: SiteContent, info: BusinessInfo, templateId: string) {
+  content.kind = inferSiteKind(info.category, templateId, info.name);
+  if (content.kind === "membership" && !content.membershipPlans?.length) {
+    content.membershipPlans = defaultMembershipPlans();
+  }
+}
 
 export type NewSiteState = { error?: string };
 
@@ -27,15 +40,16 @@ async function buildContent(info: BusinessInfo): Promise<SiteContent> {
 async function leadToBusinessInfo(
   supabase: Awaited<ReturnType<typeof createClient>>,
   lead: any,
-): Promise<BusinessInfo> {
+): Promise<{ info: BusinessInfo; reviews: SiteReview[] }> {
   let phone: string | null = lead.phone ?? null;
   let hours: string[] | null = null;
   let address: string | null = lead.address ?? null;
   let category: string | null = lead.category ?? null;
   let website: string | null = lead.website ?? null;
+  let reviews: SiteReview[] = [];
 
-  // On-demand Enterprise-tier detail fetch (phone / hours) only when building a site.
-  if (lead.place_id && !phone) {
+  // On-demand detail fetch (phone / hours / Google reviews) when building a site.
+  if (lead.place_id) {
     try {
       const d = await getPlaceDetails(lead.place_id);
       phone = d.phone ?? phone;
@@ -43,6 +57,7 @@ async function leadToBusinessInfo(
       address = d.address ?? address;
       category = d.category ?? category;
       website = d.website ?? website;
+      reviews = d.reviews;
       if (phone && phone !== lead.phone) {
         await supabase.from("leads").update({ phone }).eq("id", lead.id);
       }
@@ -51,7 +66,7 @@ async function leadToBusinessInfo(
     }
   }
 
-  return {
+  const info: BusinessInfo = {
     name: lead.name,
     category,
     address,
@@ -63,6 +78,7 @@ async function leadToBusinessInfo(
     businessId: lead.business_id ?? null,
     industryLabel: null,
   };
+  return { info, reviews };
 }
 
 export async function createSiteFromLead(
@@ -97,8 +113,10 @@ export async function createSiteFromLead(
     .maybeSingle();
   if (!lead) return { error: "Lead not found." };
 
-  const info = await leadToBusinessInfo(supabase, lead);
+  const { info, reviews } = await leadToBusinessInfo(supabase, lead);
   const content = await buildContent(info);
+  if (reviews.length) content.reviews = reviews;
+  applyKind(content, info, templateId);
 
   const { data: site, error } = await supabase
     .from("sites")
@@ -169,6 +187,8 @@ export async function createSiteFromInput(
     industryLabel: null,
   };
   const content = await buildContent(info);
+  if (details.reviews?.length) content.reviews = details.reviews;
+  applyKind(content, info, templateId);
 
   const supabase = await createClient();
   const { data: site, error } = await supabase
@@ -204,7 +224,8 @@ export async function regenerateContent(
     .select("content")
     .eq("id", siteId)
     .maybeSingle();
-  const source = (site as any)?.content?.source as BusinessInfo | undefined;
+  const existing = (site as any)?.content as SiteContent | undefined;
+  const source = existing?.source;
   if (!source) return { error: "No source business data stored for this site." };
 
   let content: SiteContent;
@@ -213,6 +234,14 @@ export async function regenerateContent(
   } catch {
     return { error: "AI generation failed. Try again in a moment." };
   }
+  // Preserve real reviews + the chosen design + kind across an AI copy refresh.
+  if (existing?.reviews?.length) content.reviews = existing.reviews;
+  if (existing?.designSeed != null) content.designSeed = existing.designSeed;
+  if (existing?.kind) content.kind = existing.kind;
+  if (existing?.membershipPlans?.length)
+    content.membershipPlans = existing.membershipPlans;
+  if (existing?.heroImage) content.heroImage = existing.heroImage;
+  if (existing?.gallery?.length) content.gallery = existing.gallery;
   await supabase
     .from("sites")
     .update({ content, updated_at: new Date().toISOString() })
@@ -252,6 +281,26 @@ export async function setSiteStatus(
     .eq("id", siteId);
   revalidatePath(`/dashboard/sites/${siteId}`);
   revalidatePath("/dashboard/sites");
+}
+
+export async function uploadSiteImageAction(
+  formData: FormData,
+): Promise<{ url?: string; error?: string }> {
+  const ctx = await requireTenantContext();
+  const siteId = String(formData.get("siteId") ?? "misc");
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0)
+    return { error: "No image selected." };
+  if (!file.type.startsWith("image/"))
+    return { error: "Please choose an image file." };
+  if (file.size > 5 * 1024 * 1024)
+    return { error: "Image must be under 5 MB." };
+  try {
+    const url = await uploadSiteImage(ctx.tenantId, siteId, file);
+    return { url };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Upload failed." };
+  }
 }
 
 export async function deleteSite(siteId: string): Promise<void> {

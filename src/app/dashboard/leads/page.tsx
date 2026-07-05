@@ -32,10 +32,10 @@ export default async function LeadsPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
             Lead Finder
           </h1>
-          <p className="mt-1 max-w-xl text-sm text-zinc-500">
+          <p className="mt-1 max-w-xl text-sm text-zinc-500 dark:text-zinc-400">
             Search a niche and location to find local businesses,
             cross-referenced with the YTJ registry and flagged by website
             status.
@@ -45,14 +45,14 @@ export default async function LeadsPage() {
           {stats.map(({ icon: Icon, label, value }) => (
             <div
               key={label}
-              className="flex items-center gap-2.5 rounded-xl border border-zinc-200 bg-white px-3.5 py-2 shadow-sm"
+              className="flex items-center gap-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3.5 py-2 shadow-sm"
             >
               <Icon className="h-4 w-4 text-indigo-500" />
               <div>
-                <div className="text-sm font-semibold tabular-nums leading-tight text-zinc-900">
+                <div className="text-sm font-semibold tabular-nums leading-tight text-zinc-900 dark:text-zinc-100">
                   {value}
                 </div>
-                <div className="text-[11px] leading-tight text-zinc-400">
+                <div className="text-[11px] leading-tight text-zinc-400 dark:text-zinc-500">
                   {label}
                 </div>
               </div>

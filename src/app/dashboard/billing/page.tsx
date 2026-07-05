@@ -31,8 +31,8 @@ export default async function BillingPage({
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-zinc-900">Billing</h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Billing</h1>
+        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
           Manage your plan, trial, and payment method.
         </p>
       </div>
@@ -44,7 +44,7 @@ export default async function BillingPage({
         </div>
       ) : null}
       {sp.canceled ? (
-        <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600">
+        <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 p-4 text-sm text-zinc-600 dark:text-zinc-300">
           Checkout canceled — no charge was made.
         </div>
       ) : null}
@@ -54,11 +54,11 @@ export default async function BillingPage({
         </div>
       ) : null}
 
-      <div className="rounded-2xl border border-zinc-200/70 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-zinc-200/70 dark:border-zinc-800/70 bg-white dark:bg-zinc-900 p-6 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-sm text-zinc-500">Current plan</p>
-            <p className="mt-0.5 text-xl font-semibold text-zinc-900">
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">Current plan</p>
+            <p className="mt-0.5 text-xl font-semibold text-zinc-900 dark:text-zinc-100">
               {plan.label}
             </p>
           </div>
@@ -67,16 +67,16 @@ export default async function BillingPage({
           </Badge>
         </div>
         {ctx.isPlatformAdmin ? (
-          <p className="mt-3 text-sm text-indigo-600">
+          <p className="mt-3 text-sm text-indigo-600 dark:text-indigo-400">
             Platform admin — full access regardless of plan.
           </p>
         ) : active ? (
-          <p className="mt-3 text-sm text-zinc-500">
+          <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
             {plan.searches.toLocaleString()} lead searches and {plan.sites}{" "}
             websites per month.
           </p>
         ) : (
-          <p className="mt-3 text-sm text-zinc-500">
+          <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
             Start a plan to unlock lead searches and AI website generation.
           </p>
         )}

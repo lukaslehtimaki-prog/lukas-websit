@@ -19,7 +19,7 @@ export type LeadOption = {
 };
 
 const inputClass =
-  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100";
+  "w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 outline-none transition placeholder:text-zinc-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100";
 
 export function NewSiteForm({
   leads,
@@ -44,7 +44,7 @@ export function NewSiteForm({
   return (
     <div className="space-y-6">
       <div>
-        <p className="mb-2 text-sm font-medium text-zinc-700">1. Choose a template</p>
+        <p className="mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">1. Choose a template</p>
         <div className="grid gap-3 sm:grid-cols-3">
           {TEMPLATES.map((t) => (
             <button
@@ -54,30 +54,30 @@ export function NewSiteForm({
               className={cn(
                 "rounded-xl border p-4 text-left transition",
                 templateId === t.id
-                  ? "border-indigo-500 ring-2 ring-indigo-100"
-                  : "border-zinc-200 hover:border-zinc-300",
+                  ? "border-indigo-500 ring-2 ring-indigo-100 dark:ring-indigo-500/20"
+                  : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-600",
               )}
             >
               <span
                 className="inline-block h-3 w-3 rounded-full"
                 style={{ background: t.accent }}
               />
-              <p className="mt-2 text-sm font-medium text-zinc-900">{t.name}</p>
-              <p className="mt-0.5 text-xs text-zinc-500">{t.description}</p>
+              <p className="mt-2 text-sm font-medium text-zinc-900 dark:text-zinc-100">{t.name}</p>
+              <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{t.description}</p>
             </button>
           ))}
         </div>
       </div>
 
       <div>
-        <p className="mb-2 text-sm font-medium text-zinc-700">2. Choose the source</p>
-        <div className="mb-3 inline-flex rounded-lg border border-zinc-200 p-0.5 text-sm">
+        <p className="mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">2. Choose the source</p>
+        <div className="mb-3 inline-flex rounded-lg border border-zinc-200 dark:border-zinc-800 p-0.5 text-sm">
           <button
             type="button"
             onClick={() => setMode("lead")}
             className={cn(
               "rounded-md px-3 py-1.5",
-              mode === "lead" ? "bg-zinc-900 text-white" : "text-zinc-600",
+              mode === "lead" ? "bg-zinc-900 text-white" : "text-zinc-600 dark:text-zinc-300",
             )}
           >
             From a lead
@@ -87,7 +87,7 @@ export function NewSiteForm({
             onClick={() => setMode("link")}
             className={cn(
               "rounded-md px-3 py-1.5",
-              mode === "link" ? "bg-zinc-900 text-white" : "text-zinc-600",
+              mode === "link" ? "bg-zinc-900 text-white" : "text-zinc-600 dark:text-zinc-300",
             )}
           >
             From a link
@@ -97,11 +97,11 @@ export function NewSiteForm({
         {mode === "lead" ? (
           <form
             action={leadAction}
-            className="rounded-xl border border-zinc-200 bg-white p-4"
+            className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4"
           >
             <input type="hidden" name="templateId" value={templateId} />
             <label className="block space-y-1.5">
-              <span className="text-xs font-medium text-zinc-600">Lead</span>
+              <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Lead</span>
               <select
                 name="leadId"
                 defaultValue={preselectedLeadId ?? ""}
@@ -135,11 +135,11 @@ export function NewSiteForm({
         ) : (
           <form
             action={linkAction}
-            className="rounded-xl border border-zinc-200 bg-white p-4"
+            className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4"
           >
             <input type="hidden" name="templateId" value={templateId} />
             <label className="block space-y-1.5">
-              <span className="text-xs font-medium text-zinc-600">
+              <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
                 Google Maps link, or business name + city
               </span>
               <input

@@ -828,7 +828,15 @@ function SiteFooter() {
         </div>
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/5 pt-6 text-sm text-zinc-500 sm:flex-row">
           <p>© {new Date().getFullYear()} Sitexa. All rights reserved.</p>
-          <p className="font-mono text-xs">sitexa.ai</p>
+          <div className="flex items-center gap-6">
+            <Link href="/privacy" className="transition hover:text-white">
+              Privacy
+            </Link>
+            <Link href="/terms" className="transition hover:text-white">
+              Terms
+            </Link>
+            <span className="font-mono text-xs">sitexa.ai</span>
+          </div>
         </div>
       </Container>
     </footer>

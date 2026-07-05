@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,10 +13,49 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const title =
+  "Sitexa — find local businesses without a website & build them one with AI";
+const description =
+  "Sitexa scans Google Places, cross-checks Finland's official YTJ registry, and turns businesses with no website into ready-to-launch AI sites — all from one dashboard.";
+
 export const metadata: Metadata = {
-  title: "Sitexa — find local businesses without a website",
-  description:
-    "Find Finnish local businesses with no website using Google Places and the YTJ registry, then generate a ready-to-launch site with AI.",
+  metadataBase: new URL(siteUrl),
+  title,
+  description,
+  applicationName: "Sitexa",
+  keywords: [
+    "lead generation",
+    "Finnish businesses",
+    "no website leads",
+    "AI website builder",
+    "YTJ registry",
+    "Google Places leads",
+    "local business outreach",
+    "freelancer tools",
+    "agency lead finder",
+  ],
+  authors: [{ name: "Sitexa" }],
+  creator: "Sitexa",
+  category: "business software",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: "Sitexa",
+    title,
+    description,
+    url: siteUrl,
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
 };
 
 export default function RootLayout({

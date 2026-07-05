@@ -16,7 +16,7 @@ export type VideoItem = {
 };
 
 const statusStyles: Record<string, string> = {
-  draft: "bg-zinc-100 text-zinc-600",
+  draft: "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300",
   queued: "bg-amber-100 text-amber-700",
   rendering: "bg-amber-100 text-amber-700",
   ready: "bg-emerald-100 text-emerald-700",
@@ -44,9 +44,9 @@ export function VideoCard({
   const words = wordCount(script);
 
   return (
-    <div className="flex flex-col rounded-xl border border-zinc-200 bg-white p-4">
+    <div className="flex flex-col rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-zinc-500">
+        <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
           #{index + 1} · {video.hookLabel || "Pitch"}
         </span>
         <span
@@ -70,19 +70,19 @@ export function VideoCard({
           <a
             href={video.signedUrl}
             download
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-500"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500"
           >
             <Download className="h-4 w-4" /> Download MP4
             {video.durationSeconds ? (
-              <span className="text-zinc-400">· {video.durationSeconds}s</span>
+              <span className="text-zinc-400 dark:text-zinc-500">· {video.durationSeconds}s</span>
             ) : null}
           </a>
         </div>
       ) : video.status === "queued" || video.status === "rendering" ? (
-        <div className="mt-3 grid aspect-[9/16] w-full place-items-center rounded-lg bg-zinc-50">
+        <div className="mt-3 grid aspect-[9/16] w-full place-items-center rounded-lg bg-zinc-50 dark:bg-zinc-950">
           <div className="text-center">
-            <Loader2 className="mx-auto h-5 w-5 animate-spin text-zinc-400" />
-            <p className="mt-2 text-xs text-zinc-500">Rendering…</p>
+            <Loader2 className="mx-auto h-5 w-5 animate-spin text-zinc-400 dark:text-zinc-500" />
+            <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Rendering…</p>
           </div>
         </div>
       ) : null}
@@ -101,20 +101,20 @@ export function VideoCard({
                 setSaved(false);
               }}
               rows={6}
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+              className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
             />
             <div className="mt-1.5 flex items-center justify-between">
               <span
                 className={cn(
                   "text-xs",
-                  words > 90 ? "text-amber-600" : "text-zinc-400",
+                  words > 90 ? "text-amber-600" : "text-zinc-400 dark:text-zinc-500",
                 )}
               >
                 {words} words ≈ {Math.round(words / 2.4)}s
                 {words > 90 ? " — long for a 30s video" : ""}
               </span>
               {saved ? (
-                <span className="inline-flex items-center gap-1 text-xs text-zinc-400">
+                <span className="inline-flex items-center gap-1 text-xs text-zinc-400 dark:text-zinc-500">
                   <Check className="h-3 w-3" /> Saved
                 </span>
               ) : (
@@ -129,7 +129,7 @@ export function VideoCard({
                       else setSaved(true);
                     })
                   }
-                  className="text-xs font-medium text-indigo-600 hover:text-indigo-500 disabled:opacity-60"
+                  className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 disabled:opacity-60"
                 >
                   {pending ? "Saving…" : "Save script"}
                 </button>
@@ -137,7 +137,7 @@ export function VideoCard({
             </div>
           </>
         ) : (
-          <p className="text-sm leading-relaxed text-zinc-600">{script}</p>
+          <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">{script}</p>
         )}
         {error ? <p className="mt-1 text-xs text-red-600">{error}</p> : null}
       </div>

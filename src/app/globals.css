@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/* Manual (class-based) dark mode: `dark:` utilities apply under a .dark ancestor. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Make native form controls, scrollbars, and default input colors dark-aware. */
+.dark {
+  color-scheme: dark;
+}
+
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);

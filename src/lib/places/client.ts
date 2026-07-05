@@ -27,11 +27,19 @@ export type PlaceCandidate = {
   lng: number | null;
 };
 
+export type PlaceReview = {
+  author: string;
+  rating: number;
+  text: string;
+  relativeTime: string | null;
+};
+
 export type PlaceDetails = PlaceCandidate & {
   phone: string | null;
   openingHours: string[] | null;
   rating: number | null;
   photoNames: string[];
+  reviews: PlaceReview[];
 };
 
 export class PlacesError extends Error {}
@@ -49,6 +57,13 @@ type GooglePlace = {
   regularOpeningHours?: { weekdayDescriptions?: string[] };
   rating?: number;
   photos?: { name?: string }[];
+  reviews?: {
+    rating?: number;
+    text?: { text?: string };
+    originalText?: { text?: string };
+    authorAttribution?: { displayName?: string };
+    relativePublishTimeDescription?: string;
+  }[];
 };
 
 // Pro-tier field mask for Text Search (websiteUri => no-website detection).
@@ -63,7 +78,8 @@ const TEXT_SEARCH_FIELDS = [
   "nextPageToken",
 ].join(",");
 
-// Includes Enterprise-tier fields (phone, opening hours) — on-demand only.
+// Includes Enterprise + Atmosphere-tier fields (phone, hours, reviews) — on-demand
+// only, fetched once per site build (a deliberate, plan-limited action).
 const DETAILS_FIELDS = [
   "id",
   "displayName",
@@ -77,6 +93,7 @@ const DETAILS_FIELDS = [
   "regularOpeningHours",
   "rating",
   "photos",
+  "reviews",
 ].join(",");
 
 function toCandidate(p: GooglePlace): PlaceCandidate {
@@ -186,7 +203,20 @@ export async function getPlaceDetails(placeId: string): Promise<PlaceDetails> {
     openingHours: p.regularOpeningHours?.weekdayDescriptions ?? null,
     rating: p.rating ?? null,
     photoNames: (p.photos ?? []).map((ph) => ph.name ?? "").filter(Boolean),
+    reviews: parseReviews(p),
   };
+}
+
+/** Map Google review objects to our compact shape, dropping empty ones. */
+function parseReviews(p: GooglePlace): PlaceReview[] {
+  return (p.reviews ?? [])
+    .map((rv) => ({
+      author: rv.authorAttribution?.displayName?.trim() || "Google-käyttäjä",
+      rating: typeof rv.rating === "number" ? rv.rating : 0,
+      text: (rv.text?.text ?? rv.originalText?.text ?? "").trim(),
+      relativeTime: rv.relativePublishTimeDescription ?? null,
+    }))
+    .filter((rv) => rv.text.length > 0);
 }
 
 /** Geocode a free-text location to coordinates so a radius bias can be applied. */
@@ -247,6 +277,13 @@ export async function resolvePlace(input: string): Promise<PlaceDetails | null> 
   try {
     return await getPlaceDetails(top.placeId);
   } catch {
-    return { ...top, phone: null, openingHours: null, rating: null, photoNames: [] };
+    return {
+      ...top,
+      phone: null,
+      openingHours: null,
+      rating: null,
+      photoNames: [],
+      reviews: [],
+    };
   }
 }

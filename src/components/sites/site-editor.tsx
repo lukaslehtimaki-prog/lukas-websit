@@ -1,6 +1,13 @@
 "use client";
 
-import { useMemo, useState, useTransition, type ReactNode } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+  type ChangeEvent,
+  type ReactNode,
+} from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -11,16 +18,31 @@ import {
   Plus,
   X,
   Loader2,
+  Shuffle,
+  Globe,
+  Copy,
+  ExternalLink,
+  ImagePlus,
 } from "lucide-react";
 import {
   updateSiteContent,
   regenerateContent,
   setSiteStatus,
   deleteSite,
+  uploadSiteImageAction,
 } from "@/app/dashboard/sites/actions";
 import { renderSiteToHtml } from "@/lib/templates/render";
-import { TEMPLATES, type SiteContent } from "@/lib/templates/types";
+import { defaultMembershipPlans } from "@/lib/templates/site-kind";
+import {
+  TEMPLATES,
+  type SiteContent,
+  type MembershipPlan,
+  type SiteKind,
+} from "@/lib/templates/types";
 import { cn } from "@/lib/utils";
+
+const fieldCls =
+  "rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none focus:border-indigo-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:placeholder:text-zinc-500";
 
 function slugify(s: string): string {
   return (
@@ -49,7 +71,12 @@ export function SiteEditor({
   const [templateId, setTemplateId] = useState(initialTemplateId);
   const [status, setStatus] = useState(initialStatus);
   const [message, setMessage] = useState<string | null>(null);
+  const [origin, setOrigin] = useState("");
+  const [uploading, setUploading] = useState<null | "hero" | "gallery">(null);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => setOrigin(window.location.origin), []);
+  const liveUrl = `${origin}/s/${siteId}`;
 
   const html = useMemo(
     () => renderSiteToHtml(content, templateId),
@@ -61,6 +88,22 @@ export function SiteEditor({
   }
   function patchContact(p: Partial<SiteContent["contact"]>) {
     setContent((prev) => ({ ...prev, contact: { ...prev.contact, ...p } }));
+  }
+  function shuffleStyle() {
+    setMessage("New style — Save to keep it");
+    patch({ designSeed: Math.floor(Math.random() * 1_000_000) });
+  }
+  function setKind(kind: SiteKind) {
+    patch({
+      kind,
+      membershipPlans:
+        kind === "membership" && !content.membershipPlans?.length
+          ? defaultMembershipPlans()
+          : content.membershipPlans,
+    });
+  }
+  function setPlans(next: MembershipPlan[]) {
+    patch({ membershipPlans: next });
   }
 
   function save() {
@@ -81,6 +124,55 @@ export function SiteEditor({
     setStatus(s);
     startTransition(async () => {
       await setSiteStatus(siteId, s);
+    });
+  }
+  function publish() {
+    startTransition(async () => {
+      await updateSiteContent(siteId, content, templateId);
+      await setSiteStatus(siteId, "published");
+      setStatus("published");
+      setMessage("Published ✓ — live link ready");
+    });
+  }
+  function copyLink() {
+    navigator.clipboard?.writeText(liveUrl);
+    setMessage("Link copied ✓");
+  }
+  async function uploadImage(file: File): Promise<string | null> {
+    const fd = new FormData();
+    fd.append("siteId", siteId);
+    fd.append("file", file);
+    const r = await uploadSiteImageAction(fd);
+    if (r.error) {
+      setMessage(r.error);
+      return null;
+    }
+    return r.url ?? null;
+  }
+  function onHeroFile(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setUploading("hero");
+    startTransition(async () => {
+      const url = await uploadImage(file);
+      if (url) patch({ heroImage: url });
+      setUploading(null);
+    });
+  }
+  function onGalleryFiles(e: ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = "";
+    if (!files.length) return;
+    setUploading("gallery");
+    startTransition(async () => {
+      const urls: string[] = [];
+      for (const f of files) {
+        const u = await uploadImage(f);
+        if (u) urls.push(u);
+      }
+      if (urls.length) patch({ gallery: [...(content.gallery ?? []), ...urls] });
+      setUploading(null);
     });
   }
   function onDelete() {
@@ -107,7 +199,7 @@ export function SiteEditor({
       <div className="flex flex-wrap items-center gap-2">
         <Link
           href="/dashboard/sites"
-          className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800"
+          className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-800 dark:hover:text-zinc-100"
         >
           <ArrowLeft className="h-4 w-4" /> Sites
         </Link>
@@ -115,8 +207,8 @@ export function SiteEditor({
         <select
           value={templateId}
           onChange={(e) => setTemplateId(e.target.value)}
-          className="rounded-lg border border-zinc-300 px-2 py-1.5 text-sm"
-          title="Template"
+          className="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-2 py-1.5 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
+          title="Template category"
         >
           {TEMPLATES.map((t) => (
             <option key={t.id} value={t.id}>
@@ -125,10 +217,18 @@ export function SiteEditor({
           ))}
         </select>
 
+        <button
+          onClick={shuffleStyle}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 px-2.5 py-1.5 text-sm text-zinc-700 dark:text-zinc-300 transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:hover:text-indigo-300"
+          title="Shuffle the visual design (palette, fonts, layout)"
+        >
+          <Shuffle className="h-4 w-4" /> Shuffle style
+        </button>
+
         <select
           value={status}
           onChange={(e) => changeStatus(e.target.value)}
-          className="rounded-lg border border-zinc-300 px-2 py-1.5 text-sm capitalize"
+          className="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-2 py-1.5 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 capitalize"
           title="Status"
         >
           <option value="draft">Draft</option>
@@ -138,13 +238,13 @@ export function SiteEditor({
 
         <div className="ml-auto flex items-center gap-2">
           {message ? (
-            <span className="text-xs text-zinc-500">{message}</span>
+            <span className="text-xs text-zinc-500 dark:text-zinc-400">{message}</span>
           ) : null}
           {aiEnabled ? (
             <button
               onClick={regenerate}
               disabled={isPending}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 transition hover:bg-zinc-50 disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 px-3 py-1.5 text-sm text-zinc-700 dark:text-zinc-300 transition hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-60"
             >
               {isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -156,7 +256,7 @@ export function SiteEditor({
           ) : null}
           <button
             onClick={download}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 transition hover:bg-zinc-50"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 px-3 py-1.5 text-sm text-zinc-700 dark:text-zinc-300 transition hover:bg-zinc-50 dark:hover:bg-zinc-800"
           >
             <Download className="h-4 w-4" /> Download
           </button>
@@ -169,7 +269,7 @@ export function SiteEditor({
           </button>
           <button
             onClick={onDelete}
-            className="rounded-lg p-1.5 text-zinc-400 transition hover:bg-red-50 hover:text-red-600"
+            className="rounded-lg p-1.5 text-zinc-400 dark:text-zinc-500 transition hover:bg-red-50 hover:text-red-600"
             title="Delete site"
           >
             <Trash2 className="h-4 w-4" />
@@ -177,15 +277,183 @@ export function SiteEditor({
         </div>
       </div>
 
+      {/* Publish */}
+      <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        {status === "published" ? (
+          <div>
+            <div className="flex items-center gap-2 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+              <span className="grid h-6 w-6 place-items-center rounded-full bg-emerald-100 dark:bg-emerald-500/15">
+                <Globe className="h-3.5 w-3.5" />
+              </span>
+              Live website
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <input
+                readOnly
+                value={liveUrl}
+                onFocus={(e) => e.currentTarget.select()}
+                className={cn("min-w-0 flex-1 font-mono text-xs", fieldCls)}
+              />
+              <button
+                onClick={copyLink}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              >
+                <Copy className="h-4 w-4" /> Copy
+              </button>
+              <a
+                href={liveUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              >
+                <ExternalLink className="h-4 w-4" /> Open
+              </a>
+              <button
+                onClick={() => changeStatus("generated")}
+                className="rounded-lg px-3 py-1.5 text-sm text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100"
+              >
+                Unpublish
+              </button>
+            </div>
+            <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+              Share this link with the client. Changes go live when you Save. To
+              use a custom domain, point it here.
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                Publish this website
+              </div>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                One click puts it online at a shareable link — no hosting setup.
+              </p>
+            </div>
+            <button
+              onClick={publish}
+              disabled={isPending}
+              className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:brightness-110 disabled:opacity-60"
+            >
+              {isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Globe className="h-4 w-4" />
+              )}
+              Publish website
+            </button>
+          </div>
+        )}
+      </div>
+
       <div className="grid gap-5 lg:grid-cols-2">
         {/* Editor */}
         <div className="space-y-5">
+          <Section title="Site type">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Adds the right section: a booking form for appointment businesses,
+              or membership pricing for gyms &amp; studios.
+            </p>
+            <select
+              value={content.kind ?? "standard"}
+              onChange={(e) => setKind(e.target.value as SiteKind)}
+              className={cn("w-full cursor-pointer appearance-none", fieldCls)}
+            >
+              <option value="standard">Standard</option>
+              <option value="booking">Booking — barber, salon, clinic</option>
+              <option value="membership">Membership — gym, studio</option>
+            </select>
+          </Section>
+
           <Section title="Hero">
             <Text label="Business name" value={content.businessName} onChange={(v) => patch({ businessName: v })} />
             <Text label="Tagline" value={content.tagline} onChange={(v) => patch({ tagline: v })} />
             <Text label="Heading" value={content.heroHeading} onChange={(v) => patch({ heroHeading: v })} />
             <Text label="Subtext" value={content.heroSubtext} onChange={(v) => patch({ heroSubtext: v })} textarea />
             <Text label="Button text" value={content.ctaText} onChange={(v) => patch({ ctaText: v })} />
+          </Section>
+
+          <Section title="Images">
+            <div>
+              <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
+                Hero image
+              </span>
+              {content.heroImage ? (
+                <div className="relative mt-1.5 overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={content.heroImage}
+                    alt="Hero"
+                    className="h-32 w-full object-cover"
+                  />
+                  <button
+                    onClick={() => patch({ heroImage: null })}
+                    className="absolute right-2 top-2 rounded-md bg-black/60 p-1 text-white hover:bg-black/80"
+                    title="Remove image"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <label className="mt-1.5 flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-zinc-300 py-6 text-sm text-zinc-500 transition hover:border-indigo-400 hover:text-indigo-600 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-indigo-500">
+                  {uploading === "hero" ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <ImagePlus className="h-5 w-5" />
+                  )}
+                  {uploading === "hero" ? "Uploading…" : "Upload hero image"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={onHeroFile}
+                  />
+                </label>
+              )}
+            </div>
+            <div>
+              <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
+                Gallery
+              </span>
+              <div className="mt-1.5 grid grid-cols-3 gap-2">
+                {(content.gallery ?? []).map((url, i) => (
+                  <div
+                    key={i}
+                    className="relative overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt="" className="h-20 w-full object-cover" />
+                    <button
+                      onClick={() =>
+                        patch({
+                          gallery: (content.gallery ?? []).filter(
+                            (_, idx) => idx !== i,
+                          ),
+                        })
+                      }
+                      className="absolute right-1 top-1 rounded bg-black/60 p-0.5 text-white hover:bg-black/80"
+                      title="Remove image"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ))}
+                <label className="flex h-20 cursor-pointer items-center justify-center rounded-lg border border-dashed border-zinc-300 text-zinc-400 transition hover:border-indigo-400 hover:text-indigo-600 dark:border-zinc-700 dark:hover:border-indigo-500">
+                  {uploading === "gallery" ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Plus className="h-5 w-5" />
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={onGalleryFiles}
+                  />
+                </label>
+              </div>
+            </div>
           </Section>
 
           <Section title="About">
@@ -201,7 +469,7 @@ export function SiteEditor({
           <Section title="Services">
             <div className="space-y-3">
               {content.services.map((s, i) => (
-                <div key={i} className="rounded-lg border border-zinc-200 p-3">
+                <div key={i} className="rounded-lg border border-zinc-200 dark:border-zinc-800 p-3">
                   <div className="flex items-center gap-2">
                     <input
                       value={s.title}
@@ -213,13 +481,13 @@ export function SiteEditor({
                         })
                       }
                       placeholder="Service name"
-                      className="flex-1 rounded-md border border-zinc-300 px-2 py-1.5 text-sm font-medium"
+                      className="flex-1 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-2 py-1.5 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 font-medium"
                     />
                     <button
                       onClick={() =>
                         patch({ services: content.services.filter((_, idx) => idx !== i) })
                       }
-                      className="rounded p-1 text-zinc-400 hover:text-red-600"
+                      className="rounded p-1 text-zinc-400 dark:text-zinc-500 hover:text-red-600"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -235,7 +503,7 @@ export function SiteEditor({
                     }
                     placeholder="Short description"
                     rows={2}
-                    className="mt-2 w-full rounded-md border border-zinc-300 px-2 py-1.5 text-sm"
+                    className="mt-2 w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-2 py-1.5 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
                   />
                 </div>
               ))}
@@ -245,19 +513,95 @@ export function SiteEditor({
                     services: [...content.services, { title: "Uusi palvelu", description: "" }],
                   })
                 }
-                className="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800"
+                className="inline-flex items-center gap-1.5 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800"
               >
                 <Plus className="h-4 w-4" /> Add service
               </button>
             </div>
           </Section>
 
+          {content.kind === "membership" ? (
+            <Section title="Membership plans">
+              <div className="space-y-3">
+                {(content.membershipPlans ?? []).map((p, i) => {
+                  const plans = content.membershipPlans ?? [];
+                  const update = (u: Partial<MembershipPlan>) =>
+                    setPlans(plans.map((x, idx) => (idx === i ? { ...x, ...u } : x)));
+                  return (
+                    <div
+                      key={i}
+                      className="rounded-lg border border-zinc-200 p-3 dark:border-zinc-800"
+                    >
+                      <div className="flex items-center gap-2">
+                        <input
+                          value={p.name}
+                          onChange={(e) => update({ name: e.target.value })}
+                          placeholder="Plan name"
+                          className={cn("flex-1 font-medium", fieldCls)}
+                        />
+                        <button
+                          onClick={() => setPlans(plans.filter((_, idx) => idx !== i))}
+                          className="rounded p-1 text-zinc-400 hover:text-red-600 dark:text-zinc-500"
+                          title="Remove plan"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <input
+                          value={p.price}
+                          onChange={(e) => update({ price: e.target.value })}
+                          placeholder="29,90 €"
+                          className={cn("w-28", fieldCls)}
+                        />
+                        <input
+                          value={p.period}
+                          onChange={(e) => update({ period: e.target.value })}
+                          placeholder="/kk"
+                          className={cn("w-20", fieldCls)}
+                        />
+                        <label className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+                          <input
+                            type="checkbox"
+                            checked={!!p.highlight}
+                            onChange={(e) => update({ highlight: e.target.checked })}
+                            className="h-3.5 w-3.5"
+                          />
+                          Featured
+                        </label>
+                      </div>
+                      <div className="mt-2">
+                        <ListEditor
+                          label="Features"
+                          items={p.features}
+                          onChange={(features) => update({ features })}
+                          placeholder="e.g. Kuntosalin vapaa käyttö"
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+                <button
+                  onClick={() =>
+                    setPlans([
+                      ...(content.membershipPlans ?? []),
+                      { name: "Uusi jäsenyys", price: "0 €", period: "/kk", features: [] },
+                    ])
+                  }
+                  className="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400"
+                >
+                  <Plus className="h-4 w-4" /> Add plan
+                </button>
+              </div>
+            </Section>
+          ) : null}
+
           <Section title="Contact">
             <Text label="Address" value={content.contact.address ?? ""} onChange={(v) => patchContact({ address: v, mapsQuery: v || content.businessName })} />
             <Text label="Phone" value={content.contact.phone ?? ""} onChange={(v) => patchContact({ phone: v })} />
             <Text label="Email" value={content.contact.email ?? ""} onChange={(v) => patchContact({ email: v })} />
             {content.contact.hours?.length ? (
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-zinc-400 dark:text-zinc-500">
                 Opening hours imported from Google: {content.contact.hours.length} day(s).
               </p>
             ) : null}
@@ -266,7 +610,7 @@ export function SiteEditor({
 
         {/* Live preview */}
         <div className="lg:sticky lg:top-4 lg:h-[calc(100vh-7rem)]">
-          <div className="h-[640px] overflow-hidden rounded-xl border border-zinc-200 bg-white lg:h-full">
+          <div className="h-[640px] overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 lg:h-full">
             <iframe
               title="Website preview"
               srcDoc={html}
@@ -281,8 +625,8 @@ export function SiteEditor({
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-4">
-      <h3 className="mb-3 text-sm font-semibold text-zinc-900">{title}</h3>
+    <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+      <h3 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
       <div className="space-y-3">{children}</div>
     </div>
   );
@@ -301,19 +645,19 @@ function Text({
 }) {
   return (
     <label className="block space-y-1">
-      <span className="text-xs font-medium text-zinc-600">{label}</span>
+      <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">{label}</span>
       {textarea ? (
         <textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
           rows={3}
-          className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-sm"
+          className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-2 py-1.5 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
         />
       ) : (
         <input
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-sm"
+          className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-2 py-1.5 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
         />
       )}
     </label>
@@ -333,18 +677,18 @@ function ListEditor({
 }) {
   return (
     <div className="space-y-2">
-      <span className="text-xs font-medium text-zinc-600">{label}</span>
+      <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">{label}</span>
       {items.map((item, i) => (
         <div key={i} className="flex items-center gap-2">
           <input
             value={item}
             onChange={(e) => onChange(items.map((x, idx) => (idx === i ? e.target.value : x)))}
             placeholder={placeholder}
-            className="flex-1 rounded-md border border-zinc-300 px-2 py-1.5 text-sm"
+            className="flex-1 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-2 py-1.5 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
           />
           <button
             onClick={() => onChange(items.filter((_, idx) => idx !== i))}
-            className="rounded p-1 text-zinc-400 hover:text-red-600"
+            className="rounded p-1 text-zinc-400 dark:text-zinc-500 hover:text-red-600"
           >
             <X className="h-4 w-4" />
           </button>
@@ -352,7 +696,7 @@ function ListEditor({
       ))}
       <button
         onClick={() => onChange([...items, ""])}
-        className="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800"
+        className="inline-flex items-center gap-1.5 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800"
       >
         <Plus className="h-4 w-4" /> Add
       </button>

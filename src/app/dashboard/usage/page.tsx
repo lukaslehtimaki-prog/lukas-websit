@@ -54,8 +54,8 @@ export default async function UsagePage() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-zinc-900">Usage</h1>
-          <p className="mt-1 text-sm text-zinc-500">
+          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Usage</h1>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             Resets at the start of each month.
           </p>
         </div>
@@ -111,14 +111,14 @@ function Meter({
 }) {
   const pct = Math.min(100, Math.round((used / Math.max(1, limit)) * 100));
   return (
-    <div className="rounded-xl border border-zinc-200/70 bg-white p-5 shadow-sm">
+    <div className="rounded-xl border border-zinc-200/70 dark:border-zinc-800/70 bg-white dark:bg-zinc-900 p-5 shadow-sm">
       <div className="flex items-baseline justify-between">
-        <p className="text-sm font-medium text-zinc-700">{label}</p>
-        <p className="text-sm text-zinc-500">
+        <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{label}</p>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
           {used} / {limit.toLocaleString()}
         </p>
       </div>
-      <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-zinc-100">
+      <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
         <div
           className="h-full rounded-full bg-indigo-500"
           style={{ width: `${pct}%` }}
