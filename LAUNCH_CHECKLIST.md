@@ -56,11 +56,16 @@ Account activated (FI / EUR, charges + payouts enabled). Live products **Sitexa 
 
 ---
 
-## 🔲 Step 3b — Stripe Tax / VAT (optional, deferred earlier) **[You] + [Claude]** ⏱ ~10 min
-Now that payments are live, this is worth closing out. Stripe Tax auto-calculates and collects VAT (~0.5% fee per transaction).
+## ✅ Step 3b — Stripe Tax / VAT — **DONE (2026-07-05)**
+Checkout now calculates VAT automatically (Stripe Tax enabled, both products tagged with the correct SaaS/business-use tax code, prices set tax-exclusive, VAT-ID collection on for B2B EU customers). Verified with a live dry-run checkout session — no errors.
 
-1. **[You]** Stripe Dashboard → **Settings → Tax** → enable, set your origin address (Finland), register the jurisdiction(s) you'll sell into.
-2. **[Claude]** Once enabled, I add automatic tax + VAT-ID collection to checkout (~10 lines) and redeploy.
+**Currently charges €0 tax** — correct, because you're not yet a registered/VAT business (see below). The moment a Finland tax registration exists in Stripe, it starts calculating real VAT automatically — no further code changes needed.
+
+### 🔲 When you get your Y-tunnus **[You] + [Claude]**
+You mentioned registering as a sole trader via YTJ today/tomorrow. Once you have the Y-tunnus:
+1. **[You]** Tell me you're registered (share the Y-tunnus if you want it reflected anywhere).
+2. **[Claude]** I'll update the Privacy Policy / Terms footer with your real business ID.
+3. **[You]** *(only if/when you cross Finland's VAT threshold — currently €20,000/year turnover)* register for VAT (ALV) and get your VAT number, then either add it as a Stripe Tax registration yourself (Settings → Tax → Registrations) or give it to me and I'll add it via the API.
 
 ---
 
@@ -76,12 +81,8 @@ You're on `lead-finder-saas.vercel.app` for now. When you buy a domain (e.g. `si
 
 ---
 
-## 🔲 Step 5 — GitHub auto-deploy — **you picked this** ⏱ ~10 min
-Right now I deploy manually via the Vercel CLI. This gives you a cloud backup of the code + auto-deploy on every push. Two parts, split by what only you can do (no GitHub CLI or stored credentials on this machine, and connecting Vercel to GitHub requires a browser OAuth step only you can click):
-
-1. **[You]** Create an empty GitHub repo (github.com/new — no README/gitignore, just the empty repo).
-2. **[You]** Create a GitHub **fine-grained personal access token** (github.com/settings/personal-access-tokens/new) scoped to just that repo, permission **Contents: Read and write**. Paste the repo URL + token to me like you did for Vercel.
-3. **[Claude]** I push the current code to that repo.
+## ✅ Step 5 — GitHub auto-deploy — **DONE (2026-07-06)**
+Code lives at **github.com/lukaslehtimaki-prog/lukas-websit** (full history, 3+ commits) and the Vercel project is linked to it (`productionBranch: main`). Every push to `main` now auto-deploys — no more manual `vercel --prod` needed. This very edit is the end-to-end test: pushing it should trigger a Vercel deployment with no CLI command from me.
 4. **[You]** In Vercel → your project → **Settings → Git** → **Connect Git Repository** → pick the repo (one click; this is the browser-OAuth step I can't do for you).
 5. **[Claude]** Once connected, all future changes deploy automatically on push — no more manual `vercel --prod` needed.
 
