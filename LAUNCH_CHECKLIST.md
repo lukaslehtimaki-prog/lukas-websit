@@ -9,10 +9,15 @@ Legend: **[You]** = you do it · **[Claude]** = ask me and I'll do it · ⏱ = r
 
 ## ✅ Already done
 - [x] App deployed & public (deployment protection removed)
-- [x] All env vars (Supabase, Google Places, Anthropic, Stripe test) live in production
+- [x] All env vars (Supabase, Google Places, Anthropic, Stripe **live**) in production
 - [x] Database migration applied (leads, sites, avatar videos)
 - [x] SEO: metadata, social preview image, `robots.txt`, `sitemap.xml`
 - [x] Legal: `/privacy` + `/terms` (sole trader Lukas Lehtimäki), linked from footer + signup
+- [x] Live Stripe products, prices, and webhook created and verified
+- [x] Dark mode for the dashboard (Settings → Appearance)
+- [x] Website builder: unique themes, Google reviews, gym/barber sections, images, one-click publish
+- [x] Image upload verified end-to-end (bucket creation + upload + public serving)
+- [x] All code committed to git (was sitting uncommitted since launch — fixed 2026-07-05)
 - [x] Verified: landing, login, signup, dashboard-guard all working
 
 ---
@@ -42,11 +47,20 @@ This is the true end-to-end test.
 ## ✅ Step 3 — Real Stripe payments — **DONE (live, 2026-07-04)**
 Account activated (FI / EUR, charges + payouts enabled). Live products **Sitexa Standard €20** and **Sitexa Pro €100**, live webhook, and all 5 live keys are in Vercel production and verified. The site now accepts **real** cards.
 
-### 3d. One thing left for you **[You]** ⏱ 3 min
-- Log into the live site → **Billing** → start a plan with a **real card** and confirm it activates. Because there's a 7-day trial, **no charge happens now** — you can cancel immediately from the billing portal to be safe.
+### 🔲 One thing left for you **[You]** ⏱ 3 min
+- Log into the live site → **Billing** → start a plan with a **real card** and confirm it activates. Because there's a 7-day trial, **no charge happens now** — you can cancel immediately from the billing portal to be safe. This is the one step only you can do (needs your browser + a real card).
 
 ### 🔐 Optional hardening **[You]**
 - Your live **secret key** passed through chat. It's working in Vercel, but if you want zero chat exposure: Stripe → Developers → API keys → **roll** `sk_live…`, then paste the new one into **Vercel → Settings → Environment Variables → `STRIPE_SECRET_KEY`**, and tell me to redeploy. (Optional — not urgent.)
+- Same idea for the **Vercel deploy token** you pasted — revoke it at vercel.com/account/settings/tokens once you don't need me deploying for a while (see Step 6).
+
+---
+
+## 🔲 Step 3b — Stripe Tax / VAT (optional, deferred earlier) **[You] + [Claude]** ⏱ ~10 min
+Now that payments are live, this is worth closing out. Stripe Tax auto-calculates and collects VAT (~0.5% fee per transaction).
+
+1. **[You]** Stripe Dashboard → **Settings → Tax** → enable, set your origin address (Finland), register the jurisdiction(s) you'll sell into.
+2. **[Claude]** Once enabled, I add automatic tax + VAT-ID collection to checkout (~10 lines) and redeploy.
 
 ---
 
@@ -62,19 +76,41 @@ You're on `lead-finder-saas.vercel.app` for now. When you buy a domain (e.g. `si
 
 ---
 
-## 🔲 Step 5 — GitHub auto-deploy (optional) **[You] + [Claude]** ⏱ ~10 min
-Right now I deploy manually via the Vercel CLI. If you want every change to deploy automatically and have a cloud backup of the code:
+## 🔲 Step 5 — GitHub auto-deploy — **you picked this** ⏱ ~10 min
+Right now I deploy manually via the Vercel CLI. This gives you a cloud backup of the code + auto-deploy on every push. Two parts, split by what only you can do (no GitHub CLI or stored credentials on this machine, and connecting Vercel to GitHub requires a browser OAuth step only you can click):
 
-1. **[You]** Create a GitHub account/repo (or tell me and I'll guide the exact clicks).
-2. **[Claude]** I push the code and connect the repo to Vercel so pushes auto-deploy.
-
-*(Not required — the site runs fine without this.)*
+1. **[You]** Create an empty GitHub repo (github.com/new — no README/gitignore, just the empty repo).
+2. **[You]** Create a GitHub **fine-grained personal access token** (github.com/settings/personal-access-tokens/new) scoped to just that repo, permission **Contents: Read and write**. Paste the repo URL + token to me like you did for Vercel.
+3. **[Claude]** I push the current code to that repo.
+4. **[You]** In Vercel → your project → **Settings → Git** → **Connect Git Repository** → pick the repo (one click; this is the browser-OAuth step I can't do for you).
+5. **[Claude]** Once connected, all future changes deploy automatically on push — no more manual `vercel --prod` needed.
 
 ---
 
 ## 🔲 Step 6 — Cleanup (once you're happy) **[You]**
 - Revoke the temporary Vercel token: https://vercel.com/account/settings/tokens → delete `sitexa-deploy`.
   *(Do this only when you don't need me to deploy again for a while — I'd need a fresh one next time.)*
+
+---
+
+## 🔲 Step 7 — Admin analytics page — **you picked this** ⏱ 2 min
+Shows a friendly "not configured" notice instead of tenant/usage stats until this is set.
+
+1. **[You]** Supabase → your project → **Connect** button (top of dashboard) → **ORMs / URI** tab → copy the connection string, replace `[YOUR-PASSWORD]` with your DB password. Paste it to me.
+2. **[Claude]** I add it to Vercel as `DATABASE_URL` (+ `DIRECT_URL`) and redeploy. The Admin page will show real tenant/usage data.
+
+---
+
+## 🔲 Step 8 — Branded password-reset emails (Resend) — **you picked this** ⏱ ~15 min
+Supabase's built-in mailer is unbranded and rate-limited (~a few emails/hour). This part is entirely in your two dashboards — I don't have API access to either, so I can't do this one for you, but here's the exact path:
+
+1. **[You]** Create a free account at resend.com (100 emails/day free, no card needed).
+2. **[You]** Resend → **Domains** → add your domain and verify it (DNS records — if you don't have a domain yet, skip this and use Resend's shared testing domain temporarily).
+3. **[You]** Resend → **API Keys** → create one.
+4. **[You]** Supabase → your project → **Project Settings → Auth → SMTP Settings** → enable custom SMTP, host `smtp.resend.com`, port `587`, username `resend`, password = your Resend API key, sender name "Sitexa", sender email from your verified domain.
+5. **[You]** Save, then trigger a password reset on the live site to confirm the branded email arrives.
+
+*(Tell me if any screen is confusing and I'll clarify the exact fields.)*
 
 ---
 
@@ -88,4 +124,4 @@ Right now I deploy manually via the Vercel CLI. If you want every change to depl
 | Plan IDs (internal) | `pro` = €20 "Standard" · `premium` = €100 "Pro" |
 | Helper scripts | `scripts/setup-stripe.mjs`, `rename-stripe-products.mjs`, `verify-billing.mjs`, `provision-trial.mjs` |
 
-**Priority order:** Step 1 → Step 2 today (2 min total). Step 3 whenever Stripe is approved. Steps 4–6 whenever you like.
+**Priority order (2026-07-05):** Steps 1 & 2 first (3 min total, genuinely pending). Then whichever of 3b/5/7/8 you want to tackle — all need a few minutes in an external dashboard from you before I can finish my part. Step 4 (custom domain) intentionally paused until this backlog clears.

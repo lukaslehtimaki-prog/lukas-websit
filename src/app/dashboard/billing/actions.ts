@@ -72,6 +72,14 @@ export async function startCheckout(plan: PlanId): Promise<ActionResult> {
       success_url: `${base}/dashboard/billing?success=1`,
       cancel_url: `${base}/dashboard/billing?canceled=1`,
       allow_promotion_codes: true,
+      // Stripe Tax: calculates VAT once a tax registration exists (none yet — the
+      // account isn't registered, so this correctly charges €0 until it is).
+      // billing_address_collection + customer_update are required by Stripe when
+      // automatic tax is on and the Customer doesn't already have a stored address.
+      automatic_tax: { enabled: true },
+      billing_address_collection: "required",
+      customer_update: { address: "auto", name: "auto" },
+      tax_id_collection: { enabled: true },
     });
     return session.url ? { url: session.url } : { error: "Could not start checkout." };
   } catch (e) {
