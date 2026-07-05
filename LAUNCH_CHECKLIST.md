@@ -7,7 +7,7 @@ Legend: **[You]** = you do it · **[Claude]** = ask me and I'll do it · ⏱ = r
 
 ---
 
-## ✅ Already done
+## ✅ Launch backlog — fully closed (2026-07-06)
 - [x] App deployed & public (deployment protection removed)
 - [x] All env vars (Supabase, Google Places, Anthropic, Stripe **live**, `DATABASE_URL`) in production
 - [x] Database migration applied (leads, sites, avatar videos)
@@ -20,57 +20,38 @@ Legend: **[You]** = you do it · **[Claude]** = ask me and I'll do it · ⏱ = r
 - [x] Image upload verified end-to-end (bucket creation + upload + public serving)
 - [x] GitHub auto-deploy — push to `main` deploys automatically, verified end-to-end
 - [x] All code committed to git, full history on GitHub
-- [x] Supabase Site URL + redirect URLs point at the live site
 - [x] Real signup + real-card checkout both tested live and working
-- [x] `DATABASE_URL` wired up — admin analytics page shows real data (2 tenants, 115 leads, 4 sites as of 2026-07-05)
-- [x] Custom domain **sitovai.com** — bought via Porkbun, DNS configured, live and verified (2026-07-06): DNS resolves to Vercel, HTTPS 200, SSL issued, all core pages + sitemap + robots checked
-- [x] Stripe webhook moved to `https://sitovai.com/api/stripe/webhook` — same signing secret (Stripe doesn't rotate it on a URL-only update), verified reachable (400 signature-required, correctly configured)
+- [x] `DATABASE_URL` wired up — admin analytics page shows real data
+- [x] Custom domain **sitovai.com** — bought via Porkbun, DNS configured, live and verified: DNS resolves to Vercel, HTTPS 200, SSL issued, all core pages + sitemap + robots checked
+- [x] Stripe webhook moved to `https://sitovai.com/api/stripe/webhook` — same signing secret, verified reachable
+- [x] Supabase Site URL + redirect URLs updated to `https://sitovai.com` (per user, 2026-07-06 — not independently verified via API, no Supabase management access from here; low-stakes if off, only affects reset-link targets)
 
 ---
 
-## 🔲 Last remaining step — Supabase Site URL **[You]** ⏱ 1 min
-The only thing I can't do via API (no Supabase management access).
+## 🔲 Optional — pick up anytime, no urgency
 
-1. Open https://supabase.com/dashboard/project/ttnafrcwvcomqsmqicji/auth/url-configuration
-2. **Site URL** → `https://sitovai.com`
-3. **Redirect URLs** → add `https://sitovai.com/**`
-4. Save
+### Branded password-reset emails (Resend) ⏱ ~15 min
+Supabase's built-in mailer is unbranded and rate-limited. Entirely in your two dashboards — no API access from here.
+1. Free account at resend.com (100 emails/day free, no card).
+2. Resend → **Domains** → add + verify yours (or use their shared testing domain temporarily).
+3. Resend → **API Keys** → create one.
+4. Supabase → **Project Settings → Auth → SMTP Settings** → enable custom SMTP: host `smtp.resend.com`, port `587`, username `resend`, password = your Resend API key, sender name "Sitovai", sender email from your verified domain.
+5. Save, then trigger a password reset on the live site to confirm the branded email arrives.
 
-Only affects where password-reset links point — login/signup already work fine on the new domain.
-
----
-
-## 🔲 Step 8 — Branded password-reset emails (Resend) — **the last opt-in item** ⏱ ~15 min
-Supabase's built-in mailer is unbranded and rate-limited (~a few emails/hour). This one's entirely in your two dashboards — I don't have API access to either — but here's the exact path:
-
-1. **[You]** Create a free account at resend.com (100 emails/day free, no card needed).
-2. **[You]** Resend → **Domains** → add your domain and verify it (DNS records — if you don't have a domain yet, skip this and use Resend's shared testing domain temporarily).
-3. **[You]** Resend → **API Keys** → create one.
-4. **[You]** Supabase → your project → **Project Settings → Auth → SMTP Settings** → enable custom SMTP, host `smtp.resend.com`, port `587`, username `resend`, password = your Resend API key, sender name "Sitovai", sender email from your verified domain.
-5. **[You]** Save, then trigger a password reset on the live site to confirm the branded email arrives.
-
-*(Tell me if any screen is confusing and I'll clarify the exact fields.)*
-
----
-
-## 🔲 When you get your Y-tunnus **[You] + [Claude]**
-You mentioned registering as a sole trader via YTJ. Once you have it:
+### When you get your Y-tunnus
 1. **[You]** Tell me — share the Y-tunnus if you want it reflected anywhere.
 2. **[Claude]** I'll update the Privacy Policy / Terms with your real business ID.
-3. **[You]** *(only if/when you cross Finland's VAT threshold — currently €20,000/year turnover)* register for VAT (ALV), then either add it as a Stripe Tax registration yourself (Settings → Tax → Registrations) or give me the number and I'll add it via the API.
+3. **[You]** *(only if/when you cross Finland's VAT threshold — currently €20,000/year)* register for VAT (ALV), then either add it as a Stripe Tax registration yourself or give me the number and I'll add it via the API.
 
----
-
-## 🔐 Optional hardening, no rush **[You]**
-- Your live Stripe **secret key** and the **Vercel deploy token** both passed through this chat. Both still work fine and only grant access to services already wired into your own accounts — low real-world risk. You chose to leave them as-is; revisit anytime via Stripe → API keys (roll) and vercel.com/account/settings/tokens (revoke).
-- Your **GitHub PAT** (used once to push + link the repo) can be revoked now if you like — auto-deploy going forward is driven by Vercel's GitHub App, not that token.
+### Security hygiene, no rush
+- Your live Stripe **secret key**, the **Vercel deploy token**, and a **GitHub PAT** all passed through this chat. All still work fine and only grant access to services already wired into your own accounts — you chose to leave them as-is. Revisit anytime: Stripe → API keys (roll), vercel.com/account/settings/tokens (revoke), GitHub → Settings → Personal access tokens (revoke — auto-deploy runs on Vercel's GitHub App now, not this token).
 
 ---
 
 ## 📌 Quick reference
 | Item | Value |
 |------|-------|
-| Live URL | https://lead-finder-saas.vercel.app |
+| Live URL | https://sitovai.com |
 | GitHub repo | github.com/lukaslehtimaki-prog/lukas-websit (auto-deploys `main`) |
 | Vercel project | `giit-up/lead-finder-saas` |
 | Supabase project ref | `ttnafrcwvcomqsmqicji` |
@@ -78,4 +59,4 @@ You mentioned registering as a sole trader via YTJ. Once you have it:
 | Plan IDs (internal) | `pro` = €20 "Standard" · `premium` = €100 "Pro" |
 | Helper scripts | `scripts/setup-stripe.mjs`, `rename-stripe-products.mjs`, `verify-billing.mjs`, `provision-trial.mjs` |
 
-**Status (2026-07-05):** the entire original launch backlog is closed. What's left is genuinely optional — a domain (Step 4), branded email (Step 8), and updating legal pages once the business registration lands.
+**Status:** Sitovai is fully live at its real domain, with billing, tax, dark mode, the full website builder, and CI/CD all working. Everything left is optional polish.
