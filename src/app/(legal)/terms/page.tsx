@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { H2, P, UL, A } from "@/components/legal/prose";
 
 export const metadata: Metadata = {
-  title: "Terms of Service · Sitexa",
+  title: "Terms of Service · Sitovai",
   description:
-    "The terms governing your use of Sitexa's lead-finding and AI website-building service.",
+    "The terms governing your use of Sitovai's lead-finding and AI website-building service.",
 };
 
 const CONTACT = "lukas.lehtimaki1@gmail.com";
@@ -23,7 +23,7 @@ export default function TermsPage() {
 
       <P>
         These Terms of Service (&ldquo;Terms&rdquo;) govern your access to and
-        use of Sitexa (the &ldquo;Service&rdquo;), operated by Lukas Lehtimäki, a
+        use of Sitovai (the &ldquo;Service&rdquo;), operated by Lukas Lehtimäki, a
         sole trader based in Finland. By creating an account or using the
         Service, you agree to these Terms. If you do not agree, do not use the
         Service.
@@ -31,7 +31,7 @@ export default function TermsPage() {
 
       <H2>1. The Service</H2>
       <P>
-        Sitexa helps you find local businesses (including those without a
+        Sitovai helps you find local businesses (including those without a
         website) using the Google Places API and Finland&rsquo;s YTJ / PRH
         business registry, generate websites and marketing videos with AI, and
         manage those leads. Features may change, improve, or be discontinued over
@@ -87,14 +87,14 @@ export default function TermsPage() {
         The Service surfaces business information to help you find prospects. You
         are solely responsible for how you contact those businesses and for
         complying with all applicable laws — including the GDPR and Finnish and
-        EU marketing rules — when you do. Sitexa is a tool; it does not send
+        EU marketing rules — when you do. Sitovai is a tool; it does not send
         outreach on your behalf.
       </P>
 
       <H2>6. Intellectual property</H2>
       <P>
         The websites, scripts, and other content you generate for your own or
-        your clients&rsquo; use are yours. The Sitexa platform, including its
+        your clients&rsquo; use are yours. The Sitovai platform, including its
         software, design, and branding, remains our property. You may not copy or
         reuse the platform itself beyond what these Terms allow.
       </P>

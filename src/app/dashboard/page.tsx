@@ -4,7 +4,7 @@ import { Search, Globe, Clapperboard, ArrowRight } from "lucide-react";
 import { requireTenantContext } from "@/lib/auth/tenant";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata = { title: "Overview · Sitexa" };
+export const metadata = { title: "Overview · Sitovai" };
 
 export default async function DashboardOverview() {
   const ctx = await requireTenantContext();

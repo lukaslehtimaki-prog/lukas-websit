@@ -7,7 +7,7 @@ import { isDemoMode } from "@/lib/video/provider";
 import { avatarPreset, toneLabel } from "@/lib/video/avatars";
 import { cn } from "@/lib/utils";
 
-export const metadata = { title: "Avatar videos · Sitexa" };
+export const metadata = { title: "Avatar videos · Sitovai" };
 
 type SeriesRow = {
   id: string;

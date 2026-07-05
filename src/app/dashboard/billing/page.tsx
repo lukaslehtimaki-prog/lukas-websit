@@ -6,7 +6,7 @@ import { syncTenantSubscription } from "@/lib/billing-sync";
 import { PlanCards } from "@/components/billing/plan-cards";
 import { Badge } from "@/components/ui/badge";
 
-export const metadata = { title: "Billing · Sitexa" };
+export const metadata = { title: "Billing · Sitovai" };
 
 export default async function BillingPage({
   searchParams,

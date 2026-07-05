@@ -38,7 +38,7 @@ export default async function DashboardLayout({
           <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 via-violet-500 to-cyan-400 text-sm font-bold text-white shadow-[0_2px_12px_-2px_rgba(99,102,241,0.5)]">
             S
           </span>
-          Sitexa
+          Sitovai
         </Link>
         <Sidebar isPlatformAdmin={ctx.isPlatformAdmin} />
         <div className="mt-auto p-4">
@@ -66,7 +66,7 @@ export default async function DashboardLayout({
             <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 via-violet-500 to-cyan-400 text-xs font-bold text-white">
               S
             </span>
-            Sitexa
+            Sitovai
           </div>
           <div className="ml-auto flex items-center gap-3">
             <ThemeToggle />

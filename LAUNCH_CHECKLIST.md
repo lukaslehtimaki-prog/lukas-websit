@@ -1,4 +1,4 @@
-# 🚀 Sitexa — Launch Checklist
+# 🚀 Sitovai — Launch Checklist
 
 **Live now:** https://lead-finder-saas.vercel.app
 Hosted on Vercel (team *Giit up*, auto-deploys from **github.com/lukaslehtimaki-prog/lukas-websit**) · Database on Supabase · Payments via Stripe (**live**)
@@ -27,14 +27,14 @@ Legend: **[You]** = you do it · **[Claude]** = ask me and I'll do it · ⏱ = r
 ---
 
 ## 🔲 Step 4 — Custom domain (optional, when you buy one) **[You] + [Claude]** ⏱ ~10 min + DNS wait
-You're on `lead-finder-saas.vercel.app` for now. When you buy a domain (e.g. `sitexa.ai`):
+You're on `lead-finder-saas.vercel.app` for now. When you buy a domain (e.g. `sitovai.com`):
 
 1. **[You]** Buy it (Namecheap / Cloudflare / GoDaddy). `.ai` ≈ €60–80/yr; `.com`/`.fi` ≈ €10–20/yr.
 2. **[Claude]** I add it to Vercel and give you the exact DNS records to paste at your registrar.
 3. **[You]** Add those DNS records; wait for it to verify (minutes–hours).
 4. **[Claude]** Once live, the site's SEO/preview URLs auto-follow the new domain. I'll also update the Supabase Site URL and the Stripe webhook to the new domain.
 
-> The hero mockup & footer already *display* "sitexa.ai" as the brand — if you land on a different domain, tell me and I'll swap the displayed text.
+> The hero mockup & footer already *display* "sitovai.com" as the brand — if you land on a different domain, tell me and I'll swap the displayed text.
 
 ---
 
@@ -44,7 +44,7 @@ Supabase's built-in mailer is unbranded and rate-limited (~a few emails/hour). T
 1. **[You]** Create a free account at resend.com (100 emails/day free, no card needed).
 2. **[You]** Resend → **Domains** → add your domain and verify it (DNS records — if you don't have a domain yet, skip this and use Resend's shared testing domain temporarily).
 3. **[You]** Resend → **API Keys** → create one.
-4. **[You]** Supabase → your project → **Project Settings → Auth → SMTP Settings** → enable custom SMTP, host `smtp.resend.com`, port `587`, username `resend`, password = your Resend API key, sender name "Sitexa", sender email from your verified domain.
+4. **[You]** Supabase → your project → **Project Settings → Auth → SMTP Settings** → enable custom SMTP, host `smtp.resend.com`, port `587`, username `resend`, password = your Resend API key, sender name "Sitovai", sender email from your verified domain.
 5. **[You]** Save, then trigger a password reset on the live site to confirm the branded email arrives.
 
 *(Tell me if any screen is confusing and I'll clarify the exact fields.)*

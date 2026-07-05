@@ -5,7 +5,7 @@ import { isAIConfigured } from "@/lib/env";
 import { SiteEditor } from "@/components/sites/site-editor";
 import type { SiteContent } from "@/lib/templates/types";
 
-export const metadata = { title: "Edit website · Sitexa" };
+export const metadata = { title: "Edit website · Sitovai" };
 
 export default async function SiteEditorPage({
   params,

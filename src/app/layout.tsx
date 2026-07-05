@@ -14,15 +14,15 @@ const geistMono = Geist_Mono({
 });
 
 const title =
-  "Sitexa — find local businesses without a website & build them one with AI";
+  "Sitovai — find local businesses without a website & build them one with AI";
 const description =
-  "Sitexa scans Google Places, cross-checks Finland's official YTJ registry, and turns businesses with no website into ready-to-launch AI sites — all from one dashboard.";
+  "Sitovai scans Google Places, cross-checks Finland's official YTJ registry, and turns businesses with no website into ready-to-launch AI sites — all from one dashboard.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title,
   description,
-  applicationName: "Sitexa",
+  applicationName: "Sitovai",
   keywords: [
     "lead generation",
     "Finnish businesses",
@@ -34,13 +34,13 @@ export const metadata: Metadata = {
     "freelancer tools",
     "agency lead finder",
   ],
-  authors: [{ name: "Sitexa" }],
-  creator: "Sitexa",
+  authors: [{ name: "Sitovai" }],
+  creator: "Sitovai",
   category: "business software",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
-    siteName: "Sitexa",
+    siteName: "Sitovai",
     title,
     description,
     url: siteUrl,

@@ -3,7 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { requireTenantContext } from "@/lib/auth/tenant";
 import { NewVideoWizard } from "@/components/videos/new-video-wizard";
 
-export const metadata = { title: "New video series · Sitexa" };
+export const metadata = { title: "New video series · Sitovai" };
 
 export default async function NewVideoPage() {
   await requireTenantContext();

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { H2, P, UL, A } from "@/components/legal/prose";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy · Sitexa",
+  title: "Privacy Policy · Sitovai",
   description:
-    "How Sitexa collects, uses, and protects your personal data under the EU GDPR.",
+    "How Sitovai collects, uses, and protects your personal data under the EU GDPR.",
 };
 
 const CONTACT = "lukas.lehtimaki1@gmail.com";
@@ -22,7 +22,7 @@ export default function PrivacyPage() {
       <p className="mt-2 text-sm text-zinc-500">Last updated: {UPDATED}</p>
 
       <P>
-        This Privacy Policy explains how Sitexa (&ldquo;we&rdquo;,
+        This Privacy Policy explains how Sitovai (&ldquo;we&rdquo;,
         &ldquo;us&rdquo;) collects, uses, and protects your personal data when
         you use our website and services (the &ldquo;Service&rdquo;). We process
         personal data in accordance with the EU General Data Protection

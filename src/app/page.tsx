@@ -49,7 +49,7 @@ function Logo({ className }: { className?: string }) {
       <span className="relative grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 via-violet-500 to-cyan-400 text-[15px] font-bold text-white shadow-[0_0_20px_-4px_rgba(99,102,241,0.8)]">
         S
       </span>
-      <span className="text-[17px]">Sitexa</span>
+      <span className="text-[17px]">Sitovai</span>
     </Link>
   );
 }
@@ -161,7 +161,7 @@ function Hero() {
           className="animate-fade-up mx-auto mt-7 max-w-2xl text-lg leading-8 text-zinc-400"
           style={{ animationDelay: "120ms" }}
         >
-          Sitexa scans Google Places, cross-checks Finland&apos;s official YTJ
+          Sitovai scans Google Places, cross-checks Finland&apos;s official YTJ
           registry, and turns the best leads into ready-to-launch websites —
           all from one dashboard.
         </p>
@@ -225,7 +225,7 @@ function HeroPreview() {
           <span className="h-3 w-3 rounded-full bg-white/15" />
           <span className="h-3 w-3 rounded-full bg-white/15" />
           <span className="ml-3 rounded-md bg-white/5 px-3 py-1 text-xs text-zinc-500 ring-1 ring-white/10">
-            sitexa.ai / dashboard / leads
+            sitovai.com / dashboard / leads
           </span>
         </div>
 
@@ -388,7 +388,7 @@ function Features() {
               Chat-style lead finder
             </h3>
             <p className="mt-2 text-[15px] leading-7 text-zinc-400">
-              Describe a niche and a location. Sitexa queries Google Places and
+              Describe a niche and a location. Sitovai queries Google Places and
               returns a clean list with website status detected instantly.
             </p>
             <div className="mt-6 rounded-xl border border-white/5 bg-black/30 p-3">
@@ -530,7 +530,7 @@ function HowItWorks() {
     {
       icon: <MousePointerClick className="h-5 w-5" />,
       title: "Describe your target",
-      body: "Type a niche and a town, set a radius. Sitexa queries Google Places behind the scenes.",
+      body: "Type a niche and a town, set a radius. Sitovai queries Google Places behind the scenes.",
     },
     {
       icon: <Zap className="h-5 w-5" />,
@@ -693,12 +693,12 @@ function Faq() {
       a: "Live from the Google Places API, cross-checked against Finland's official YTJ / PRH business registry. Nothing is scraped — every lead comes from an official, up-to-date source.",
     },
     {
-      q: "How does Sitexa know a business has no website?",
-      a: "Google Places reports whether a business has a website listed. Sitexa flags the ones without one and verifies the company is active in the YTJ registry, so you only contact real, reachable businesses.",
+      q: "How does Sitovai know a business has no website?",
+      a: "Google Places reports whether a business has a website listed. Sitovai flags the ones without one and verifies the company is active in the YTJ registry, so you only contact real, reachable businesses.",
     },
     {
       q: "Do I own the websites I generate?",
-      a: "Yes. Every generated site can be exported as standard HTML/CSS files that you can host anywhere and sell to your client — no lock-in, no Sitexa branding.",
+      a: "Yes. Every generated site can be exported as standard HTML/CSS files that you can host anywhere and sell to your client — no lock-in, no Sitovai branding.",
     },
     {
       q: "What language are the generated sites in?",
@@ -827,7 +827,7 @@ function SiteFooter() {
           </div>
         </div>
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/5 pt-6 text-sm text-zinc-500 sm:flex-row">
-          <p>© {new Date().getFullYear()} Sitexa. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Sitovai. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="transition hover:text-white">
               Privacy
@@ -835,7 +835,7 @@ function SiteFooter() {
             <Link href="/terms" className="transition hover:text-white">
               Terms
             </Link>
-            <span className="font-mono text-xs">sitexa.ai</span>
+            <span className="font-mono text-xs">sitovai.com</span>
           </div>
         </div>
       </Container>

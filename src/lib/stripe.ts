@@ -13,7 +13,7 @@ export function getStripe(): Stripe {
   }
   if (!_stripe) {
     _stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-      appInfo: { name: "Sitexa" },
+      appInfo: { name: "Sitovai" },
     });
   }
   return _stripe;

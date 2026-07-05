@@ -6,7 +6,7 @@ import { getAdminDb, schema } from "@/lib/db";
 import { env } from "@/lib/env";
 import { planLimits } from "@/lib/plans";
 
-export const metadata = { title: "Admin · Sitexa" };
+export const metadata = { title: "Admin · Sitovai" };
 
 type CountRow = { tenantId: string; n: number };
 

@@ -1,4 +1,4 @@
-// Creates (idempotently) the Sitexa Standard (€20/mo) and Pro (€100/mo) products +
+// Creates (idempotently) the Sitovai Standard (€20/mo) and Pro (€100/mo) products +
 // prices in your Stripe account, then writes the price IDs into .env.local.
 // Note: product NAMES follow the customer-facing labels (Standard/Pro); the internal
 // plan ids stay `pro` (=€20) and `premium` (=€100) via the lookup keys below.
@@ -35,7 +35,7 @@ async function ensurePrice(slug, name, description, amountCents) {
   if (existing.data[0]) return existing.data[0].id;
 
   const product = await stripe.products.create({
-    name: `Sitexa ${name}`,
+    name: `Sitovai ${name}`,
     description,
   });
   const price = await stripe.prices.create({

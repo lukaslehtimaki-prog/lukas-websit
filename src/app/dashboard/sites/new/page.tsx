@@ -4,7 +4,7 @@ import { requireTenantContext } from "@/lib/auth/tenant";
 import { createClient } from "@/lib/supabase/server";
 import { NewSiteForm, type LeadOption } from "@/components/sites/new-site-form";
 
-export const metadata = { title: "New website · Sitexa" };
+export const metadata = { title: "New website · Sitovai" };
 
 export default async function NewSitePage({
   searchParams,

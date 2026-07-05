@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SignupForm } from "@/components/auth/signup-form";
 
-export const metadata: Metadata = { title: "Create account · Sitexa" };
+export const metadata: Metadata = { title: "Create account · Sitovai" };
 
 export default function SignupPage() {
   return (

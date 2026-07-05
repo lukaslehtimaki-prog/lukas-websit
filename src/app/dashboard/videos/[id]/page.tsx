@@ -8,7 +8,7 @@ import { isDemoMode } from "@/lib/video/provider";
 import { getSignedVideoUrl } from "@/lib/video/storage";
 import { SeriesView } from "@/components/videos/series-view";
 
-export const metadata = { title: "Video series · Sitexa" };
+export const metadata = { title: "Video series · Sitovai" };
 
 export default async function SeriesPage({
   params,

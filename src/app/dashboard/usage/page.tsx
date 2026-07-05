@@ -8,7 +8,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { Badge } from "@/components/ui/badge";
 
-export const metadata = { title: "Usage · Sitexa" };
+export const metadata = { title: "Usage · Sitovai" };
 
 export default async function UsagePage() {
   const ctx = await requireTenantContext();

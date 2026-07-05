@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const alt =
-  "Sitexa — find local businesses without a website and build them one with AI";
+  "Sitovai — find local businesses without a website and build them one with AI";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -57,7 +57,7 @@ export default function Image() {
             S
           </div>
           <div style={{ marginLeft: "24px", fontSize: "44px", fontWeight: 700 }}>
-            Sitexa
+            Sitovai
           </div>
         </div>
 
@@ -102,7 +102,7 @@ export default function Image() {
             AI lead-gen for Finnish local business
           </div>
           <div style={{ display: "flex", color: "#a5b4fc", fontWeight: 600 }}>
-            sitexa.ai
+            sitovai.com
           </div>
         </div>
       </div>

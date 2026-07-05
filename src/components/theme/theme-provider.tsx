@@ -11,8 +11,8 @@ import {
 export type ThemePref = "light" | "dark" | "system";
 export type Resolved = "light" | "dark";
 
-export const THEME_PREF_KEY = "sitexa-theme";
-export const THEME_COOKIE = "sitexa-theme-resolved";
+export const THEME_PREF_KEY = "sitovai-theme";
+export const THEME_COOKIE = "sitovai-theme-resolved";
 
 type Ctx = {
   theme: ThemePref;

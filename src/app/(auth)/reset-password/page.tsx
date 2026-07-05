@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 
-export const metadata: Metadata = { title: "Set new password · Sitexa" };
+export const metadata: Metadata = { title: "Set new password · Sitovai" };
 
 export default function ResetPasswordPage() {
   return (

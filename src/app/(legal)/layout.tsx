@@ -15,7 +15,7 @@ export default function LegalLayout({ children }: { children: ReactNode }) {
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 via-violet-500 to-cyan-400 text-[15px] font-bold text-white shadow-[0_0_20px_-4px_rgba(99,102,241,0.8)]">
               S
             </span>
-            <span className="text-[17px]">Sitexa</span>
+            <span className="text-[17px]">Sitovai</span>
           </Link>
           <Link
             href="/"
@@ -32,7 +32,7 @@ export default function LegalLayout({ children }: { children: ReactNode }) {
 
       <footer className="border-t border-white/5 py-8">
         <Container className="flex flex-col items-center justify-between gap-3 text-sm text-zinc-500 sm:flex-row">
-          <p>© {new Date().getFullYear()} Sitexa. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Sitovai. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="transition hover:text-white">
               Privacy
