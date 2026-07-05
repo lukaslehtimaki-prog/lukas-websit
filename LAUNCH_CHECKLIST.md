@@ -26,15 +26,27 @@ Legend: **[You]** = you do it · **[Claude]** = ask me and I'll do it · ⏱ = r
 
 ---
 
-## 🔲 Step 4 — Custom domain (optional, when you buy one) **[You] + [Claude]** ⏱ ~10 min + DNS wait
-You're on `lead-finder-saas.vercel.app` for now. When you buy a domain (e.g. `sitovai.com`):
+## 🔲 Step 4 — Custom domain: sitovai.com — **DNS is the only thing left** ⏱ 5 min + propagation wait
+You bought **sitovai.com**. It's already added to the Vercel project (both the bare domain and `www`, which redirects to the bare domain) — but DNS isn't pointed at Vercel yet.
 
-1. **[You]** Buy it (Namecheap / Cloudflare / GoDaddy). `.ai` ≈ €60–80/yr; `.com`/`.fi` ≈ €10–20/yr.
-2. **[Claude]** I add it to Vercel and give you the exact DNS records to paste at your registrar.
-3. **[You]** Add those DNS records; wait for it to verify (minutes–hours).
-4. **[Claude]** Once live, the site's SEO/preview URLs auto-follow the new domain. I'll also update the Supabase Site URL and the Stripe webhook to the new domain.
+### 🔲 [You] Add these DNS records at your registrar (wherever you bought the domain)
+| Type | Name/Host | Value | Notes |
+|------|-----------|-------|-------|
+| A | `@` (or blank/root) | `216.198.79.1` | Add a second A record too: |
+| A | `@` (or blank/root) | `64.29.17.1` | Vercel recommends both for the apex domain |
+| CNAME | `www` | `cname.vercel-dns.com.` | Handles the www redirect |
 
-> The hero mockup & footer already *display* "sitovai.com" as the brand — if you land on a different domain, tell me and I'll swap the displayed text.
+Every registrar's UI looks a little different, but look for "DNS", "DNS records", or "Manage DNS" in the domain's settings.
+
+### Then, automatically
+- **Vercel** detects the DNS change itself (usually minutes, sometimes up to a few hours) and issues an SSL certificate — no action needed from either of us.
+- **The site's own SEO/metadata already show sitovai.com** (verified — `og:url` picked it up the moment the domain was added to the project, before DNS even propagates).
+
+### 🔲 [You] → [Claude] — once DNS is live
+Visit https://sitovai.com yourself to confirm it loads the site. Tell me it works, and I'll:
+1. Update the Supabase Auth Site URL + redirect URLs to `https://sitovai.com`
+2. Point the Stripe webhook at the new domain
+3. Do a final full health check across the new domain (checkout, signup, publish links)
 
 ---
 
