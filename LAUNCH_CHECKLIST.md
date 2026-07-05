@@ -1,6 +1,6 @@
 # 🚀 Sitovai — Launch Checklist
 
-**Live now:** https://lead-finder-saas.vercel.app
+**Live now:** https://sitovai.com (also reachable at lead-finder-saas.vercel.app)
 Hosted on Vercel (team *Giit up*, auto-deploys from **github.com/lukaslehtimaki-prog/lukas-websit**) · Database on Supabase · Payments via Stripe (**live**)
 
 Legend: **[You]** = you do it · **[Claude]** = ask me and I'll do it · ⏱ = rough time
@@ -23,30 +23,20 @@ Legend: **[You]** = you do it · **[Claude]** = ask me and I'll do it · ⏱ = r
 - [x] Supabase Site URL + redirect URLs point at the live site
 - [x] Real signup + real-card checkout both tested live and working
 - [x] `DATABASE_URL` wired up — admin analytics page shows real data (2 tenants, 115 leads, 4 sites as of 2026-07-05)
+- [x] Custom domain **sitovai.com** — bought via Porkbun, DNS configured, live and verified (2026-07-06): DNS resolves to Vercel, HTTPS 200, SSL issued, all core pages + sitemap + robots checked
+- [x] Stripe webhook moved to `https://sitovai.com/api/stripe/webhook` — same signing secret (Stripe doesn't rotate it on a URL-only update), verified reachable (400 signature-required, correctly configured)
 
 ---
 
-## 🔲 Step 4 — Custom domain: sitovai.com — **DNS is the only thing left** ⏱ 5 min + propagation wait
-You bought **sitovai.com**. It's already added to the Vercel project (both the bare domain and `www`, which redirects to the bare domain) — but DNS isn't pointed at Vercel yet.
+## 🔲 Last remaining step — Supabase Site URL **[You]** ⏱ 1 min
+The only thing I can't do via API (no Supabase management access).
 
-### 🔲 [You] Add these DNS records at your registrar (wherever you bought the domain)
-| Type | Name/Host | Value | Notes |
-|------|-----------|-------|-------|
-| A | `@` (or blank/root) | `216.198.79.1` | Add a second A record too: |
-| A | `@` (or blank/root) | `64.29.17.1` | Vercel recommends both for the apex domain |
-| CNAME | `www` | `cname.vercel-dns.com.` | Handles the www redirect |
+1. Open https://supabase.com/dashboard/project/ttnafrcwvcomqsmqicji/auth/url-configuration
+2. **Site URL** → `https://sitovai.com`
+3. **Redirect URLs** → add `https://sitovai.com/**`
+4. Save
 
-Every registrar's UI looks a little different, but look for "DNS", "DNS records", or "Manage DNS" in the domain's settings.
-
-### Then, automatically
-- **Vercel** detects the DNS change itself (usually minutes, sometimes up to a few hours) and issues an SSL certificate — no action needed from either of us.
-- **The site's own SEO/metadata already show sitovai.com** (verified — `og:url` picked it up the moment the domain was added to the project, before DNS even propagates).
-
-### 🔲 [You] → [Claude] — once DNS is live
-Visit https://sitovai.com yourself to confirm it loads the site. Tell me it works, and I'll:
-1. Update the Supabase Auth Site URL + redirect URLs to `https://sitovai.com`
-2. Point the Stripe webhook at the new domain
-3. Do a final full health check across the new domain (checkout, signup, publish links)
+Only affects where password-reset links point — login/signup already work fine on the new domain.
 
 ---
 
