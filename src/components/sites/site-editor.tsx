@@ -23,6 +23,9 @@ import {
   Copy,
   ExternalLink,
   ImagePlus,
+  Mail,
+  Send,
+  Sparkles,
 } from "lucide-react";
 import {
   updateSiteContent,
@@ -31,6 +34,8 @@ import {
   deleteSite,
   uploadSiteImageAction,
   importGooglePhotosAction,
+  generatePitchAction,
+  sendPitchAction,
 } from "@/app/dashboard/sites/actions";
 import { renderSiteToHtml } from "@/lib/templates/render";
 import { defaultMembershipPlans } from "@/lib/templates/site-kind";
@@ -63,12 +68,14 @@ export function SiteEditor({
   initialStatus,
   initialContent,
   aiEnabled,
+  emailEnabled,
 }: {
   siteId: string;
   initialTemplateId: string;
   initialStatus: string;
   initialContent: SiteContent;
   aiEnabled: boolean;
+  emailEnabled: boolean;
 }) {
   const [content, setContent] = useState<SiteContent>(initialContent);
   const [templateId, setTemplateId] = useState(initialTemplateId);
@@ -78,6 +85,12 @@ export function SiteEditor({
   const [uploading, setUploading] = useState<
     null | "hero" | "gallery" | "google"
   >(null);
+  const [pitch, setPitch] = useState<{ subject: string; body: string } | null>(
+    null,
+  );
+  const [pitchTo, setPitchTo] = useState("");
+  const [pitchBusy, setPitchBusy] = useState<null | "draft" | "send">(null);
+  const [pitchSent, setPitchSent] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => setOrigin(window.location.origin), []);
@@ -165,6 +178,35 @@ export function SiteEditor({
   function copyLink() {
     navigator.clipboard?.writeText(liveUrl);
     setMessage("Link copied ✓");
+  }
+  function draftPitch() {
+    setPitchBusy("draft");
+    startTransition(async () => {
+      const r = await generatePitchAction(siteId);
+      if (r.error) {
+        setMessage(r.error);
+      } else {
+        setPitch({ subject: r.subject ?? "", body: r.body ?? "" });
+        if (r.to) setPitchTo((prev) => prev || r.to || "");
+        setPitchSent(false);
+      }
+      setPitchBusy(null);
+    });
+  }
+  function sendPitch() {
+    if (!pitch) return;
+    setPitchBusy("send");
+    startTransition(async () => {
+      const r = await sendPitchAction(siteId, pitchTo, pitch.subject, pitch.body);
+      if (r.error) {
+        setMessage(r.error);
+      } else {
+        setPitchSent(true);
+        setStatus("published");
+        setMessage("Email sent ✓ — site is now published");
+      }
+      setPitchBusy(null);
+    });
   }
   async function uploadImage(file: File): Promise<string | null> {
     const fd = new FormData();
@@ -388,6 +430,93 @@ export function SiteEditor({
               )}
               Publish website
             </button>
+          </div>
+        )}
+      </div>
+
+      {/* Pitch email */}
+      <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          <span className="grid h-6 w-6 place-items-center rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-300">
+            <Mail className="h-3.5 w-3.5" />
+          </span>
+          Pitch it to the business
+        </div>
+        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          AI drafts a sales email in the site&apos;s language with the live
+          preview link. Sending publishes the site automatically — replies go
+          straight to your email.
+        </p>
+        {pitch === null ? (
+          <button
+            onClick={draftPitch}
+            disabled={pitchBusy !== null || isPending}
+            className="mt-3 inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:brightness-110 disabled:opacity-60"
+          >
+            {pitchBusy === "draft" ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4" />
+            )}
+            Draft sales email
+          </button>
+        ) : (
+          <div className="mt-3 space-y-2.5">
+            <input
+              value={pitchTo}
+              onChange={(e) => setPitchTo(e.target.value)}
+              placeholder="business@example.com"
+              type="email"
+              aria-label="Recipient email"
+              className={cn("w-full", fieldCls)}
+            />
+            <input
+              value={pitch.subject}
+              onChange={(e) => setPitch({ ...pitch, subject: e.target.value })}
+              aria-label="Subject"
+              className={cn("w-full font-medium", fieldCls)}
+            />
+            <textarea
+              value={pitch.body}
+              onChange={(e) => setPitch({ ...pitch, body: e.target.value })}
+              rows={9}
+              aria-label="Message"
+              className={cn("w-full", fieldCls)}
+            />
+            <div className="flex flex-wrap items-center gap-2">
+              {emailEnabled ? (
+                <button
+                  onClick={sendPitch}
+                  disabled={pitchBusy !== null || isPending}
+                  className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:brightness-110 disabled:opacity-60"
+                >
+                  {pitchBusy === "send" ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                  Send email
+                </button>
+              ) : null}
+              <a
+                href={`mailto:${pitchTo}?subject=${encodeURIComponent(pitch.subject)}&body=${encodeURIComponent(pitch.body)}`}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              >
+                <ExternalLink className="h-4 w-4" /> Open in email app
+              </a>
+              <button
+                onClick={draftPitch}
+                disabled={pitchBusy !== null}
+                className="rounded-lg px-3 py-2 text-sm text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100"
+              >
+                Redraft
+              </button>
+              {pitchSent ? (
+                <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                  Sent ✓
+                </span>
+              ) : null}
+            </div>
           </div>
         )}
       </div>

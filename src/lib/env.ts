@@ -27,6 +27,11 @@ export const env = {
   // avatar-video flow in demo mode with a mock provider and sample output.
   HEYGEN_API_KEY: process.env.HEYGEN_API_KEY ?? "",
 
+  // Resend (outbound pitch emails from the app)
+  RESEND_API_KEY: process.env.RESEND_API_KEY ?? "",
+  RESEND_FROM_EMAIL:
+    process.env.RESEND_FROM_EMAIL ?? "Sitovai <noreply@contact.sitovai.com>",
+
   // Platform admin allowlist (comma-separated emails)
   PLATFORM_ADMIN_EMAILS: process.env.PLATFORM_ADMIN_EMAILS ?? "",
 
@@ -65,6 +70,10 @@ export function platformAdminEmails(): string[] {
   return env.PLATFORM_ADMIN_EMAILS.split(",")
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean);
+}
+
+export function isResendConfigured(): boolean {
+  return Boolean(env.RESEND_API_KEY);
 }
 
 export function isHeyGenConfigured(): boolean {

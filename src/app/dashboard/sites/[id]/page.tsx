@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { requireTenantContext } from "@/lib/auth/tenant";
 import { createClient } from "@/lib/supabase/server";
-import { isAIConfigured } from "@/lib/env";
+import { isAIConfigured, isResendConfigured } from "@/lib/env";
 import { SiteEditor } from "@/components/sites/site-editor";
 import type { SiteContent } from "@/lib/templates/types";
 
@@ -38,6 +38,7 @@ export default async function SiteEditorPage({
       initialStatus={s.status}
       initialContent={s.content}
       aiEnabled={isAIConfigured()}
+      emailEnabled={isResendConfigured()}
     />
   );
 }

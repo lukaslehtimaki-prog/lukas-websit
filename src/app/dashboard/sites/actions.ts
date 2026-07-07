@@ -3,9 +3,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { requireTenantContext } from "@/lib/auth/tenant";
 import { createClient } from "@/lib/supabase/server";
-import { isAIConfigured, isPlacesConfigured } from "@/lib/env";
+import { isAIConfigured, isPlacesConfigured, isResendConfigured } from "@/lib/env";
+import { generatePitchEmail } from "@/lib/ai/pitch-email";
+import { sendEmail } from "@/lib/email/send";
 import { getPlaceDetails, resolvePlace } from "@/lib/places/client";
 import { generateWebsiteContent, fallbackContent } from "@/lib/ai/website-content";
 import {
@@ -349,6 +352,80 @@ export async function uploadSiteImageAction(
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Upload failed." };
   }
+}
+
+export async function generatePitchAction(
+  siteId: string,
+): Promise<{ to?: string; subject?: string; body?: string; error?: string }> {
+  const ctx = await requireTenantContext();
+  if (!isAIConfigured())
+    return { error: "Add ANTHROPIC_API_KEY to draft pitch emails." };
+
+  const supabase = await createClient();
+  const { data: site } = await supabase
+    .from("sites")
+    .select("content, lead_id")
+    .eq("id", siteId)
+    .maybeSingle();
+  if (!site) return { error: "Site not found." };
+  const content = (site as any).content as SiteContent;
+
+  let to = "";
+  if ((site as any).lead_id) {
+    const { data: lead } = await supabase
+      .from("leads")
+      .select("email")
+      .eq("id", (site as any).lead_id)
+      .maybeSingle();
+    to = ((lead as any)?.email as string | null) ?? "";
+  }
+
+  const h = await headers();
+  const base = h.get("origin") ?? `https://${h.get("host") ?? "localhost:3000"}`;
+  try {
+    const pitch = await generatePitchEmail({
+      businessName: content.businessName,
+      category: content.source?.category ?? null,
+      language: content.language ?? "fi",
+      liveUrl: `${base}/s/${siteId}`,
+      senderName: ctx.tenantName || ctx.email || "Sitovai",
+    });
+    return { to, ...pitch };
+  } catch {
+    return { error: "Could not draft the email. Try again in a moment." };
+  }
+}
+
+export async function sendPitchAction(
+  siteId: string,
+  to: string,
+  subject: string,
+  body: string,
+): Promise<{ ok?: boolean; error?: string }> {
+  const ctx = await requireTenantContext();
+  if (!isResendConfigured())
+    return { error: "Email sending isn't configured (RESEND_API_KEY)." };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to.trim()))
+    return { error: "Enter a valid recipient email address." };
+  if (!subject.trim() || !body.trim())
+    return { error: "Subject and message are both required." };
+
+  // Publish first so the preview link in the email actually works.
+  const supabase = await createClient();
+  await supabase
+    .from("sites")
+    .update({ status: "published", updated_at: new Date().toISOString() })
+    .eq("id", siteId);
+
+  const r = await sendEmail({
+    to: to.trim(),
+    subject: subject.trim(),
+    text: body,
+    replyTo: ctx.email ?? undefined,
+  });
+  if (!r.ok) return { error: r.error };
+  revalidatePath(`/dashboard/sites/${siteId}`);
+  return { ok: true };
 }
 
 export async function importGooglePhotosAction(
