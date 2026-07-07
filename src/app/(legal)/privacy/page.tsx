@@ -50,7 +50,7 @@ export default function PrivacyPage() {
         </li>
         <li>
           <strong className="text-zinc-200">Content you generate</strong> — lead
-          lists, generated websites, avatar-video scripts, and related data you
+          lists, generated websites, and related data you
           create in the Service.
         </li>
         <li>
@@ -123,7 +123,7 @@ export default function PrivacyPage() {
         </li>
         <li>
           <strong className="text-zinc-200">Anthropic</strong> — AI generation of
-          website copy and video scripts.
+          website copy.
         </li>
       </UL>
       <P>

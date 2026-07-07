@@ -26,7 +26,7 @@ export default async function UsagePage() {
     Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1),
   ).toISOString();
 
-  const [{ count: searchCount }, { count: siteGenCount }, videoUsage] =
+  const [{ count: searchCount }, { count: siteGenCount }] =
     await Promise.all([
       supabase
         .from("usage_events")
@@ -38,17 +38,7 @@ export default async function UsagePage() {
         .select("*", { count: "exact", head: true })
         .eq("kind", "site_generation")
         .gte("created_at", startOfMonth),
-      supabase
-        .from("usage_events")
-        .select("quantity")
-        .eq("kind", "avatar_video")
-        .gte("created_at", startOfMonth),
     ]);
-  // Video renders are metered with quantity = videos queued per event.
-  const videoCount = (videoUsage.data ?? []).reduce(
-    (sum, e) => sum + ((e.quantity as number) ?? 1),
-    0,
-  );
 
   return (
     <div className="space-y-8">
@@ -89,11 +79,6 @@ export default async function UsagePage() {
           label="Websites generated"
           used={siteGenCount ?? 0}
           limit={limits.sites}
-        />
-        <Meter
-          label="Avatar videos rendered"
-          used={videoCount}
-          limit={limits.videos}
         />
       </div>
     </div>

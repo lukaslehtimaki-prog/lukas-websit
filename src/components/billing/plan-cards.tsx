@@ -22,7 +22,6 @@ const PLANS: {
     features: [
       "50 lead searches / month",
       "15 AI websites / month",
-      "15 AI avatar videos / month",
       "1 seat",
       "YTJ registry matching",
       "CSV export",
@@ -36,7 +35,6 @@ const PLANS: {
     features: [
       "5,000 lead searches / month",
       "500 AI websites / month",
-      "100 AI avatar videos / month",
       "5 team seats",
       "Priority AI generation",
       "Everything in Standard",

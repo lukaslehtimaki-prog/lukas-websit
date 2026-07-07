@@ -23,10 +23,6 @@ export const env = {
   ANTHROPIC_FAST_MODEL:
     process.env.ANTHROPIC_FAST_MODEL ?? "claude-haiku-4-5-20251001",
 
-  // HeyGen (avatar video generation) — optional; without it the app runs the
-  // avatar-video flow in demo mode with a mock provider and sample output.
-  HEYGEN_API_KEY: process.env.HEYGEN_API_KEY ?? "",
-
   // Resend (outbound pitch emails from the app)
   RESEND_API_KEY: process.env.RESEND_API_KEY ?? "",
   RESEND_FROM_EMAIL:
@@ -74,10 +70,6 @@ export function platformAdminEmails(): string[] {
 
 export function isResendConfigured(): boolean {
   return Boolean(env.RESEND_API_KEY);
-}
-
-export function isHeyGenConfigured(): boolean {
-  return Boolean(env.HEYGEN_API_KEY);
 }
 
 export function isStripeConfigured(): boolean {

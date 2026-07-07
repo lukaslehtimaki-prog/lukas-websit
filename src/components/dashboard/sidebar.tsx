@@ -7,7 +7,6 @@ import {
   LayoutDashboard,
   Search,
   Globe,
-  Clapperboard,
   BarChart3,
   CreditCard,
   Shield,
@@ -26,7 +25,6 @@ const nav: NavItem[] = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/dashboard/leads", label: "Lead Finder", icon: Search },
   { href: "/dashboard/sites", label: "Websites", icon: Globe },
-  { href: "/dashboard/videos", label: "Avatar Videos", icon: Clapperboard },
   { href: "/dashboard/usage", label: "Usage", icon: BarChart3 },
   { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
 ];

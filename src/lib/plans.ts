@@ -6,9 +6,9 @@
  * subscription — see src/lib/subscription.ts.
  */
 export const PLAN_LIMITS = {
-  free: { label: "Free", searches: 0, sites: 0, videos: 0, priceCents: 0 },
-  pro: { label: "Standard", searches: 50, sites: 15, videos: 15, priceCents: 2000 },
-  premium: { label: "Pro", searches: 5000, sites: 500, videos: 100, priceCents: 10000 },
+  free: { label: "Free", searches: 0, sites: 0, priceCents: 0 },
+  pro: { label: "Standard", searches: 50, sites: 15, priceCents: 2000 },
+  premium: { label: "Pro", searches: 5000, sites: 500, priceCents: 10000 },
 } as const;
 
 export type PlanId = keyof typeof PLAN_LIMITS;

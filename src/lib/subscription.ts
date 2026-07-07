@@ -20,7 +20,6 @@ export function effectiveLimits(
       label: planLimits(planId).label,
       searches: 0,
       sites: 0,
-      videos: 0,
       priceCents: 0,
     };
   }

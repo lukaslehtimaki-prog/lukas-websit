@@ -2,7 +2,7 @@ import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { effectiveLimits } from "@/lib/subscription";
 
-export type UsageKind = "lead_search" | "site_generation" | "avatar_video";
+export type UsageKind = "lead_search" | "site_generation";
 
 function startOfMonthISO(): string {
   const now = new Date();
@@ -13,7 +13,7 @@ function startOfMonthISO(): string {
 
 /**
  * This calendar month's usage of a kind for the current tenant (RLS-scoped).
- * Sums event quantities — batch kinds (avatar_video) record one event per batch
+ * Sums event quantities — batch kinds record one event per batch
  * with quantity = batch size; the others always use quantity 1.
  */
 export async function getMonthlyUsage(kind: UsageKind): Promise<number> {
@@ -60,9 +60,7 @@ export async function checkLimit(
   const limit =
     kind === "lead_search"
       ? limits.searches
-      : kind === "avatar_video"
-        ? limits.videos
-        : limits.sites;
+      : limits.sites;
   const used = await getMonthlyUsage(kind);
   return {
     allowed: used < limit,

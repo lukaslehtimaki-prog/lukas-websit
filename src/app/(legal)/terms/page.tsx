@@ -33,7 +33,7 @@ export default function TermsPage() {
       <P>
         Sitovai helps you find local businesses (including those without a
         website) using the Google Places API and Finland&rsquo;s YTJ / PRH
-        business registry, generate websites and marketing videos with AI, and
+        business registry, generate websites with AI, and
         manage those leads. Features may change, improve, or be discontinued over
         time.
       </P>
@@ -63,7 +63,7 @@ export default function TermsPage() {
         </li>
         <li>
           Except where required by law, payments are non-refundable. Plan limits
-          (searches, websites, and videos per month) are shown at checkout.
+          (searches and websites per month) are shown at checkout.
         </li>
       </UL>
 

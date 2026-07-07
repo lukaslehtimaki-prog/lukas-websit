@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { Search, Globe, Clapperboard, ArrowRight } from "lucide-react";
+import { Search, Globe, ArrowRight } from "lucide-react";
 import { requireTenantContext } from "@/lib/auth/tenant";
 import { createClient } from "@/lib/supabase/server";
 
@@ -14,7 +14,6 @@ export default async function DashboardOverview() {
     { count: leadCount },
     { count: noWebsiteCount },
     { count: siteCount },
-    { count: videoCount },
   ] = await Promise.all([
     supabase.from("leads").select("*", { count: "exact", head: true }),
     supabase
@@ -22,10 +21,6 @@ export default async function DashboardOverview() {
       .select("*", { count: "exact", head: true })
       .eq("website_status", "no_website"),
     supabase.from("sites").select("*", { count: "exact", head: true }),
-    supabase
-      .from("videos")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "ready"),
   ]);
 
   const firstName = (ctx.fullName || ctx.email || "there")
@@ -43,14 +38,13 @@ export default async function DashboardOverview() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Stat label="Leads" value={leadCount ?? 0} />
         <Stat label="No-website leads" value={noWebsiteCount ?? 0} />
         <Stat label="Websites built" value={siteCount ?? 0} />
-        <Stat label="Videos ready" value={videoCount ?? 0} />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2">
         <ActionCard
           href="/dashboard/leads"
           icon={<Search className="h-5 w-5" />}
@@ -62,12 +56,6 @@ export default async function DashboardOverview() {
           icon={<Globe className="h-5 w-5" />}
           title="Build a website"
           desc="Turn a lead into a ready-to-launch site with AI-generated copy."
-        />
-        <ActionCard
-          href="/dashboard/videos"
-          icon={<Clapperboard className="h-5 w-5" />}
-          title="Create avatar videos"
-          desc="Generate short AI spokesperson videos that sell your product."
         />
       </div>
     </div>

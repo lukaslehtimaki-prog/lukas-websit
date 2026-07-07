@@ -69,7 +69,7 @@ export default async function AdminPage() {
       db
         .select({
           kind: schema.usageEvents.kind,
-          // sum, not count: batch kinds (avatar_video) record quantity = batch size
+          // sum, not count: batch kinds record quantity = batch size
           n: sql<number>`coalesce(sum(${schema.usageEvents.quantity}), 0)::int`,
         })
         .from(schema.usageEvents)
@@ -109,10 +109,6 @@ export default async function AdminPage() {
         <Stat
           label="Sites built (mo)"
           value={usageByKind.get("site_generation") ?? 0}
-        />
-        <Stat
-          label="Videos (mo)"
-          value={usageByKind.get("avatar_video") ?? 0}
         />
       </div>
 
