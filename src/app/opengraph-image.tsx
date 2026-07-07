@@ -84,7 +84,7 @@ export default function Image() {
               display: "flex",
             }}
           >
-            Google Places + YTJ registry leads → ready-to-launch Finnish sites.
+            Google Places leads → ready-to-launch sites in any language.
           </div>
         </div>
 
@@ -99,7 +99,7 @@ export default function Image() {
           }}
         >
           <div style={{ display: "flex" }}>
-            AI lead-gen for Finnish local business
+            AI lead-gen for local businesses
           </div>
           <div style={{ display: "flex", color: "#a5b4fc", fontWeight: 600 }}>
             sitovai.com

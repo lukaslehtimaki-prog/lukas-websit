@@ -30,9 +30,12 @@ import {
   setSiteStatus,
   deleteSite,
   uploadSiteImageAction,
+  importGooglePhotosAction,
 } from "@/app/dashboard/sites/actions";
 import { renderSiteToHtml } from "@/lib/templates/render";
 import { defaultMembershipPlans } from "@/lib/templates/site-kind";
+import { THEMES } from "@/lib/templates/themes";
+import { SUPPORTED_LANGUAGES } from "@/lib/templates/i18n";
 import {
   TEMPLATES,
   type SiteContent,
@@ -72,7 +75,9 @@ export function SiteEditor({
   const [status, setStatus] = useState(initialStatus);
   const [message, setMessage] = useState<string | null>(null);
   const [origin, setOrigin] = useState("");
-  const [uploading, setUploading] = useState<null | "hero" | "gallery">(null);
+  const [uploading, setUploading] = useState<
+    null | "hero" | "gallery" | "google"
+  >(null);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => setOrigin(window.location.origin), []);
@@ -91,15 +96,38 @@ export function SiteEditor({
   }
   function shuffleStyle() {
     setMessage("New style — Save to keep it");
-    patch({ designSeed: Math.floor(Math.random() * 1_000_000) });
+    patch({
+      designSeed: Math.floor(Math.random() * 1_000_000),
+      themeId: undefined,
+    });
   }
   function setKind(kind: SiteKind) {
     patch({
       kind,
       membershipPlans:
         kind === "membership" && !content.membershipPlans?.length
-          ? defaultMembershipPlans()
+          ? defaultMembershipPlans(content.language)
           : content.membershipPlans,
+    });
+  }
+  function importFromGoogle() {
+    setUploading("google");
+    startTransition(async () => {
+      const r = await importGooglePhotosAction(siteId);
+      if (r.error) {
+        setMessage(r.error);
+      } else if (r.urls?.length) {
+        const hadHero = Boolean(content.heroImage);
+        patch({
+          heroImage: content.heroImage ?? r.urls[0],
+          gallery: [
+            ...(content.gallery ?? []),
+            ...(hadHero ? r.urls : r.urls.slice(1)),
+          ],
+        });
+        setMessage(`Imported ${r.urls.length} photos ✓ — Save to keep them`);
+      }
+      setUploading(null);
     });
   }
   function setPlans(next: MembershipPlan[]) {
@@ -222,8 +250,26 @@ export function SiteEditor({
           className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 px-2.5 py-1.5 text-sm text-zinc-700 dark:text-zinc-300 transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:hover:text-indigo-300"
           title="Shuffle the visual design (palette, fonts, layout)"
         >
-          <Shuffle className="h-4 w-4" /> Shuffle style
+          <Shuffle className="h-4 w-4" /> Shuffle
         </button>
+
+        <select
+          value={content.themeId ?? "auto"}
+          onChange={(e) =>
+            patch({
+              themeId: e.target.value === "auto" ? undefined : e.target.value,
+            })
+          }
+          className={cn("max-w-[220px] cursor-pointer", fieldCls)}
+          title="Visual style"
+        >
+          <option value="auto">Style: Auto</option>
+          {THEMES.map((th) => (
+            <option key={th.id} value={th.id}>
+              {th.label}
+            </option>
+          ))}
+        </select>
 
         <select
           value={status}
@@ -365,6 +411,24 @@ export function SiteEditor({
             </select>
           </Section>
 
+          <Section title="Language">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Detected from the business&apos;s country. Headings switch
+              instantly — click Regenerate to rewrite the copy in this language.
+            </p>
+            <select
+              value={content.language ?? "fi"}
+              onChange={(e) => patch({ language: e.target.value })}
+              className={cn("w-full cursor-pointer appearance-none", fieldCls)}
+            >
+              {SUPPORTED_LANGUAGES.map((l) => (
+                <option key={l.code} value={l.code}>
+                  {l.label}
+                </option>
+              ))}
+            </select>
+          </Section>
+
           <Section title="Hero">
             <Text label="Business name" value={content.businessName} onChange={(v) => patch({ businessName: v })} />
             <Text label="Tagline" value={content.tagline} onChange={(v) => patch({ tagline: v })} />
@@ -374,6 +438,21 @@ export function SiteEditor({
           </Section>
 
           <Section title="Images">
+            <button
+              type="button"
+              onClick={importFromGoogle}
+              disabled={uploading !== null || isPending}
+              className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-indigo-300 bg-indigo-50/50 px-3 py-2 text-sm font-medium text-indigo-700 transition hover:bg-indigo-50 disabled:opacity-60 dark:border-indigo-500/40 dark:bg-indigo-500/10 dark:text-indigo-300"
+            >
+              {uploading === "google" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              {uploading === "google"
+                ? "Importing from Google…"
+                : "Import the business's Google photos"}
+            </button>
             <div>
               <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
                 Hero image
@@ -595,6 +674,118 @@ export function SiteEditor({
               </div>
             </Section>
           ) : null}
+
+          <Section title="Trust stats">
+            <div className="space-y-2">
+              {(content.stats ?? []).map((st, i) => {
+                const stats = content.stats ?? [];
+                return (
+                  <div key={i} className="flex items-center gap-2">
+                    <input
+                      value={st.value}
+                      onChange={(e) =>
+                        patch({
+                          stats: stats.map((x, idx) =>
+                            idx === i ? { ...x, value: e.target.value } : x,
+                          ),
+                        })
+                      }
+                      placeholder="100 %"
+                      className={cn("w-24", fieldCls)}
+                    />
+                    <input
+                      value={st.label}
+                      onChange={(e) =>
+                        patch({
+                          stats: stats.map((x, idx) =>
+                            idx === i ? { ...x, label: e.target.value } : x,
+                          ),
+                        })
+                      }
+                      placeholder="e.g. Locally owned"
+                      className={cn("flex-1", fieldCls)}
+                    />
+                    <button
+                      onClick={() =>
+                        patch({ stats: stats.filter((_, idx) => idx !== i) })
+                      }
+                      className="rounded p-1 text-zinc-400 hover:text-red-600 dark:text-zinc-500"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                );
+              })}
+              <button
+                onClick={() =>
+                  patch({
+                    stats: [...(content.stats ?? []), { value: "", label: "" }],
+                  })
+                }
+                className="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400"
+              >
+                <Plus className="h-4 w-4" /> Add stat
+              </button>
+            </div>
+          </Section>
+
+          <Section title="FAQ">
+            <div className="space-y-3">
+              {(content.faq ?? []).map((f, i) => {
+                const faq = content.faq ?? [];
+                return (
+                  <div
+                    key={i}
+                    className="rounded-lg border border-zinc-200 p-3 dark:border-zinc-800"
+                  >
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={f.q}
+                        onChange={(e) =>
+                          patch({
+                            faq: faq.map((x, idx) =>
+                              idx === i ? { ...x, q: e.target.value } : x,
+                            ),
+                          })
+                        }
+                        placeholder="Question"
+                        className={cn("flex-1 font-medium", fieldCls)}
+                      />
+                      <button
+                        onClick={() =>
+                          patch({ faq: faq.filter((_, idx) => idx !== i) })
+                        }
+                        className="rounded p-1 text-zinc-400 hover:text-red-600 dark:text-zinc-500"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <textarea
+                      value={f.a}
+                      onChange={(e) =>
+                        patch({
+                          faq: faq.map((x, idx) =>
+                            idx === i ? { ...x, a: e.target.value } : x,
+                          ),
+                        })
+                      }
+                      placeholder="Answer"
+                      rows={2}
+                      className={cn("mt-2 w-full", fieldCls)}
+                    />
+                  </div>
+                );
+              })}
+              <button
+                onClick={() =>
+                  patch({ faq: [...(content.faq ?? []), { q: "", a: "" }] })
+                }
+                className="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400"
+              >
+                <Plus className="h-4 w-4" /> Add question
+              </button>
+            </div>
+          </Section>
 
           <Section title="Contact">
             <Text label="Address" value={content.contact.address ?? ""} onChange={(v) => patchContact({ address: v, mapsQuery: v || content.businessName })} />

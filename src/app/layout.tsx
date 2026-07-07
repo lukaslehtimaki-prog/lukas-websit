@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 const title =
   "Sitovai — find local businesses without a website & build them one with AI";
 const description =
-  "Sitovai scans Google Places, cross-checks Finland's official YTJ registry, and turns businesses with no website into ready-to-launch AI sites — all from one dashboard.";
+  "Sitovai finds local businesses with no website via Google Places and builds them ready-to-launch AI websites in their own language — all from one dashboard.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -25,10 +25,10 @@ export const metadata: Metadata = {
   applicationName: "Sitovai",
   keywords: [
     "lead generation",
-    "Finnish businesses",
+    "local businesses",
     "no website leads",
     "AI website builder",
-    "YTJ registry",
+    "business registry",
     "Google Places leads",
     "local business outreach",
     "freelancer tools",

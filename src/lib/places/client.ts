@@ -40,6 +40,8 @@ export type PlaceDetails = PlaceCandidate & {
   rating: number | null;
   photoNames: string[];
   reviews: PlaceReview[];
+  /** ISO 3166-1 alpha-2 country of the business (drives site language). */
+  countryCode: string | null;
 };
 
 export class PlacesError extends Error {}
@@ -57,6 +59,11 @@ type GooglePlace = {
   regularOpeningHours?: { weekdayDescriptions?: string[] };
   rating?: number;
   photos?: { name?: string }[];
+  addressComponents?: {
+    longText?: string;
+    shortText?: string;
+    types?: string[];
+  }[];
   reviews?: {
     rating?: number;
     text?: { text?: string };
@@ -94,6 +101,7 @@ const DETAILS_FIELDS = [
   "rating",
   "photos",
   "reviews",
+  "addressComponents",
 ].join(",");
 
 function toCandidate(p: GooglePlace): PlaceCandidate {
@@ -127,10 +135,10 @@ export async function searchPlaces(opts: {
   let pageToken: string | undefined;
 
   do {
+    // No region/language pinning — searches work worldwide and Google returns
+    // results in each business's local language.
     const body: Record<string, unknown> = {
       textQuery: opts.query,
-      regionCode: "FI",
-      languageCode: "fi",
       pageSize: 20,
     };
     if (opts.lat != null && opts.lng != null) {
@@ -204,7 +212,34 @@ export async function getPlaceDetails(placeId: string): Promise<PlaceDetails> {
     rating: p.rating ?? null,
     photoNames: (p.photos ?? []).map((ph) => ph.name ?? "").filter(Boolean),
     reviews: parseReviews(p),
+    countryCode:
+      p.addressComponents?.find((c) => c.types?.includes("country"))
+        ?.shortText ?? null,
   };
+}
+
+/**
+ * Download one place photo (photoName like "places/X/photos/Y") at up to maxWidthPx.
+ * Returns null on any failure — callers treat photos as best-effort.
+ */
+export async function fetchPlacePhoto(
+  photoName: string,
+  maxWidthPx = 1600,
+): Promise<{ buffer: Buffer; contentType: string } | null> {
+  if (!isPlacesConfigured() || !photoName) return null;
+  try {
+    const res = await fetch(
+      `${PLACES_BASE}/${photoName}/media?maxWidthPx=${maxWidthPx}&key=${env.GOOGLE_MAPS_API_KEY}`,
+      { cache: "no-store", redirect: "follow" },
+    );
+    if (!res.ok) return null;
+    return {
+      buffer: Buffer.from(await res.arrayBuffer()),
+      contentType: res.headers.get("content-type") ?? "image/jpeg",
+    };
+  } catch {
+    return null;
+  }
 }
 
 /** Map Google review objects to our compact shape, dropping empty ones. */
@@ -226,7 +261,6 @@ export async function geocodeLocation(
   if (!isPlacesConfigured() || !location.trim()) return null;
   const url = new URL("https://maps.googleapis.com/maps/api/geocode/json");
   url.searchParams.set("address", location);
-  url.searchParams.set("region", "fi");
   url.searchParams.set("key", env.GOOGLE_MAPS_API_KEY);
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) return null;
@@ -284,6 +318,7 @@ export async function resolvePlace(input: string): Promise<PlaceDetails | null> 
       rating: null,
       photoNames: [],
       reviews: [],
+      countryCode: null,
     };
   }
 }

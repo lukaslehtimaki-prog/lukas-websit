@@ -37,8 +37,8 @@ export default async function LeadsPage() {
           </h1>
           <p className="mt-1 max-w-xl text-sm text-zinc-500 dark:text-zinc-400">
             Search a niche and location to find local businesses,
-            cross-referenced with the YTJ registry and flagged by website
-            status.
+            enriched with registry data where available and flagged by
+            website status.
           </p>
         </div>
         <div className="flex gap-2.5">

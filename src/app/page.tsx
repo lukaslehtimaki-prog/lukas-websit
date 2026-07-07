@@ -141,7 +141,7 @@ function Hero() {
         <div className="animate-fade-up">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[13px] text-zinc-300 backdrop-blur">
             <Sparkles className="h-3.5 w-3.5 text-indigo-300" />
-            AI lead-gen for Finnish local business
+            AI lead-gen for local businesses
             <span className="ml-1 hidden rounded-full bg-indigo-500/20 px-2 py-0.5 text-[11px] font-medium text-indigo-300 sm:inline">
               New
             </span>
@@ -161,9 +161,9 @@ function Hero() {
           className="animate-fade-up mx-auto mt-7 max-w-2xl text-lg leading-8 text-zinc-400"
           style={{ animationDelay: "120ms" }}
         >
-          Sitovai scans Google Places, cross-checks Finland&apos;s official YTJ
-          registry, and turns the best leads into ready-to-launch websites —
-          all from one dashboard.
+          Sitovai scans Google Places worldwide, enriches every lead with
+          registry data, and turns the best ones into ready-to-launch websites
+          — written in the business&apos;s own language.
         </p>
 
         <div
@@ -290,7 +290,7 @@ function HeroPreview() {
           <span className="grid h-6 w-6 place-items-center rounded-md bg-indigo-500/15 text-indigo-300">
             <ShieldCheck className="h-3.5 w-3.5" />
           </span>
-          YTJ verified · 3312445-1
+          Registry verified · 3312445-1
         </div>
       </div>
     </div>
@@ -345,7 +345,7 @@ function StatsBand() {
   const stats = [
     { value: "~40", label: "businesses surfaced per search" },
     { value: "< 60 s", label: "from lead to a full draft website" },
-    { value: "100 %", label: "cross-checked against the YTJ registry" },
+    { value: "10", label: "languages for generated websites" },
     { value: "1 click", label: "CSV export of every lead list" },
   ];
   return (
@@ -421,8 +421,8 @@ function Features() {
               AI website builder
             </h3>
             <p className="mt-2 text-[15px] leading-7 text-zinc-400">
-              Turn a lead into a mobile-ready Finnish site in seconds. Preview
-              live, edit inline, export the files and hand them over.
+              Turn a lead into a mobile-ready site in seconds — in the
+              business&apos;s own language. Preview live, edit inline, export.
             </p>
             <div className="mt-6 grid grid-cols-3 gap-2">
               {["Moderni", "Klassinen", "Rohkea"].map((t, i) => (
@@ -465,8 +465,8 @@ function Features() {
               Registry cross-check
             </h3>
             <p className="mt-2 text-[15px] leading-7 text-zinc-400">
-              Every lead matched to the official YTJ registry — y-tunnus,
-              industry code, registration date.
+              Finnish leads are matched to the official YTJ registry —
+              business ID, industry code, registration date.
             </p>
           </BentoCard>
 
@@ -535,12 +535,12 @@ function HowItWorks() {
     {
       icon: <Zap className="h-5 w-5" />,
       title: "Get qualified leads",
-      body: "See who has no website, cross-referenced with the YTJ registry. Filter, tag, and export.",
+      body: "See who has no website, enriched with registry data where available. Filter, tag, and export.",
     },
     {
       icon: <Globe className="h-5 w-5" />,
       title: "Ship their website",
-      body: "Generate a polished Finnish site from real business data. Preview, tweak, and hand it over.",
+      body: "Generate a polished site in the local language from real business data. Preview, tweak, hand it over.",
     },
   ];
   return (
@@ -601,7 +601,7 @@ const TIERS = [
       "50 lead searches / month",
       "15 AI websites / month",
       "1 seat",
-      "YTJ registry matching",
+      "Registry cross-check (FI)",
       "CSV export",
     ],
   },
@@ -690,11 +690,11 @@ function Faq() {
   const faqs = [
     {
       q: "Where does the lead data come from?",
-      a: "Live from the Google Places API, cross-checked against Finland's official YTJ / PRH business registry. Nothing is scraped — every lead comes from an official, up-to-date source.",
+      a: "Live from the Google Places API — anywhere in the world. Finnish leads are additionally cross-checked against the official YTJ / PRH business registry. Nothing is scraped.",
     },
     {
       q: "How does Sitovai know a business has no website?",
-      a: "Google Places reports whether a business has a website listed. Sitovai flags the ones without one and verifies the company is active in the YTJ registry, so you only contact real, reachable businesses.",
+      a: "Google Places reports whether a business has a website listed. Sitovai flags the ones without one — and for Finnish companies also verifies they're active in the YTJ registry.",
     },
     {
       q: "Do I own the websites I generate?",
@@ -702,7 +702,7 @@ function Faq() {
     },
     {
       q: "What language are the generated sites in?",
-      a: "Sites are generated with natural Finnish copy based on the business's real data — name, industry, and location. You can edit every text inline before exporting.",
+      a: "Sites are written in the business's own language, detected automatically from its location — with 10 languages to pick from (English, Finnish, Swedish, German, Spanish, Mandarin and more). Every text is editable.",
     },
     {
       q: "Can I cancel anytime?",
@@ -781,8 +781,8 @@ function SiteFooter() {
           <div>
             <Logo />
             <p className="mt-4 max-w-xs text-sm leading-6 text-zinc-500">
-              Find Finnish businesses without a website and build them one with
-              AI — from first search to shipped site.
+              Find local businesses without a website and build them one with
+              AI — in their own language, from first search to shipped site.
             </p>
           </div>
           <div>

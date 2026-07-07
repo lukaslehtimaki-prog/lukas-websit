@@ -12,6 +12,14 @@ export type SiteReview = {
 /** Drives which extra section a generated site gets. */
 export type SiteKind = "standard" | "booking" | "membership";
 
+/** Design mood the AI assigns per business; steers theme selection. */
+export type Vibe = "elegant" | "bold" | "warm" | "minimal" | "fresh" | "luxury";
+
+export type SiteFaq = { q: string; a: string };
+
+/** Short trust point, e.g. { value: "100 %", label: "Kotimainen yritys" }. */
+export type SiteStat = { value: string; label: string };
+
 export type MembershipPlan = {
   name: string;
   price: string; // e.g. "29,90 €"
@@ -22,6 +30,9 @@ export type MembershipPlan = {
 
 export type BusinessInfo = {
   name: string;
+  placeId?: string | null;
+  /** ISO 639-1 site language inferred from the business's country. */
+  language?: string;
   category: string | null;
   address: string | null;
   phone: string | null;
@@ -59,6 +70,16 @@ export type SiteContent = {
   heroImage?: string | null;
   /** Public URLs of gallery images (optional). */
   gallery?: string[];
+  /** AI-written FAQ entries (optional). */
+  faq?: SiteFaq[];
+  /** Short trust points shown as a stats band (optional). */
+  stats?: SiteStat[];
+  /** Site language (ISO 639-1, e.g. "en", "fi"). Legacy sites without it are Finnish. */
+  language?: string;
+  /** AI-assigned design mood; narrows theme selection. */
+  vibe?: Vibe;
+  /** Explicit theme override from the editor's Style picker; wins over vibe/seed. */
+  themeId?: string;
   /** Seed to reroll the visual design; when unset a hash of the name is used. */
   designSeed?: number;
   /** Original business data, kept so AI copy can be regenerated later. */

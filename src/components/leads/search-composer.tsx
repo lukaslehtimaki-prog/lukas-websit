@@ -17,9 +17,9 @@ const initial: SearchState = {};
 
 const examples = [
   { niche: "Barbershop", location: "Helsinki" },
-  { niche: "Hairdresser", location: "Tampere" },
-  { niche: "Gym", location: "Turku" },
-  { niche: "Restaurant", location: "Oulu" },
+  { niche: "Café", location: "Stockholm" },
+  { niche: "Gym", location: "Berlin" },
+  { niche: "Restaurant", location: "New York" },
 ];
 
 const inputClass =
@@ -41,7 +41,7 @@ export function SearchComposer() {
         <Sparkles className="h-4 w-4 text-indigo-500" />
         <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">New search</span>
         <span className="ml-auto hidden text-xs text-zinc-400 dark:text-zinc-500 sm:block">
-          Google Places · YTJ cross-check
+          Google Places · registry cross-check
         </span>
       </div>
 

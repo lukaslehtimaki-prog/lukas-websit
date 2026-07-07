@@ -1,3 +1,4 @@
+import { t } from "./i18n";
 import type { MembershipPlan, SiteKind } from "./types";
 
 // Infer which extra section a site should get from the business category / template.
@@ -56,32 +57,28 @@ export function inferSiteKind(
   return "standard";
 }
 
-/** Sensible starter membership tiers (in Finnish) for a gym / studio. Editable later. */
-export function defaultMembershipPlans(): MembershipPlan[] {
+/** Sensible starter membership tiers for a gym / studio, in the site's language. */
+export function defaultMembershipPlans(language?: string): MembershipPlan[] {
+  const s = t(language ?? "en");
   return [
     {
-      name: "Perus",
+      name: s.planBasic,
       price: "29,90 €",
-      period: "/kk",
-      features: ["Kuntosalin vapaa käyttö", "Pukukaappi ja suihkut", "Ei liittymismaksua"],
+      period: s.perMonth,
+      features: [s.ftAccess, s.ftLockers, s.ftNoJoinFee],
     },
     {
-      name: "Premium",
+      name: s.planPremium,
       price: "49,90 €",
-      period: "/kk",
-      features: [
-        "Kaikki Perus-edut",
-        "Ryhmäliikuntatunnit",
-        "Personal trainer -alennus",
-        "Solarium",
-      ],
+      period: s.perMonth,
+      features: [s.ftAllBasic, s.ftGroupClasses, s.ftPtDiscount],
       highlight: true,
     },
     {
-      name: "Vuosijäsen",
+      name: s.planAnnual,
       price: "399 €",
-      period: "/vuosi",
-      features: ["Kaikki Premium-edut", "2 kuukautta ilmaiseksi", "Kaverietu"],
+      period: s.perYear,
+      features: [s.ftAllPremium, s.ftTwoMonthsFree],
     },
   ];
 }

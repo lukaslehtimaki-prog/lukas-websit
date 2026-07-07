@@ -12,7 +12,8 @@ import {
   inferSiteKind,
   defaultMembershipPlans,
 } from "@/lib/templates/site-kind";
-import { uploadSiteImage } from "@/lib/sites/images";
+import { languageForCountry } from "@/lib/templates/i18n";
+import { uploadSiteImage, importPlacePhotos } from "@/lib/sites/images";
 import { checkLimit, recordUsage } from "@/lib/usage";
 import type { BusinessInfo, SiteContent, SiteReview } from "@/lib/templates/types";
 
@@ -20,7 +21,34 @@ import type { BusinessInfo, SiteContent, SiteReview } from "@/lib/templates/type
 function applyKind(content: SiteContent, info: BusinessInfo, templateId: string) {
   content.kind = inferSiteKind(info.category, templateId, info.name);
   if (content.kind === "membership" && !content.membershipPlans?.length) {
-    content.membershipPlans = defaultMembershipPlans();
+    content.membershipPlans = defaultMembershipPlans(content.language);
+  }
+}
+
+/**
+ * Best-effort: copy the business's own Google photos into the site (hero + gallery)
+ * and persist. Runs after the row exists; never blocks creation on failure.
+ */
+async function attachPlacePhotos(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  tenantId: string,
+  siteId: string,
+  content: SiteContent,
+  photoNames: string[],
+): Promise<void> {
+  if (!photoNames.length) return;
+  try {
+    const urls = await importPlacePhotos(tenantId, siteId, photoNames, 4);
+    if (!urls.length) return;
+    if (!content.heroImage) {
+      content.heroImage = urls[0];
+      content.gallery = [...(content.gallery ?? []), ...urls.slice(1)];
+    } else {
+      content.gallery = [...(content.gallery ?? []), ...urls];
+    }
+    await supabase.from("sites").update({ content }).eq("id", siteId);
+  } catch {
+    // photos are a bonus — never fail site creation over them
   }
 }
 
@@ -40,15 +68,17 @@ async function buildContent(info: BusinessInfo): Promise<SiteContent> {
 async function leadToBusinessInfo(
   supabase: Awaited<ReturnType<typeof createClient>>,
   lead: any,
-): Promise<{ info: BusinessInfo; reviews: SiteReview[] }> {
+): Promise<{ info: BusinessInfo; reviews: SiteReview[]; photoNames: string[] }> {
   let phone: string | null = lead.phone ?? null;
   let hours: string[] | null = null;
   let address: string | null = lead.address ?? null;
   let category: string | null = lead.category ?? null;
   let website: string | null = lead.website ?? null;
   let reviews: SiteReview[] = [];
+  let photoNames: string[] = [];
+  let language = "en";
 
-  // On-demand detail fetch (phone / hours / Google reviews) when building a site.
+  // On-demand detail fetch (phone / hours / reviews / photos / country) at build time.
   if (lead.place_id) {
     try {
       const d = await getPlaceDetails(lead.place_id);
@@ -58,6 +88,8 @@ async function leadToBusinessInfo(
       category = d.category ?? category;
       website = d.website ?? website;
       reviews = d.reviews;
+      photoNames = d.photoNames;
+      language = languageForCountry(d.countryCode);
       if (phone && phone !== lead.phone) {
         await supabase.from("leads").update({ phone }).eq("id", lead.id);
       }
@@ -68,6 +100,8 @@ async function leadToBusinessInfo(
 
   const info: BusinessInfo = {
     name: lead.name,
+    placeId: lead.place_id ?? null,
+    language,
     category,
     address,
     phone,
@@ -78,7 +112,7 @@ async function leadToBusinessInfo(
     businessId: lead.business_id ?? null,
     industryLabel: null,
   };
-  return { info, reviews };
+  return { info, reviews, photoNames };
 }
 
 export async function createSiteFromLead(
@@ -113,7 +147,7 @@ export async function createSiteFromLead(
     .maybeSingle();
   if (!lead) return { error: "Lead not found." };
 
-  const { info, reviews } = await leadToBusinessInfo(supabase, lead);
+  const { info, reviews, photoNames } = await leadToBusinessInfo(supabase, lead);
   const content = await buildContent(info);
   if (reviews.length) content.reviews = reviews;
   applyKind(content, info, templateId);
@@ -133,9 +167,11 @@ export async function createSiteFromLead(
     .single();
   if (error || !site) return { error: error?.message ?? "Could not create site." };
 
+  const siteId = (site as any).id as string;
+  await attachPlacePhotos(supabase, ctx.tenantId, siteId, content, photoNames);
   await recordUsage(ctx.tenantId, ctx.userId, "site_generation");
   revalidatePath("/dashboard/sites");
-  redirect(`/dashboard/sites/${(site as any).id}`);
+  redirect(`/dashboard/sites/${siteId}`);
 }
 
 export async function createSiteFromInput(
@@ -176,6 +212,8 @@ export async function createSiteFromInput(
 
   const info: BusinessInfo = {
     name: details.name,
+    placeId: details.placeId,
+    language: languageForCountry(details.countryCode),
     category: details.category,
     address: details.address,
     phone: details.phone,
@@ -206,9 +244,17 @@ export async function createSiteFromInput(
     .single();
   if (error || !site) return { error: error?.message ?? "Could not create site." };
 
+  const siteId = (site as any).id as string;
+  await attachPlacePhotos(
+    supabase,
+    ctx.tenantId,
+    siteId,
+    content,
+    details.photoNames ?? [],
+  );
   await recordUsage(ctx.tenantId, ctx.userId, "site_generation");
   revalidatePath("/dashboard/sites");
-  redirect(`/dashboard/sites/${(site as any).id}`);
+  redirect(`/dashboard/sites/${siteId}`);
 }
 
 export async function regenerateContent(
@@ -230,13 +276,15 @@ export async function regenerateContent(
 
   let content: SiteContent;
   try {
-    content = await generateWebsiteContent(source);
+    // The editor's language picker wins over the originally detected language.
+    content = await generateWebsiteContent(source, existing?.language);
   } catch {
     return { error: "AI generation failed. Try again in a moment." };
   }
   // Preserve real reviews + the chosen design + kind across an AI copy refresh.
   if (existing?.reviews?.length) content.reviews = existing.reviews;
   if (existing?.designSeed != null) content.designSeed = existing.designSeed;
+  if (existing?.themeId) content.themeId = existing.themeId;
   if (existing?.kind) content.kind = existing.kind;
   if (existing?.membershipPlans?.length)
     content.membershipPlans = existing.membershipPlans;
@@ -300,6 +348,45 @@ export async function uploadSiteImageAction(
     return { url };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Upload failed." };
+  }
+}
+
+export async function importGooglePhotosAction(
+  siteId: string,
+): Promise<{ urls?: string[]; error?: string }> {
+  const ctx = await requireTenantContext();
+  if (!isPlacesConfigured())
+    return { error: "Google Places is not configured." };
+
+  const supabase = await createClient();
+  const { data: site } = await supabase
+    .from("sites")
+    .select("content, lead_id")
+    .eq("id", siteId)
+    .maybeSingle();
+  if (!site) return { error: "Site not found." };
+
+  let placeId =
+    ((site as any).content?.source?.placeId as string | undefined) ?? null;
+  if (!placeId && (site as any).lead_id) {
+    const { data: lead } = await supabase
+      .from("leads")
+      .select("place_id")
+      .eq("id", (site as any).lead_id)
+      .maybeSingle();
+    placeId = (lead as any)?.place_id ?? null;
+  }
+  if (!placeId) return { error: "No Google listing is linked to this site." };
+
+  try {
+    const d = await getPlaceDetails(placeId);
+    if (!d.photoNames.length)
+      return { error: "This business has no photos on Google." };
+    const urls = await importPlacePhotos(ctx.tenantId, siteId, d.photoNames, 6);
+    if (!urls.length) return { error: "Could not download photos from Google." };
+    return { urls };
+  } catch {
+    return { error: "Photo import failed. Try again in a moment." };
   }
 }
 
