@@ -12,7 +12,7 @@ export default async function SiteEditorPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireTenantContext();
+  const ctx = await requireTenantContext();
   const { id } = await params;
 
   const supabase = await createClient();
@@ -39,6 +39,7 @@ export default async function SiteEditorPage({
       initialContent={s.content}
       aiEnabled={isAIConfigured()}
       emailEnabled={isResendConfigured()}
+      senderName={ctx.tenantName || ctx.email || "Sitovai"}
     />
   );
 }

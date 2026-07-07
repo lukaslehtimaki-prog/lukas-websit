@@ -38,6 +38,7 @@ import {
   sendPitchAction,
 } from "@/app/dashboard/sites/actions";
 import { renderSiteToHtml } from "@/lib/templates/render";
+import { renderPitchEmailHtml } from "@/lib/email/pitch-template";
 import { defaultMembershipPlans } from "@/lib/templates/site-kind";
 import { THEMES } from "@/lib/templates/themes";
 import { SUPPORTED_LANGUAGES } from "@/lib/templates/i18n";
@@ -69,6 +70,7 @@ export function SiteEditor({
   initialContent,
   aiEnabled,
   emailEnabled,
+  senderName,
 }: {
   siteId: string;
   initialTemplateId: string;
@@ -76,6 +78,7 @@ export function SiteEditor({
   initialContent: SiteContent;
   aiEnabled: boolean;
   emailEnabled: boolean;
+  senderName: string;
 }) {
   const [content, setContent] = useState<SiteContent>(initialContent);
   const [templateId, setTemplateId] = useState(initialTemplateId);
@@ -91,14 +94,51 @@ export function SiteEditor({
   const [pitchTo, setPitchTo] = useState("");
   const [pitchBusy, setPitchBusy] = useState<null | "draft" | "send">(null);
   const [pitchSent, setPitchSent] = useState(false);
+  const [offerPrice, setOfferPrice] = useState("");
+  const [offerLink, setOfferLink] = useState("");
+  const [showEmailPreview, setShowEmailPreview] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  useEffect(() => setOrigin(window.location.origin), []);
+  useEffect(() => {
+    setOrigin(window.location.origin);
+    // Price and payment link tend to be the same deal-to-deal — remember them.
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem("sitovai.pitch.offer") ?? "{}",
+      ) as { price?: string; paymentLink?: string };
+      if (saved.price) setOfferPrice(saved.price);
+      if (saved.paymentLink) setOfferLink(saved.paymentLink);
+    } catch {}
+  }, []);
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        "sitovai.pitch.offer",
+        JSON.stringify({ price: offerPrice, paymentLink: offerLink }),
+      );
+    } catch {}
+  }, [offerPrice, offerLink]);
   const liveUrl = `${origin}/s/${siteId}`;
 
   const html = useMemo(
     () => renderSiteToHtml(content, templateId),
     [content, templateId],
+  );
+  const emailHtml = useMemo(
+    () =>
+      pitch
+        ? renderPitchEmailHtml({
+            body: pitch.body,
+            businessName: content.businessName,
+            tagline: content.tagline,
+            language: content.language ?? "fi",
+            liveUrl,
+            senderName,
+            heroImage: content.heroImage,
+            offer: { price: offerPrice, paymentLink: offerLink },
+          })
+        : "",
+    [pitch, content, liveUrl, senderName, offerPrice, offerLink],
   );
 
   function patch(p: Partial<SiteContent>) {
@@ -197,7 +237,10 @@ export function SiteEditor({
     if (!pitch) return;
     setPitchBusy("send");
     startTransition(async () => {
-      const r = await sendPitchAction(siteId, pitchTo, pitch.subject, pitch.body);
+      const r = await sendPitchAction(siteId, pitchTo, pitch.subject, pitch.body, {
+        price: offerPrice,
+        paymentLink: offerLink,
+      });
       if (r.error) {
         setMessage(r.error);
       } else {
@@ -443,8 +486,9 @@ export function SiteEditor({
           Pitch it to the business
         </div>
         <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-          AI drafts a sales email in the site&apos;s language with the live
-          preview link. Sending publishes the site automatically — replies go
+          AI drafts a sales email in the site&apos;s language, delivered as a
+          designed email with the site preview, a view button and an optional
+          Buy button. Sending publishes the site automatically — replies go
           straight to your email.
         </p>
         {pitch === null ? (
@@ -483,6 +527,29 @@ export function SiteEditor({
               aria-label="Message"
               className={cn("w-full", fieldCls)}
             />
+            <div className="grid gap-2.5 sm:grid-cols-[8rem_1fr]">
+              <input
+                value={offerPrice}
+                onChange={(e) => setOfferPrice(e.target.value)}
+                placeholder="Price, e.g. 299 €"
+                aria-label="Price"
+                className={cn("w-full", fieldCls)}
+              />
+              <input
+                value={offerLink}
+                onChange={(e) => setOfferLink(e.target.value)}
+                placeholder="Payment link (optional) — e.g. https://buy.stripe.com/…"
+                aria-label="Payment link"
+                type="url"
+                className={cn("w-full", fieldCls)}
+              />
+            </div>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              With a price the email shows an offer box; with a payment link it
+              gets a one-click <span className="font-medium">Buy this website</span>{" "}
+              button (paste a Stripe Payment Link). Leave both empty to sell by
+              reply. Remembered for your next pitch.
+            </p>
             <div className="flex flex-wrap items-center gap-2">
               {emailEnabled ? (
                 <button
@@ -505,6 +572,12 @@ export function SiteEditor({
                 <ExternalLink className="h-4 w-4" /> Open in email app
               </a>
               <button
+                onClick={() => setShowEmailPreview((v) => !v)}
+                className="rounded-lg px-3 py-2 text-sm text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100"
+              >
+                {showEmailPreview ? "Hide preview" : "Preview email"}
+              </button>
+              <button
                 onClick={draftPitch}
                 disabled={pitchBusy !== null}
                 className="rounded-lg px-3 py-2 text-sm text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100"
@@ -517,6 +590,14 @@ export function SiteEditor({
                 </span>
               ) : null}
             </div>
+            {showEmailPreview ? (
+              <iframe
+                srcDoc={emailHtml}
+                title="Email preview"
+                sandbox=""
+                className="h-[480px] w-full rounded-lg border border-zinc-200 bg-zinc-100 dark:border-zinc-800"
+              />
+            ) : null}
           </div>
         )}
       </div>

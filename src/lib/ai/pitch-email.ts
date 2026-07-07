@@ -30,6 +30,7 @@ const PITCH_TOOL: Anthropic.Tool = {
 export async function generatePitchEmail(opts: {
   businessName: string;
   category: string | null;
+  location: string | null;
   language: string;
   liveUrl: string;
   senderName: string;
@@ -48,16 +49,35 @@ export async function generatePitchEmail(opts: {
         content: [
           `Business: ${opts.businessName}`,
           opts.category ? `Type: ${opts.category}` : "",
+          opts.location ? `Location: ${opts.location}` : "",
           `Sender: ${opts.senderName}`,
           "",
           `Write a short, personal sales email ENTIRELY IN ${langName.toUpperCase()}`,
-          "to this business. Context: the sender noticed the business has no website,",
-          "went ahead and built them a complete, ready-to-launch one, and is sharing a",
-          "live preview link. Goals: friendly and human (not corporate), 100-160 words,",
-          "no pressure tactics, no invented claims or prices. Say the preview is free to",
-          "look at, invite them to reply if they want it for their business. Include the",
-          "placeholder [WEBSITE_LINK] exactly once on its own line where the link should",
-          `go. Sign off with the sender's name (${opts.senderName}).`,
+          "to this business owner. Context: the sender noticed the business has no",
+          "website, went ahead and built them a complete, ready-to-launch one, and is",
+          "sharing it. The email is delivered with a large preview image of the site",
+          "and a button linking to it, so the email's job is to make them click and",
+          "want to keep it.",
+          "",
+          "Structure:",
+          "- Subject: specific and curiosity-driving, like a note from a person, not a",
+          "  campaign. Mention the business by name or what was made for them.",
+          "- Opening line: show this is about THEIR business specifically (their trade,",
+          "  their town) — never a generic 'I help businesses grow' opener.",
+          "- The hook: you already built their website. It exists, it's finished, the",
+          "  link below shows it. No 'would you be interested' — it's show, then tell.",
+          "- One or two concrete benefits a local business owner actually feels:",
+          "  customers who search their name find a professional site, it works on",
+          "  phones, people can call or find them in one tap.",
+          "- Close: looking is free and takes a minute; if they like it, it's theirs —",
+          "  reply or use the button below the message. If not, no hard feelings.",
+          "",
+          "Tone: a skilled human wrote this in two minutes — warm, direct, confident,",
+          "zero corporate speak, zero pressure tactics. Short sentences, short",
+          "paragraphs (it's read on a phone). 100-170 words. Never invent claims,",
+          "statistics, prices, or fake deadlines. Include the placeholder",
+          "[WEBSITE_LINK] exactly once on its own line where the link should go.",
+          `Sign off with the sender's name (${opts.senderName}).`,
         ]
           .filter(Boolean)
           .join("\n"),
