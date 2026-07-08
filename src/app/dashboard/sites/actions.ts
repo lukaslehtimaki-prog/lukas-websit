@@ -6,7 +6,12 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { requireTenantContext } from "@/lib/auth/tenant";
 import { createClient } from "@/lib/supabase/server";
-import { isAIConfigured, isPlacesConfigured, isResendConfigured } from "@/lib/env";
+import {
+  isAIConfigured,
+  isPlacesConfigured,
+  isResendConfigured,
+  isStripeConfigured,
+} from "@/lib/env";
 import { generatePitchEmail } from "@/lib/ai/pitch-email";
 import { sendEmail } from "@/lib/email/send";
 import {
@@ -21,6 +26,7 @@ import {
 } from "@/lib/templates/site-kind";
 import { languageForCountry } from "@/lib/templates/i18n";
 import { uploadSiteImage, importPlacePhotos } from "@/lib/sites/images";
+import { ensureSitePaymentLink } from "@/lib/sites/checkout";
 import { checkLimit, recordUsage } from "@/lib/usage";
 import type { BusinessInfo, SiteContent, SiteReview } from "@/lib/templates/types";
 
@@ -360,7 +366,14 @@ export async function uploadSiteImageAction(
 
 export async function generatePitchAction(
   siteId: string,
-): Promise<{ to?: string; subject?: string; body?: string; error?: string }> {
+  priceStr?: string,
+): Promise<{
+  to?: string;
+  subject?: string;
+  body?: string;
+  paymentLink?: string;
+  error?: string;
+}> {
   const ctx = await requireTenantContext();
   if (!isAIConfigured())
     return { error: "Add ANTHROPIC_API_KEY to draft pitch emails." };
@@ -397,7 +410,33 @@ export async function generatePitchAction(
       liveUrl: `${base}/s/${siteId}`,
       senderName: ctx.tenantName || ctx.email || "Sitovai",
     });
-    return { to, ...pitch };
+
+    // Auto-create the Stripe payment link for the asking price so the email's
+    // Buy button works with zero setup. Best-effort: a Stripe hiccup shouldn't
+    // block the draft — send falls back to reply-to-buy.
+    let paymentLink: string | undefined;
+    if (priceStr?.trim() && isStripeConfigured()) {
+      const r = await ensureSitePaymentLink({
+        siteId,
+        tenantId: ctx.tenantId,
+        content,
+        priceStr,
+        liveUrl: `${base}/s/${siteId}`,
+      });
+      if ("payment" in r) {
+        paymentLink = r.payment.link;
+        if (r.changed) {
+          await supabase
+            .from("sites")
+            .update({
+              content: { ...content, payment: r.payment },
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", siteId);
+        }
+      }
+    }
+    return { to, ...pitch, paymentLink };
   } catch {
     return { error: "Could not draft the email. Try again in a moment." };
   }
@@ -439,7 +478,38 @@ export async function sendPitchAction(
   const h = await headers();
   const base = h.get("origin") ?? `https://${h.get("host") ?? "localhost:3000"}`;
   const liveUrl = `${base}/s/${siteId}`;
-  const cleanOffer = { price: offer?.price?.trim() || undefined, paymentLink };
+
+  // Guarantee the Buy button: when a price is set and the link field is empty
+  // or holds our own auto-created link, (re)create a Stripe payment link that
+  // matches the asking price. A pasted third-party link is used untouched.
+  let finalLink = paymentLink;
+  const priceStr = offer?.price?.trim();
+  const isAutoLink = !finalLink || finalLink === content.payment?.link;
+  if (priceStr && isAutoLink && isStripeConfigured()) {
+    const r = await ensureSitePaymentLink({
+      siteId,
+      tenantId: ctx.tenantId,
+      content,
+      priceStr,
+      liveUrl,
+    });
+    if ("payment" in r) {
+      finalLink = r.payment.link;
+      if (r.changed) {
+        content.payment = r.payment;
+        await supabase
+          .from("sites")
+          .update({
+            content,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", siteId);
+      }
+    } else if (!finalLink) {
+      return { error: r.error };
+    }
+  }
+  const cleanOffer = { price: priceStr || undefined, paymentLink: finalLink };
 
   const r = await sendEmail({
     to: to.trim(),

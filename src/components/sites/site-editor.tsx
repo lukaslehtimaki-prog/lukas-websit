@@ -94,30 +94,34 @@ export function SiteEditor({
   const [pitchTo, setPitchTo] = useState("");
   const [pitchBusy, setPitchBusy] = useState<null | "draft" | "send">(null);
   const [pitchSent, setPitchSent] = useState(false);
-  const [offerPrice, setOfferPrice] = useState("");
-  const [offerLink, setOfferLink] = useState("");
+  const [offerPrice, setOfferPrice] = useState(
+    initialContent.payment?.priceStr || "500 €",
+  );
+  const [offerLink, setOfferLink] = useState(initialContent.payment?.link ?? "");
   const [showEmailPreview, setShowEmailPreview] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     setOrigin(window.location.origin);
-    // Price and payment link tend to be the same deal-to-deal — remember them.
+    // The asking price tends to be the same deal-to-deal — remember it. The
+    // payment link is per-site (auto-created by Stripe), so it is not shared.
     try {
       const saved = JSON.parse(
         localStorage.getItem("sitovai.pitch.offer") ?? "{}",
-      ) as { price?: string; paymentLink?: string };
-      if (saved.price) setOfferPrice(saved.price);
-      if (saved.paymentLink) setOfferLink(saved.paymentLink);
+      ) as { price?: string };
+      if (saved.price && !initialContent.payment?.priceStr)
+        setOfferPrice(saved.price);
     } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
     try {
       localStorage.setItem(
         "sitovai.pitch.offer",
-        JSON.stringify({ price: offerPrice, paymentLink: offerLink }),
+        JSON.stringify({ price: offerPrice }),
       );
     } catch {}
-  }, [offerPrice, offerLink]);
+  }, [offerPrice]);
   const liveUrl = `${origin}/s/${siteId}`;
 
   const html = useMemo(
@@ -222,12 +226,13 @@ export function SiteEditor({
   function draftPitch() {
     setPitchBusy("draft");
     startTransition(async () => {
-      const r = await generatePitchAction(siteId);
+      const r = await generatePitchAction(siteId, offerPrice);
       if (r.error) {
         setMessage(r.error);
       } else {
         setPitch({ subject: r.subject ?? "", body: r.body ?? "" });
         if (r.to) setPitchTo((prev) => prev || r.to || "");
+        if (r.paymentLink) setOfferLink(r.paymentLink);
         setPitchSent(false);
       }
       setPitchBusy(null);
@@ -484,6 +489,11 @@ export function SiteEditor({
             <Mail className="h-3.5 w-3.5" />
           </span>
           Pitch it to the business
+          {content.payment?.paidAt ? (
+            <span className="ml-auto rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+              Sold 🎉
+            </span>
+          ) : null}
         </div>
         <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
           AI drafts a sales email in the site&apos;s language, delivered as a
@@ -538,17 +548,19 @@ export function SiteEditor({
               <input
                 value={offerLink}
                 onChange={(e) => setOfferLink(e.target.value)}
-                placeholder="Payment link (optional) — e.g. https://buy.stripe.com/…"
+                placeholder="Payment link — auto-created by Stripe, or paste your own"
                 aria-label="Payment link"
                 type="url"
                 className={cn("w-full", fieldCls)}
               />
             </div>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              With a price the email shows an offer box; with a payment link it
-              gets a one-click <span className="font-medium">Buy this website</span>{" "}
-              button (paste a Stripe Payment Link). Leave both empty to sell by
-              reply. Remembered for your next pitch.
+              The Stripe payment link is created automatically for your asking
+              price — the email gets a one-click{" "}
+              <span className="font-medium">Buy this website</span> button and
+              the money lands in your Stripe. Change the price and it updates on
+              send. Paste your own link to override, or clear the price to sell
+              by reply.
             </p>
             <div className="flex flex-wrap items-center gap-2">
               {emailEnabled ? (

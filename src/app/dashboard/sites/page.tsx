@@ -14,12 +14,14 @@ type SiteRow = {
   template_id: string;
   status: string;
   updated_at: string;
+  paid_at: string | null;
 };
 
 const statusStyles: Record<string, string> = {
   draft: "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300",
   generated: "bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300",
   published: "bg-emerald-100 text-emerald-700",
+  sold: "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300",
 };
 
 export default async function SitesPage() {
@@ -27,7 +29,7 @@ export default async function SitesPage() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("sites")
-    .select("id,title,template_id,status,updated_at")
+    .select("id,title,template_id,status,updated_at,paid_at:content->payment->>paidAt")
     .order("updated_at", { ascending: false })
     .limit(200);
   const sites = (data ?? []) as unknown as SiteRow[];
@@ -84,10 +86,12 @@ export default async function SitesPage() {
                 <span
                   className={cn(
                     "rounded-full px-2 py-0.5 text-xs font-medium capitalize",
-                    statusStyles[s.status] ?? statusStyles.draft,
+                    s.paid_at
+                      ? statusStyles.sold
+                      : (statusStyles[s.status] ?? statusStyles.draft),
                   )}
                 >
-                  {s.status}
+                  {s.paid_at ? "sold 🎉" : s.status}
                 </span>
                 <span className="text-xs text-zinc-400 dark:text-zinc-500">
                   {templateMeta(s.template_id).name}

@@ -82,6 +82,18 @@ export type SiteContent = {
   themeId?: string;
   /** Seed to reroll the visual design; when unset a hash of the name is used. */
   designSeed?: number;
+  /** Stripe payment-link sale info, auto-created for pitch emails. */
+  payment?: {
+    productId: string;
+    priceId: string;
+    linkId: string;
+    link: string;
+    priceStr: string;
+    amount: number; // minor units (cents)
+    currency: string; // ISO code, lowercase
+    /** Set by the Stripe webhook when the business pays — the site is sold. */
+    paidAt?: string | null;
+  };
   /** Original business data, kept so AI copy can be regenerated later. */
   source?: BusinessInfo;
 };

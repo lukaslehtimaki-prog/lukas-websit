@@ -65,6 +65,38 @@ export async function POST(req: NextRequest) {
         if (typeof session.subscription === "string") {
           const sub = await stripe.subscriptions.retrieve(session.subscription);
           await syncSubscription(sub);
+        } else if (session.mode === "payment") {
+          // A business may have bought its website through a pitch-email
+          // payment link. Metadata is copied from the link to the session;
+          // fall back to the link itself if it ever isn't.
+          let meta = session.metadata ?? {};
+          if (!meta.site_id && typeof session.payment_link === "string") {
+            const pl = await stripe.paymentLinks.retrieve(session.payment_link);
+            meta = pl.metadata ?? {};
+          }
+          if (meta.kind !== "site_sale" || !meta.site_id) break;
+          const siteId = meta.site_id;
+          const { data: site } = await supabase
+            .from("sites")
+            .select("content")
+            .eq("id", siteId)
+            .maybeSingle();
+          const content = (site as { content?: Record<string, unknown> } | null)
+            ?.content;
+          if (content && typeof content === "object") {
+            const payment =
+              (content.payment as Record<string, unknown> | undefined) ?? {};
+            await supabase
+              .from("sites")
+              .update({
+                content: {
+                  ...content,
+                  payment: { ...payment, paidAt: new Date().toISOString() },
+                },
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", siteId);
+          }
         }
         break;
       }
