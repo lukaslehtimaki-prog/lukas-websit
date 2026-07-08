@@ -164,6 +164,17 @@ export async function POST(
   // Honeypot: real visitors never see or fill this field — silently accept.
   if (field(form.get("company"), 100)) return done();
 
+  // Flood guard: a real local business gets a handful of messages an hour.
+  // Over the cap we still show success (no signal to spammers) but drop the
+  // message instead of storing/forwarding it.
+  const hourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const { count } = await supabase
+    .from("site_messages")
+    .select("*", { count: "exact", head: true })
+    .eq("site_id", siteId)
+    .gte("created_at", hourAgo);
+  if ((count ?? 0) >= 20) return done();
+
   const kind = form.get("kind") === "booking" ? "booking" : "contact";
   const name = field(form.get("name"), 200);
   const email = field(form.get("email"), 200);

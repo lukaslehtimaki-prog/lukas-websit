@@ -52,11 +52,15 @@ export function ThemeProvider({
   const [theme, setThemeState] = useState<ThemePref>("system");
   const [resolved, setResolved] = useState<Resolved>(initialResolved);
 
+  // One-time sync from localStorage after hydration — the server render only
+  // knows the cookie's resolved value, not the underlying preference.
   useEffect(() => {
     const pref =
       (localStorage.getItem(THEME_PREF_KEY) as ThemePref | null) ?? "system";
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setThemeState(pref);
     const r = resolve(pref);
+     
     setResolved(r);
     writeCookie(r);
   }, []);

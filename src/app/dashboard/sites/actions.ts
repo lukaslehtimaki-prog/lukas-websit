@@ -304,6 +304,8 @@ export async function regenerateContent(
     content.membershipPlans = existing.membershipPlans;
   if (existing?.heroImage) content.heroImage = existing.heroImage;
   if (existing?.gallery?.length) content.gallery = existing.gallery;
+  if (existing?.payment) content.payment = existing.payment;
+  if (existing?.pitch) content.pitch = existing.pitch;
   await supabase
     .from("sites")
     .update({ content, updated_at: new Date().toISOString() })
@@ -319,6 +321,18 @@ export async function updateSiteContent(
 ): Promise<{ ok?: boolean; error?: string }> {
   await requireTenantContext();
   const supabase = await createClient();
+
+  // Server-managed records (Stripe sale info incl. the webhook's paidAt, and
+  // the pitch log) must survive a Save from a client whose copy predates them.
+  const { data: row } = await supabase
+    .from("sites")
+    .select("content")
+    .eq("id", siteId)
+    .maybeSingle();
+  const existing = (row as any)?.content as SiteContent | undefined;
+  if (existing?.payment) content.payment = existing.payment;
+  if (existing?.pitch) content.pitch = existing.pitch;
+
   const patch: Record<string, any> = {
     content,
     title: content.businessName,
