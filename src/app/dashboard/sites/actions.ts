@@ -28,6 +28,7 @@ import { languageForCountry } from "@/lib/templates/i18n";
 import { uploadSiteImage, importPlacePhotos } from "@/lib/sites/images";
 import { ensureSitePaymentLink } from "@/lib/sites/checkout";
 import { checkLimit, recordUsage } from "@/lib/usage";
+import { hasProFeatures } from "@/lib/subscription";
 import type { BusinessInfo, SiteContent, SiteReview } from "@/lib/templates/types";
 
 /** Tag the site with its business kind + starter data for the extra section. */
@@ -375,6 +376,8 @@ export async function generatePitchAction(
   error?: string;
 }> {
   const ctx = await requireTenantContext();
+  if (!hasProFeatures(ctx.planId, ctx.subscriptionStatus, ctx.isPlatformAdmin))
+    return { error: "Pitch emails are a Pro feature — upgrade in Billing." };
   if (!isAIConfigured())
     return { error: "Add ANTHROPIC_API_KEY to draft pitch emails." };
 
@@ -450,6 +453,8 @@ export async function sendPitchAction(
   offer?: { price?: string; paymentLink?: string },
 ): Promise<{ ok?: boolean; error?: string }> {
   const ctx = await requireTenantContext();
+  if (!hasProFeatures(ctx.planId, ctx.subscriptionStatus, ctx.isPlatformAdmin))
+    return { error: "Pitch emails are a Pro feature — upgrade in Billing." };
   if (!isResendConfigured())
     return { error: "Email sending isn't configured (RESEND_API_KEY)." };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to.trim()))

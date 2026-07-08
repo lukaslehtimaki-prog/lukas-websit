@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Search,
   Globe,
+  Inbox,
   BarChart3,
   CreditCard,
   Shield,
@@ -25,6 +26,7 @@ const nav: NavItem[] = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/dashboard/leads", label: "Lead Finder", icon: Search },
   { href: "/dashboard/sites", label: "Websites", icon: Globe },
+  { href: "/dashboard/messages", label: "Messages", icon: Inbox },
   { href: "/dashboard/usage", label: "Usage", icon: BarChart3 },
   { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
 ];

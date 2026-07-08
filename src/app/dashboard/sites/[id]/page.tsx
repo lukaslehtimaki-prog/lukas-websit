@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { requireTenantContext } from "@/lib/auth/tenant";
 import { createClient } from "@/lib/supabase/server";
 import { isAIConfigured, isResendConfigured } from "@/lib/env";
+import { hasProFeatures } from "@/lib/subscription";
 import { SiteEditor } from "@/components/sites/site-editor";
 import type { SiteContent } from "@/lib/templates/types";
 
@@ -40,6 +41,11 @@ export default async function SiteEditorPage({
       aiEnabled={isAIConfigured()}
       emailEnabled={isResendConfigured()}
       senderName={ctx.tenantName || ctx.email || "Sitovai"}
+      pitchAllowed={hasProFeatures(
+        ctx.planId,
+        ctx.subscriptionStatus,
+        ctx.isPlatformAdmin,
+      )}
     />
   );
 }

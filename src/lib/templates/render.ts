@@ -62,12 +62,23 @@ function dividerSvg(t: Theme): string {
   return `<div class="hero-divider" aria-hidden="true"><svg viewBox="0 0 1440 64" preserveAspectRatio="none"><path d="${path}" fill="${t.bg}"/></svg></div>`;
 }
 
-export function renderSiteToHtml(content: SiteContent, templateId: string): string {
+export function renderSiteToHtml(
+  content: SiteContent,
+  templateId: string,
+  opts?: { formAction?: string | null },
+): string {
   const t = pickTheme(content, templateId);
   const s = strings(content.language);
   const c = content.contact;
   const heroAccent = isLight(t.heroText) ? t.accent2 : t.accent;
   const kind = content.kind ?? "standard";
+  // With a form endpoint, forms POST there (message is stored + forwarded — no
+  // mail app needed). Without one (e.g. downloaded HTML hosted elsewhere),
+  // fall back to the old mailto behaviour.
+  const formAction = opts?.formAction ?? null;
+  const honeypot = formAction
+    ? `<input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;height:0;width:0;opacity:0;" />`
+    : "";
 
   /* ------------------------------- pieces ------------------------------- */
 
@@ -196,15 +207,18 @@ export function renderSiteToHtml(content: SiteContent, templateId: string): stri
         : ""
     }</p>
     <form class="form"${
-      c.email
-        ? ` action="mailto:${esc(c.email)}" method="post" enctype="text/plain"`
-        : ""
+      formAction
+        ? ` action="${esc(formAction)}" method="post"`
+        : c.email
+          ? ` action="mailto:${esc(c.email)}" method="post" enctype="text/plain"`
+          : ""
     }>
+      ${formAction ? `<input type="hidden" name="kind" value="booking" />${honeypot}` : ""}
       <div class="fields">
-        ${serviceOptions ? `<label>${esc(s.service)}<select name="${esc(s.service)}">${serviceOptions}</select></label>` : ""}
-        <label>${esc(s.name)}<input name="${esc(s.name)}" required /></label>
-        <label>${esc(s.phone)}<input name="${esc(s.phone)}" required /></label>
-        <label>${esc(s.preferredTime)}<input name="${esc(s.preferredTime)}" placeholder="${esc(s.preferredTimeHint)}" /></label>
+        ${serviceOptions ? `<label>${esc(s.service)}<select name="${formAction ? "service" : esc(s.service)}">${serviceOptions}</select></label>` : ""}
+        <label>${esc(s.name)}<input name="${formAction ? "name" : esc(s.name)}" required /></label>
+        <label>${esc(s.phone)}<input name="${formAction ? "phone" : esc(s.phone)}" required /></label>
+        <label>${esc(s.preferredTime)}<input name="${formAction ? "preferred_time" : esc(s.preferredTime)}" placeholder="${esc(s.preferredTimeHint)}" /></label>
       </div>
       <button class="btn" type="submit">${esc(s.sendBooking)}</button>
     </form>
@@ -251,15 +265,21 @@ export function renderSiteToHtml(content: SiteContent, templateId: string): stri
     </div>
   </div></section>`;
 
-  const contactForm = c.email
-    ? `<h3 class="form-title">${esc(s.sendMessageTitle)}</h3>
-      <form class="form contact-form" action="mailto:${esc(c.email)}" method="post" enctype="text/plain">
-        <label>${esc(s.name)}<input name="${esc(s.name)}" required /></label>
-        <label>${esc(s.email)}<input type="email" name="${esc(s.email)}" required /></label>
-        <label>${esc(s.message)}<textarea name="${esc(s.message)}" rows="4" required></textarea></label>
+  const contactForm =
+    formAction || c.email
+      ? `<h3 class="form-title">${esc(s.sendMessageTitle)}</h3>
+      <form class="form contact-form"${
+        formAction
+          ? ` action="${esc(formAction)}" method="post"`
+          : ` action="mailto:${esc(c.email!)}" method="post" enctype="text/plain"`
+      }>
+        ${formAction ? `<input type="hidden" name="kind" value="contact" />${honeypot}` : ""}
+        <label>${esc(s.name)}<input name="${formAction ? "name" : esc(s.name)}" required /></label>
+        <label>${esc(s.email)}<input type="email" name="${formAction ? "email" : esc(s.email)}" required /></label>
+        <label>${esc(s.message)}<textarea name="${formAction ? "message" : esc(s.message)}" rows="4" required></textarea></label>
         <button class="btn" type="submit">${esc(s.send)}</button>
       </form>`
-    : "";
+      : "";
 
   const hours = (c.hours ?? []).map((h) => `<li>${esc(h)}</li>`).join("");
   const mapEmbed = c.mapsQuery

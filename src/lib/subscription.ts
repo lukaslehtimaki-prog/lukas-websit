@@ -26,6 +26,19 @@ export function effectiveLimits(
   return planLimits(planId);
 }
 
+/**
+ * Pro-only features (AI pitch emails with instant buy). Note the id/label
+ * offset: plan id "premium" is the plan displayed as "Pro" (€100).
+ */
+export function hasProFeatures(
+  planId: string,
+  status: string | null | undefined,
+  isPlatformAdmin = false,
+): boolean {
+  if (isPlatformAdmin) return true;
+  return planId === "premium" && hasActiveSubscription(status);
+}
+
 /** Human-friendly subscription state for the UI. */
 export function subscriptionLabel(
   status: string | null | undefined,

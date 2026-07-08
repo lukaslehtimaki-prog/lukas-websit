@@ -44,7 +44,9 @@ export async function GET(
     });
   }
 
-  const html = renderSiteToHtml(site.content, site.template_id);
+  const html = renderSiteToHtml(site.content, site.template_id, {
+    formAction: `/api/f/${id}`,
+  });
   return new Response(html, {
     headers: {
       "content-type": "text/html; charset=utf-8",
