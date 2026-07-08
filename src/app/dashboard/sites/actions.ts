@@ -528,6 +528,13 @@ export async function sendPitchAction(
     replyTo: ctx.email ?? undefined,
   });
   if (!r.ok) return { error: r.error };
+
+  content.pitch = { sentAt: new Date().toISOString(), to: to.trim() };
+  await supabase
+    .from("sites")
+    .update({ content, updated_at: new Date().toISOString() })
+    .eq("id", siteId);
+
   revalidatePath(`/dashboard/sites/${siteId}`);
   return { ok: true };
 }

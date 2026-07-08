@@ -14,6 +14,7 @@ export default async function DashboardOverview() {
     { count: leadCount },
     { count: noWebsiteCount },
     { count: siteCount },
+    { count: soldCount },
   ] = await Promise.all([
     supabase.from("leads").select("*", { count: "exact", head: true }),
     supabase
@@ -21,6 +22,10 @@ export default async function DashboardOverview() {
       .select("*", { count: "exact", head: true })
       .eq("website_status", "no_website"),
     supabase.from("sites").select("*", { count: "exact", head: true }),
+    supabase
+      .from("sites")
+      .select("*", { count: "exact", head: true })
+      .not("content->payment->>paidAt", "is", null),
   ]);
 
   const firstName = (ctx.fullName || ctx.email || "there")
@@ -38,10 +43,11 @@ export default async function DashboardOverview() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="Leads" value={leadCount ?? 0} />
         <Stat label="No-website leads" value={noWebsiteCount ?? 0} />
         <Stat label="Websites built" value={siteCount ?? 0} />
+        <Stat label="Websites sold" value={soldCount ?? 0} />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

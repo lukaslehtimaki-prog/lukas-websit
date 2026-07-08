@@ -15,6 +15,7 @@ type SiteRow = {
   status: string;
   updated_at: string;
   paid_at: string | null;
+  pitched_at: string | null;
 };
 
 const statusStyles: Record<string, string> = {
@@ -29,7 +30,9 @@ export default async function SitesPage() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("sites")
-    .select("id,title,template_id,status,updated_at,paid_at:content->payment->>paidAt")
+    .select(
+      "id,title,template_id,status,updated_at,paid_at:content->payment->>paidAt,pitched_at:content->pitch->>sentAt",
+    )
     .order("updated_at", { ascending: false })
     .limit(200);
   const sites = (data ?? []) as unknown as SiteRow[];
@@ -99,7 +102,13 @@ export default async function SitesPage() {
               </div>
               <p className="mt-3 font-medium text-zinc-900 dark:text-zinc-100">{s.title}</p>
               <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                Updated {new Date(s.updated_at).toLocaleDateString()}
+                {s.pitched_at && !s.paid_at ? (
+                  <span className="font-medium text-indigo-600 dark:text-indigo-400">
+                    Pitched {new Date(s.pitched_at).toLocaleDateString()}
+                  </span>
+                ) : (
+                  <>Updated {new Date(s.updated_at).toLocaleDateString()}</>
+                )}
               </p>
             </Link>
           ))}

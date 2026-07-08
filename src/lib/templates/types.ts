@@ -82,6 +82,8 @@ export type SiteContent = {
   themeId?: string;
   /** Seed to reroll the visual design; when unset a hash of the name is used. */
   designSeed?: number;
+  /** Set when a pitch email was sent, for outreach tracking. */
+  pitch?: { sentAt: string; to: string };
   /** Stripe payment-link sale info, auto-created for pitch emails. */
   payment?: {
     productId: string;

@@ -26,9 +26,21 @@ export async function GET(
     | null;
 
   if (!site || site.status !== "published") {
-    return new Response("This website is not published.", {
+    // A friendly page: this URL travels in pitch emails, so a business owner
+    // clicking an outdated link should see something presentable.
+    const notFound = `<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" /><title>Website not available</title></head>
+<body style="margin:0;min-height:100vh;display:grid;place-items:center;background:#fafafa;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+<div style="text-align:center;padding:48px 24px;max-width:420px;">
+<div style="width:56px;height:56px;margin:0 auto 20px;border-radius:16px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:grid;place-items:center;color:#fff;font-size:26px;font-weight:700;">S</div>
+<h1 style="margin:0 0 8px;font-size:22px;color:#18181b;">This website isn&rsquo;t available right now</h1>
+<p style="margin:0;font-size:15px;line-height:1.6;color:#71717a;">The preview may have been taken down or moved. If someone sent you this link, reply to them for an up-to-date one.</p>
+</div></body></html>`;
+    return new Response(notFound, {
       status: 404,
-      headers: { "content-type": "text/plain; charset=utf-8" },
+      headers: { "content-type": "text/html; charset=utf-8" },
     });
   }
 
