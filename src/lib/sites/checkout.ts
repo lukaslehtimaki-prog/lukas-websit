@@ -1,11 +1,17 @@
 import "server-only";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
+import { PLATFORM_COMMISSION_PCT } from "@/lib/sites/connect";
 import type { SiteContent } from "@/lib/templates/types";
 
 // Auto-created Stripe Payment Links for selling a generated website through the
 // pitch email. One Product per site (reused), a new Price + Payment Link when
 // the asking price changes; superseded links are deactivated so an old email
 // can't undercut a new offer.
+//
+// Money routing: the platform owner's own sales charge directly on the
+// platform account. Everyone else needs Stripe Connect payouts — their sales
+// become destination charges (money to their account, minus the platform
+// commission which stays in the platform balance).
 
 export type SitePayment = NonNullable<SiteContent["payment"]>;
 
@@ -54,11 +60,21 @@ export async function ensureSitePaymentLink(opts: {
   content: SiteContent;
   priceStr: string;
   liveUrl: string;
+  /** Platform owner's own workspace: charge directly, no fee. */
+  platformDirect: boolean;
+  /** The seller's ready Connect account (required unless platformDirect). */
+  connectAccountId?: string | null;
 }): Promise<
   { payment: SitePayment; changed: boolean } | { error: string }
 > {
   if (!isStripeConfigured())
     return { error: "Stripe is not configured (STRIPE_SECRET_KEY)." };
+  const dest = opts.platformDirect ? null : (opts.connectAccountId ?? null);
+  if (!opts.platformDirect && !dest)
+    return {
+      error:
+        "Connect Stripe payouts in Settings to sell websites with the Buy button.",
+    };
   const parsed = parsePrice(opts.priceStr);
   if (!parsed) return { error: "Enter a valid price (e.g. 500 €)." };
 
@@ -66,7 +82,8 @@ export async function ensureSitePaymentLink(opts: {
   if (
     existing?.link &&
     existing.amount === parsed.amount &&
-    existing.currency === parsed.currency
+    existing.currency === parsed.currency &&
+    (existing.dest ?? null) === dest
   ) {
     return { payment: existing, changed: false };
   }
@@ -92,6 +109,14 @@ export async function ensureSitePaymentLink(opts: {
       type: "redirect",
       redirect: { url: opts.liveUrl },
     },
+    ...(dest
+      ? {
+          transfer_data: { destination: dest },
+          application_fee_amount: Math.round(
+            (parsed.amount * PLATFORM_COMMISSION_PCT) / 100,
+          ),
+        }
+      : {}),
   });
   if (existing?.linkId && existing.linkId !== link.id) {
     await stripe.paymentLinks
@@ -107,6 +132,7 @@ export async function ensureSitePaymentLink(opts: {
       priceStr: opts.priceStr.trim(),
       amount: parsed.amount,
       currency: parsed.currency,
+      dest,
       paidAt: existing?.paidAt ?? null,
     },
     changed: true,

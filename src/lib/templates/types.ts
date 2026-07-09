@@ -93,6 +93,8 @@ export type SiteContent = {
     priceStr: string;
     amount: number; // minor units (cents)
     currency: string; // ISO code, lowercase
+    /** Connected Stripe account the sale pays out to (null = platform-direct). */
+    dest?: string | null;
     /** Set by the Stripe webhook when the business pays — the site is sold. */
     paidAt?: string | null;
   };

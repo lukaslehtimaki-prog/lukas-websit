@@ -27,6 +27,7 @@ import {
 import { languageForCountry } from "@/lib/templates/i18n";
 import { uploadSiteImage, importPlacePhotos } from "@/lib/sites/images";
 import { ensureSitePaymentLink } from "@/lib/sites/checkout";
+import { getConnectStatus } from "@/lib/sites/connect";
 import { checkLimit, recordUsage } from "@/lib/usage";
 import { hasProFeatures } from "@/lib/subscription";
 import type { BusinessInfo, SiteContent, SiteReview } from "@/lib/templates/types";
@@ -387,6 +388,7 @@ export async function generatePitchAction(
   subject?: string;
   body?: string;
   paymentLink?: string;
+  paymentNote?: string;
   error?: string;
 }> {
   const ctx = await requireTenantContext();
@@ -432,13 +434,19 @@ export async function generatePitchAction(
     // Buy button works with zero setup. Best-effort: a Stripe hiccup shouldn't
     // block the draft — send falls back to reply-to-buy.
     let paymentLink: string | undefined;
+    let paymentNote: string | undefined;
     if (priceStr?.trim() && isStripeConfigured()) {
+      const connect = ctx.isPlatformAdmin
+        ? null
+        : await getConnectStatus(ctx.tenantId);
       const r = await ensureSitePaymentLink({
         siteId,
         tenantId: ctx.tenantId,
         content,
         priceStr,
         liveUrl: `${base}/s/${siteId}`,
+        platformDirect: ctx.isPlatformAdmin,
+        connectAccountId: connect?.ready ? connect.accountId : null,
       });
       if ("payment" in r) {
         paymentLink = r.payment.link;
@@ -451,9 +459,11 @@ export async function generatePitchAction(
             })
             .eq("id", siteId);
         }
+      } else {
+        paymentNote = r.error;
       }
     }
-    return { to, ...pitch, paymentLink };
+    return { to, ...pitch, paymentLink, paymentNote };
   } catch {
     return { error: "Could not draft the email. Try again in a moment." };
   }
@@ -505,12 +515,17 @@ export async function sendPitchAction(
   const priceStr = offer?.price?.trim();
   const isAutoLink = !finalLink || finalLink === content.payment?.link;
   if (priceStr && isAutoLink && isStripeConfigured()) {
+    const connect = ctx.isPlatformAdmin
+      ? null
+      : await getConnectStatus(ctx.tenantId);
     const r = await ensureSitePaymentLink({
       siteId,
       tenantId: ctx.tenantId,
       content,
       priceStr,
       liveUrl,
+      platformDirect: ctx.isPlatformAdmin,
+      connectAccountId: connect?.ready ? connect.accountId : null,
     });
     if ("payment" in r) {
       finalLink = r.payment.link;
@@ -524,8 +539,10 @@ export async function sendPitchAction(
           })
           .eq("id", siteId);
       }
-    } else if (!finalLink) {
-      return { error: r.error };
+    } else {
+      // No link possible (e.g. payouts not connected) — the email still goes
+      // out with the price and the reply-to-buy path.
+      finalLink = undefined;
     }
   }
   const cleanOffer = { price: priceStr || undefined, paymentLink: finalLink };

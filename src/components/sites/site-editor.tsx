@@ -245,6 +245,7 @@ export function SiteEditor({
         setPitch({ subject: r.subject ?? "", body: r.body ?? "" });
         if (r.to) setPitchTo((prev) => prev || r.to || "");
         if (r.paymentLink) setOfferLink(r.paymentLink);
+        if (r.paymentNote) setMessage(r.paymentNote);
         setPitchSent(false);
       }
       setPitchBusy(null);
