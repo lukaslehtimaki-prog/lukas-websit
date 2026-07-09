@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/env";
 
@@ -57,13 +57,23 @@ export async function signUpAction(
   if (password.length < 8)
     return { error: "Password must be at least 8 characters." };
 
+  // Affiliate referral captured by the proxy from a ?ref= link; the
+  // handle_new_user() trigger stores it on the new tenant for attribution.
+  const jar = await cookies();
+  const refCookie = jar.get("sitovai_ref")?.value?.toLowerCase() ?? "";
+  const refCode = /^[a-z0-9-]{3,32}$/.test(refCookie) ? refCookie : "";
+
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       // Consumed by the handle_new_user() trigger to name the new tenant/profile.
-      data: { full_name: fullName, company_name: companyName },
+      data: {
+        full_name: fullName,
+        company_name: companyName,
+        ...(refCode ? { ref_code: refCode } : {}),
+      },
       emailRedirectTo: `${await siteOrigin()}/auth/callback`,
     },
   });

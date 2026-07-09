@@ -5,6 +5,11 @@ import { requireTenantContext } from "@/lib/auth/tenant";
 import { createClient } from "@/lib/supabase/server";
 import { getStripe, priceIdForPlan, isStripeConfigured } from "@/lib/stripe";
 import { TRIAL_DAYS, type PlanId } from "@/lib/plans";
+import {
+  getActiveAffiliate,
+  tenantReferralCode,
+  ensureAffiliateCoupon,
+} from "@/lib/affiliates";
 
 type ActionResult = { url?: string; error?: string };
 
@@ -60,18 +65,36 @@ export async function startCheckout(plan: PlanId): Promise<ActionResult> {
     );
     const stripe = getStripe();
     const base = await origin();
+
+    // Referred workspaces get the affiliate discount automatically. Stripe
+    // forbids combining `discounts` with `allow_promotion_codes`, so referred
+    // checkouts lose the manual promo-code field (they already have the deal).
+    const affiliate = await getActiveAffiliate(
+      await tenantReferralCode(ctx.tenantId),
+    );
+    const discounts = affiliate
+      ? [{ coupon: await ensureAffiliateCoupon(stripe) }]
+      : undefined;
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: customerId,
       line_items: [{ price: priceId, quantity: 1 }],
       subscription_data: {
         trial_period_days: TRIAL_DAYS,
-        metadata: { tenant_id: ctx.tenantId },
+        metadata: {
+          tenant_id: ctx.tenantId,
+          ...(affiliate ? { affiliate_code: affiliate.code } : {}),
+        },
       },
-      metadata: { tenant_id: ctx.tenantId, plan },
+      metadata: {
+        tenant_id: ctx.tenantId,
+        plan,
+        ...(affiliate ? { affiliate_code: affiliate.code } : {}),
+      },
       success_url: `${base}/dashboard/billing?success=1`,
       cancel_url: `${base}/dashboard/billing?canceled=1`,
-      allow_promotion_codes: true,
+      ...(discounts ? { discounts } : { allow_promotion_codes: true }),
       // Stripe Tax: calculates VAT once a tax registration exists (none yet — the
       // account isn't registered, so this correctly charges €0 until it is).
       // billing_address_collection + customer_update are required by Stripe when

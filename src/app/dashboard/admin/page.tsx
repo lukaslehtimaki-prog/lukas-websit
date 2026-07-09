@@ -5,6 +5,12 @@ import { requireTenantContext } from "@/lib/auth/tenant";
 import { getAdminDb, schema } from "@/lib/db";
 import { env } from "@/lib/env";
 import { planLimits } from "@/lib/plans";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { siteUrl } from "@/lib/site";
+import {
+  AffiliatesPanel,
+  type AffiliateRow,
+} from "@/components/admin/affiliates-panel";
 
 export const metadata = { title: "Admin · Sitovai" };
 
@@ -149,8 +155,74 @@ export default async function AdminPage() {
           </tbody>
         </table>
       </div>
+
+      <AffiliatesSection />
     </AdminShell>
   );
+}
+
+/**
+ * Affiliate roster + performance, via the service-role client (independent of
+ * DATABASE_URL). Commission ≈ referred paying subs × plan price × 90%
+ * (the referred discount) × the affiliate's rate.
+ */
+async function AffiliatesSection() {
+  const supabase = createAdminClient();
+  const { data: affRows, error } = await supabase
+    .from("affiliates")
+    .select("*")
+    .order("created_at", { ascending: true });
+  if (error) {
+    return (
+      <Notice>
+        The affiliate program needs a one-time database setup: run{" "}
+        <code className="font-mono">supabase/migrations/0005_affiliates.sql</code>{" "}
+        in the Supabase SQL editor.
+      </Notice>
+    );
+  }
+  const list = (affRows ?? []) as {
+    id: string;
+    code: string;
+    name: string;
+    email: string | null;
+    commission_bps: number;
+    clicks: number;
+    active: boolean;
+  }[];
+
+  const { data: refRows } = await supabase
+    .from("tenants")
+    .select("referred_by_code, plan_id, subscription_status")
+    .not("referred_by_code", "is", null);
+  const referred = (refRows ?? []) as {
+    referred_by_code: string;
+    plan_id: string;
+    subscription_status: string | null;
+  }[];
+
+  const rows: AffiliateRow[] = list.map((a) => {
+    const mine = referred.filter((t) => t.referred_by_code === a.code);
+    const paying = mine.filter((t) => t.subscription_status === "active");
+    const trialing = mine.filter((t) => t.subscription_status === "trialing");
+    const monthlyCommissionCents = paying.reduce(
+      (sum, t) =>
+        sum +
+        Math.round(
+          planLimits(t.plan_id).priceCents * 0.9 * (a.commission_bps / 10000),
+        ),
+      0,
+    );
+    return {
+      ...a,
+      signups: mine.length,
+      paying: paying.length,
+      trialing: trialing.length,
+      monthlyCommissionCents,
+    };
+  });
+
+  return <AffiliatesPanel affiliates={rows} baseUrl={siteUrl} />;
 }
 
 function AdminShell({ children }: { children: ReactNode }) {
