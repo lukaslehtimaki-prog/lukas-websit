@@ -75,7 +75,7 @@ export async function connectOnboardingUrl(
   return link.url;
 }
 
-/** Re-checks charges_enabled with Stripe and caches it on the tenant. */
+/** Re-checks readiness with Stripe and caches it on the tenant. */
 export async function refreshConnectStatus(
   tenantId: string,
 ): Promise<ConnectStatus> {
@@ -83,7 +83,11 @@ export async function refreshConnectStatus(
   if (!status.accountId) return status;
   const stripe = getStripe();
   const account = await stripe.accounts.retrieve(status.accountId);
-  const ready = Boolean(account.charges_enabled);
+  // Destination charges specifically require the transfers capability on the
+  // connected account — charges_enabled alone isn't the right gate.
+  const ready =
+    account.capabilities?.transfers === "active" &&
+    Boolean(account.payouts_enabled || account.charges_enabled);
   if (ready !== status.ready) {
     const supabase = createAdminClient();
     await supabase
