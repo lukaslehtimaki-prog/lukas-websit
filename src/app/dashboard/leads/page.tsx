@@ -19,12 +19,14 @@ export default async function LeadsPage() {
     .limit(500);
 
   const leads = (data ?? []) as unknown as LeadRow[];
-  const noWebsite = leads.filter((l) => l.website_status === "no_website").length;
+  const opportunities = leads.filter(
+    (l) => l.website_status !== "has_website" && l.website_status !== "unknown",
+  ).length;
   const matched = leads.filter((l) => l.registry_status === "matched").length;
 
   const stats = [
     { icon: Users, label: "Total leads", value: leads.length },
-    { icon: Globe, label: "No website", value: noWebsite },
+    { icon: Globe, label: "No real website", value: opportunities },
     { icon: ShieldCheck, label: "YTJ matched", value: matched },
   ];
 

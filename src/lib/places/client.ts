@@ -104,6 +104,25 @@ const DETAILS_FIELDS = [
   "addressComponents",
 ].join(",");
 
+// Domains that mean "listed online" but NOT "has their own website" — social
+// profiles, link hubs, booking/delivery platforms and directories. A business
+// whose Google listing points here is still a website-sales opportunity.
+const SOCIAL_OR_DIRECTORY_RE =
+  /(^|\.)(facebook|fb|instagram|tiktok|linktr|linktree|wa|whatsapp|m\.me|t\.me|youtube|x|twitter|yelp|tripadvisor|treatwell|fresha|booksy|timma|varaa|wolt|foodora|ubereats|doordash|deliveroo|just-eat|justeat|foursquare|groupon|booking|opentable|thefork|squarespace-cdn|google|business\.site)\.(com|net|fi|se|de|fr|es|it|nl|be|co|me|ee|app|site|page|link)$|(^|\.)(linktr\.ee|fb\.me|wa\.me|t\.me|business\.google\.com)$/i;
+
+/** True when a listing URL is a social profile / directory, not a real site. */
+export function isSocialOrDirectoryUrl(url: string): boolean {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    if (/^(linktr\.ee|fb\.me|wa\.me|t\.me)$/i.test(host)) return true;
+    // Google's discontinued free business sites + Google Sites pages.
+    if (/(^|\.)business\.site$|^sites\.google\.com$/i.test(host)) return true;
+    return SOCIAL_OR_DIRECTORY_RE.test(host);
+  } catch {
+    return false;
+  }
+}
+
 function toCandidate(p: GooglePlace): PlaceCandidate {
   const website = p.websiteUri ?? null;
   return {

@@ -4,9 +4,38 @@ import { revalidatePath } from "next/cache";
 import { requireTenantContext } from "@/lib/auth/tenant";
 import { createClient } from "@/lib/supabase/server";
 import { isPlacesConfigured } from "@/lib/env";
-import { searchPlaces, geocodeLocation, PlacesError } from "@/lib/places/client";
-import { enrichBatch } from "@/lib/leads/matching";
+import {
+  searchPlaces,
+  geocodeLocation,
+  PlacesError,
+  type PlaceCandidate,
+} from "@/lib/places/client";
+import { enrichBatch, isOpportunity } from "@/lib/leads/matching";
 import { checkLimit, recordUsage } from "@/lib/usage";
+
+// The "every business type" sweep fans one search out across the local trades
+// and services most likely to lack a website. Each entry is one Text Search
+// query (1 page / 20 results) — worldwide English queries work fine.
+const SWEEP_CATEGORIES = [
+  "plumber",
+  "electrician",
+  "construction company",
+  "roofing contractor",
+  "painter decorator",
+  "carpenter",
+  "car repair shop",
+  "heating and air conditioning",
+  "cleaning service",
+  "moving company",
+  "landscaping and gardening",
+  "locksmith",
+  "barber shop",
+  "beauty salon",
+  "massage therapist",
+  "physiotherapy",
+  "restaurant",
+  "cafe bakery",
+] as const;
 
 export type SearchState = {
   ok?: boolean;
@@ -35,7 +64,12 @@ export async function runSearchAction(
   const niche = String(formData.get("niche") ?? "").trim();
   const location = String(formData.get("location") ?? "").trim();
   const radiusKm = Number(formData.get("radiusKm") ?? "5") || 5;
-  if (!niche) return { error: "Enter a niche or business type to search for." };
+  const allTypes = formData.get("allTypes") === "on";
+  const onlyOpportunities = formData.get("onlyOpportunities") === "on";
+  if (!niche && !allTypes)
+    return { error: "Enter a niche or business type to search for." };
+  if (allTypes && !location)
+    return { error: "The every-business-type sweep needs a location." };
 
   const limit = await checkLimit(
     ctx.planId,
@@ -52,7 +86,6 @@ export async function runSearchAction(
     };
   }
 
-  const query = [niche, location].filter(Boolean).join(" in ");
   let lat: number | null = null;
   let lng: number | null = null;
   let label = location;
@@ -65,15 +98,31 @@ export async function runSearchAction(
     }
   }
 
-  let candidates;
+  const geoOpts = { lat, lng, radiusMeters: radiusKm * 1000 };
+  const queries = allTypes
+    ? SWEEP_CATEGORIES.map((c) => `${c} in ${location}`)
+    : [[niche, location].filter(Boolean).join(" in ")];
+
+  let candidates: PlaceCandidate[];
   try {
-    candidates = await searchPlaces({
-      query,
-      lat,
-      lng,
-      radiusMeters: radiusKm * 1000,
-      maxResults: 40,
-    });
+    if (allTypes) {
+      // Fan out, dedupe by place id (a garage can match two categories).
+      const batches = await Promise.all(
+        queries.map((query) =>
+          searchPlaces({ query, ...geoOpts, maxResults: 20 }).catch(() => []),
+        ),
+      );
+      const seen = new Map<string, PlaceCandidate>();
+      for (const batch of batches)
+        for (const c of batch) if (!seen.has(c.placeId)) seen.set(c.placeId, c);
+      candidates = [...seen.values()];
+    } else {
+      candidates = await searchPlaces({
+        query: queries[0],
+        ...geoOpts,
+        maxResults: 60,
+      });
+    }
   } catch (e) {
     return {
       error:
@@ -83,7 +132,9 @@ export async function runSearchAction(
     };
   }
 
-  const enriched = await enrichBatch(candidates);
+  let enriched = await enrichBatch(candidates);
+  if (onlyOpportunities)
+    enriched = enriched.filter((l) => isOpportunity(l.websiteStatus));
 
   const supabase = await createClient();
   const { data: searchRow } = await supabase
@@ -91,7 +142,7 @@ export async function runSearchAction(
     .insert({
       tenant_id: ctx.tenantId,
       created_by: ctx.userId,
-      niche,
+      niche: allTypes ? "All business types" : niche,
       location_label: label || null,
       lat,
       lng,
@@ -123,24 +174,46 @@ export async function runSearchAction(
       registry_registration_date: asDate(l.registryRegistrationDate),
       registry_industry_code: l.registryIndustryCode,
     }));
-    const { error } = await supabase
+    let { error } = await supabase
       .from("leads")
       .upsert(rows, { onConflict: "tenant_id,place_id" });
+    if (error && /website_status/.test(error.message)) {
+      // Migration 0007 not applied yet: degrade the new statuses to the legacy
+      // set so the search still saves (social/dead are opportunities).
+      const legacy = rows.map((r) => ({
+        ...r,
+        website_status:
+          r.website_status === "has_website" ? "has_website" : "no_website",
+      }));
+      ({ error } = await supabase
+        .from("leads")
+        .upsert(legacy, { onConflict: "tenant_id,place_id" }));
+    }
     if (error) return { error: `Could not save leads: ${error.message}` };
   }
 
-  await recordUsage(ctx.tenantId, ctx.userId, "lead_search", 1, {
-    niche,
+  await recordUsage(ctx.tenantId, ctx.userId, "lead_search", queries.length, {
+    niche: allTypes ? "all_types_sweep" : niche,
     location: label,
     results: enriched.length,
   });
   revalidatePath("/dashboard/leads");
 
-  const noWeb = enriched.filter((l) => l.websiteStatus === "no_website").length;
+  const counts = { no_website: 0, social_only: 0, dead_site: 0 } as Record<
+    string,
+    number
+  >;
+  for (const l of enriched)
+    if (l.websiteStatus in counts) counts[l.websiteStatus]++;
+  const parts = [
+    `${counts.no_website} with no website`,
+    counts.social_only ? `${counts.social_only} social-media only` : null,
+    counts.dead_site ? `${counts.dead_site} with a dead site` : null,
+  ].filter(Boolean);
   return {
     ok: true,
     count: enriched.length,
-    message: `Found ${enriched.length} businesses — ${noWeb} with no website.`,
+    message: `Found ${enriched.length} businesses — ${parts.join(", ")}.`,
   };
 }
 

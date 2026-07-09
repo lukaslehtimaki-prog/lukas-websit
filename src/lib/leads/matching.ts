@@ -1,9 +1,14 @@
 import "server-only";
 import { searchRegistryByName, type RegistryCompany } from "@/lib/ytj/client";
-import type { PlaceCandidate } from "@/lib/places/client";
+import {
+  isSocialOrDirectoryUrl,
+  type PlaceCandidate,
+} from "@/lib/places/client";
 
 // Cross-references Google Places results with the PRH/YTJ registry by company name
-// (boosted when the registry city/postcode also appears in the Places address).
+// (boosted when the registry city/postcode also appears in the Places address),
+// and classifies each lead's web presence — including a live probe that catches
+// dead/parked domains still listed on Google.
 
 export type RegistryStatus =
   | "matched"
@@ -11,14 +16,81 @@ export type RegistryStatus =
   | "no_match"
   | "unchecked";
 
+/** no_website, social_only and dead_site are all sales opportunities. */
+export type WebsiteStatus =
+  | "no_website"
+  | "social_only"
+  | "dead_site"
+  | "has_website";
+
+export function isOpportunity(status: string): boolean {
+  return status !== "has_website";
+}
+
 export type EnrichedLead = PlaceCandidate & {
-  websiteStatus: "no_website" | "has_website";
+  websiteStatus: WebsiteStatus;
   registryStatus: RegistryStatus;
   businessId: string | null;
   registryName: string | null;
   registryRegistrationDate: string | null;
   registryIndustryCode: string | null;
 };
+
+/**
+ * GET the site with a short timeout. Any HTTP response (even 403/404) proves a
+ * server exists; network errors / timeouts mean the listed site is dead. A
+ * redirect that lands on a social platform counts as social-only.
+ */
+async function probeWebsite(
+  url: string,
+  timeoutMs = 3500,
+): Promise<"alive" | "dead" | "social"> {
+  try {
+    const res = await fetch(url, {
+      redirect: "follow",
+      signal: AbortSignal.timeout(timeoutMs),
+      cache: "no-store",
+      headers: { "user-agent": "Mozilla/5.0 (compatible; SitovaiBot/1.0)" },
+    });
+    if (res.url && isSocialOrDirectoryUrl(res.url)) return "social";
+    return res.status >= 500 ? "dead" : "alive";
+  } catch {
+    return "dead";
+  }
+}
+
+/** Classify every candidate's web presence; probes real URLs concurrently. */
+export async function classifyWebsites(
+  candidates: PlaceCandidate[],
+  concurrency = 10,
+): Promise<Map<string, WebsiteStatus>> {
+  const out = new Map<string, WebsiteStatus>();
+  const toProbe: PlaceCandidate[] = [];
+  for (const c of candidates) {
+    if (!c.website) out.set(c.placeId, "no_website");
+    else if (isSocialOrDirectoryUrl(c.website)) out.set(c.placeId, "social_only");
+    else toProbe.push(c);
+  }
+  let next = 0;
+  async function worker() {
+    while (next < toProbe.length) {
+      const c = toProbe[next++];
+      const result = await probeWebsite(c.website!);
+      out.set(
+        c.placeId,
+        result === "social"
+          ? "social_only"
+          : result === "dead"
+            ? "dead_site"
+            : "has_website",
+      );
+    }
+  }
+  await Promise.all(
+    Array.from({ length: Math.min(concurrency, toProbe.length) }, worker),
+  );
+  return out;
+}
 
 const COMPANY_SUFFIXES = /\b(oyj|oy|ab|ky|tmi|ry|osk)\b/g;
 
@@ -56,10 +128,11 @@ function pickBest(candidate: PlaceCandidate, companies: RegistryCompany[]) {
 
 export async function enrichWithRegistry(
   candidate: PlaceCandidate,
+  websiteStatus: WebsiteStatus,
 ): Promise<EnrichedLead> {
   const lead: EnrichedLead = {
     ...candidate,
-    websiteStatus: candidate.hasWebsite ? "has_website" : "no_website",
+    websiteStatus,
     registryStatus: "no_match",
     businessId: null,
     registryName: null,
@@ -89,12 +162,17 @@ export async function enrichBatch(
   candidates: PlaceCandidate[],
   concurrency = 4,
 ): Promise<EnrichedLead[]> {
+  const websiteStatuses = await classifyWebsites(candidates);
   const out: EnrichedLead[] = new Array(candidates.length);
   let next = 0;
   async function worker() {
     while (next < candidates.length) {
       const idx = next++;
-      out[idx] = await enrichWithRegistry(candidates[idx]);
+      const c = candidates[idx];
+      out[idx] = await enrichWithRegistry(
+        c,
+        websiteStatuses.get(c.placeId) ?? (c.hasWebsite ? "has_website" : "no_website"),
+      );
     }
   }
   await Promise.all(

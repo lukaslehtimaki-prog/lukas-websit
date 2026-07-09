@@ -57,6 +57,34 @@ function WebsiteBadge({ status, website }: { status: string; website: string | n
       </span>
     );
   }
+  if (status === "social_only") {
+    return (
+      <a
+        href={website ?? "#"}
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Only a social-media or directory profile — still a great lead"
+        className="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-800 ring-1 ring-inset ring-sky-200 transition hover:ring-sky-300 dark:bg-sky-500/10 dark:text-sky-300 dark:ring-sky-500/25"
+      >
+        <span className="h-1.5 w-1.5 rounded-full bg-sky-500" />
+        Social only <ExternalLink className="h-3 w-3" />
+      </a>
+    );
+  }
+  if (status === "dead_site") {
+    return (
+      <a
+        href={website ?? "#"}
+        target="_blank"
+        rel="noopener noreferrer"
+        title="The listed website doesn't respond — likely dead or parked"
+        className="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-800 ring-1 ring-inset ring-red-200 transition hover:ring-red-300 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-500/25"
+      >
+        <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+        Dead site <ExternalLink className="h-3 w-3" />
+      </a>
+    );
+  }
   return (
     <a
       href={website ?? "#"}
@@ -108,7 +136,7 @@ export function LeadsTable({ leads }: { leads: LeadRow[] }) {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return leads.filter((l) => {
-      if (noWebOnly && l.website_status !== "no_website") return false;
+      if (noWebOnly && l.website_status === "has_website") return false;
       if (!q) return true;
       return `${l.name} ${l.address ?? ""} ${l.category ?? ""}`
         .toLowerCase()
@@ -130,7 +158,7 @@ export function LeadsTable({ leads }: { leads: LeadRow[] }) {
   }
 
   const segmented = [
-    { label: "No website", value: true },
+    { label: "Opportunities", value: true },
     { label: "All leads", value: false },
   ] as const;
 

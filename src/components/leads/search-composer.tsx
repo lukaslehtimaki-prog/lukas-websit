@@ -16,10 +16,10 @@ import { runSearchAction, type SearchState } from "@/app/dashboard/leads/actions
 const initial: SearchState = {};
 
 const examples = [
-  { niche: "Barbershop", location: "Helsinki" },
-  { niche: "Café", location: "Stockholm" },
-  { niche: "Gym", location: "Berlin" },
-  { niche: "Restaurant", location: "New York" },
+  { niche: "Plumber", location: "Helsinki" },
+  { niche: "Car repair", location: "Stockholm" },
+  { niche: "Electrician", location: "Berlin" },
+  { niche: "Barbershop", location: "New York" },
 ];
 
 const inputClass =
@@ -29,6 +29,7 @@ export function SearchComposer() {
   const [state, formAction, pending] = useActionState(runSearchAction, initial);
   const [niche, setNiche] = useState("");
   const [location, setLocation] = useState("");
+  const [allTypes, setAllTypes] = useState(false);
 
   return (
     <form
@@ -55,11 +56,16 @@ export function SearchComposer() {
               <Store className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" />
               <input
                 name="niche"
-                value={niche}
+                value={allTypes ? "" : niche}
                 onChange={(e) => setNiche(e.target.value)}
-                placeholder="e.g. barbershop, gym, hairdresser"
+                placeholder={
+                  allTypes
+                    ? "Every business type — plumbers, mechanics, salons…"
+                    : "e.g. plumber, electrician, barbershop"
+                }
                 className={inputClass}
-                required
+                required={!allTypes}
+                disabled={allTypes}
               />
             </div>
           </label>
@@ -107,6 +113,40 @@ export function SearchComposer() {
           </button>
         </div>
 
+        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
+          <label className="inline-flex cursor-pointer items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+            <input
+              type="checkbox"
+              name="allTypes"
+              checked={allTypes}
+              onChange={(e) => setAllTypes(e.target.checked)}
+              className="h-4 w-4 cursor-pointer rounded border-zinc-300 accent-indigo-600 dark:border-zinc-700"
+            />
+            <span>
+              <span className="font-medium">Every business type</span>
+              <span className="hidden text-zinc-400 dark:text-zinc-500 sm:inline">
+                {" "}
+                — sweeps 18 trades &amp; services in one go
+              </span>
+            </span>
+          </label>
+          <label className="inline-flex cursor-pointer items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+            <input
+              type="checkbox"
+              name="onlyOpportunities"
+              defaultChecked
+              className="h-4 w-4 cursor-pointer rounded border-zinc-300 accent-indigo-600 dark:border-zinc-700"
+            />
+            <span>
+              <span className="font-medium">Only without a real website</span>
+              <span className="hidden text-zinc-400 dark:text-zinc-500 sm:inline">
+                {" "}
+                — skips businesses that already have one
+              </span>
+            </span>
+          </label>
+        </div>
+
         <div className="mt-3.5 flex flex-wrap items-center gap-2">
           <span className="text-xs text-zinc-400 dark:text-zinc-500">Try:</span>
           {examples.map((ex) => (
@@ -114,6 +154,7 @@ export function SearchComposer() {
               key={ex.niche}
               type="button"
               onClick={() => {
+                setAllTypes(false);
                 setNiche(ex.niche);
                 setLocation(ex.location);
               }}
