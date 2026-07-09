@@ -41,12 +41,16 @@ export async function createAffiliateAction(input: {
     return { error: "Enter a valid email (or leave it empty)." };
 
   const supabase = createAdminClient();
-  const { error } = await supabase.from("affiliates").insert({
-    name,
-    code,
-    email,
-    commission_bps: pct * 100,
-  });
+  const { data: created, error } = await supabase
+    .from("affiliates")
+    .insert({
+      name,
+      code,
+      email,
+      commission_bps: pct * 100,
+    })
+    .select("id")
+    .single();
   if (error) {
     return {
       error: error.code === "23505"
@@ -54,6 +58,64 @@ export async function createAffiliateAction(input: {
         : error.message,
     };
   }
+  // If the email belongs to a Sitovai account, link their workspace so the
+  // partner discount kicks in on their own subscription.
+  if (email && created) await tryLinkAffiliateTenant(created.id, email);
+  revalidatePath("/dashboard/admin");
+  return { ok: true };
+}
+
+/** Match an affiliate's email to a user account → link their workspace. */
+async function tryLinkAffiliateTenant(
+  affiliateId: string,
+  email: string,
+): Promise<boolean> {
+  const supabase = createAdminClient();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id")
+    .ilike("email", email)
+    .maybeSingle();
+  if (!profile) return false;
+  const { data: membership } = await supabase
+    .from("memberships")
+    .select("tenant_id")
+    .eq("user_id", (profile as { id: string }).id)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  const tenantId = (membership as { tenant_id?: string } | null)?.tenant_id;
+  if (!tenantId) return false;
+  // Unique constraint: a workspace can back at most one affiliate.
+  const { error } = await supabase
+    .from("affiliates")
+    .update({ tenant_id: tenantId })
+    .eq("id", affiliateId);
+  return !error;
+}
+
+export async function linkAffiliateAccountAction(
+  id: string,
+): Promise<{ ok?: boolean; error?: string }> {
+  try {
+    await requirePlatformAdmin();
+  } catch {
+    return { error: "Not authorized." };
+  }
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("affiliates")
+    .select("email")
+    .eq("id", id)
+    .maybeSingle();
+  const email = (data as { email?: string | null } | null)?.email;
+  if (!email) return { error: "Add an email to this affiliate first." };
+  const linked = await tryLinkAffiliateTenant(id, email);
+  if (!linked)
+    return {
+      error:
+        "No Sitovai account found with that email (or its workspace already backs another affiliate).",
+    };
   revalidatePath("/dashboard/admin");
   return { ok: true };
 }

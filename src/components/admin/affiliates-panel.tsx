@@ -6,6 +6,7 @@ import { Copy, Loader2, Plus, UserPlus } from "lucide-react";
 import {
   createAffiliateAction,
   setAffiliateActiveAction,
+  linkAffiliateAccountAction,
 } from "@/app/dashboard/admin/actions";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +21,7 @@ export type AffiliateRow = {
   commission_bps: number;
   clicks: number;
   active: boolean;
+  tenant_id: string | null;
   signups: number;
   paying: number;
   trialing: number;
@@ -38,7 +40,7 @@ export function AffiliatesPanel({
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
   const [email, setEmail] = useState("");
-  const [pct, setPct] = useState("20");
+  const [pct, setPct] = useState("10");
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -85,6 +87,18 @@ export function AffiliatesPanel({
     setMessage("Link copied ✓");
   }
 
+  function linkAccount(id: string) {
+    setMessage(null);
+    startTransition(async () => {
+      const r = await linkAffiliateAccountAction(id);
+      if (r.error) setMessage(r.error);
+      else {
+        setMessage("Account linked ✓ — partner discount active");
+        router.refresh();
+      }
+    });
+  }
+
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-3">
@@ -107,7 +121,8 @@ export function AffiliatesPanel({
         Share links like{" "}
         <code className="font-mono text-xs">{baseUrl}/?ref=code</code> — sign-ups
         through them get 10% off every invoice, and the affiliate earns their
-        commission share of referred revenue (paid out manually).
+        commission share of referred revenue (paid out manually). Affiliates
+        with a linked Sitovai account also get 20% off their own subscription.
       </p>
 
       {showForm ? (
@@ -197,6 +212,19 @@ export function AffiliatesPanel({
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">
                       {a.email ?? "—"} · {a.commission_bps / 100}%
                     </p>
+                    {a.tenant_id ? (
+                      <span className="mt-1 inline-block rounded-full bg-indigo-100 px-2 py-0.5 text-[11px] font-medium text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300">
+                        Partner −20% on own plan
+                      </span>
+                    ) : a.email ? (
+                      <button
+                        onClick={() => linkAccount(a.id)}
+                        disabled={isPending}
+                        className="mt-1 text-[11px] font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                      >
+                        Link Sitovai account → partner −20%
+                      </button>
+                    ) : null}
                   </td>
                   <td className="px-4 py-3">
                     <button

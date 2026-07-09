@@ -7,8 +7,10 @@ import { getStripe, priceIdForPlan, isStripeConfigured } from "@/lib/stripe";
 import { TRIAL_DAYS, type PlanId } from "@/lib/plans";
 import {
   getActiveAffiliate,
+  getAffiliateForTenant,
   tenantReferralCode,
   ensureAffiliateCoupon,
+  ensurePartnerCoupon,
 } from "@/lib/affiliates";
 
 type ActionResult = { url?: string; error?: string };
@@ -66,15 +68,20 @@ export async function startCheckout(plan: PlanId): Promise<ActionResult> {
     const stripe = getStripe();
     const base = await origin();
 
-    // Referred workspaces get the affiliate discount automatically. Stripe
-    // forbids combining `discounts` with `allow_promotion_codes`, so referred
-    // checkouts lose the manual promo-code field (they already have the deal).
-    const affiliate = await getActiveAffiliate(
-      await tenantReferralCode(ctx.tenantId),
-    );
-    const discounts = affiliate
-      ? [{ coupon: await ensureAffiliateCoupon(stripe) }]
-      : undefined;
+    // Discounts, best one wins: an affiliate buying for their own workspace
+    // gets the partner 20%; a workspace referred through an affiliate link
+    // gets 10%. Stripe forbids combining `discounts` with
+    // `allow_promotion_codes`, so discounted checkouts lose the manual
+    // promo-code field (they already have the deal).
+    const partner = await getAffiliateForTenant(ctx.tenantId);
+    const affiliate = partner
+      ? null
+      : await getActiveAffiliate(await tenantReferralCode(ctx.tenantId));
+    const discounts = partner
+      ? [{ coupon: await ensurePartnerCoupon(stripe) }]
+      : affiliate
+        ? [{ coupon: await ensureAffiliateCoupon(stripe) }]
+        : undefined;
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",

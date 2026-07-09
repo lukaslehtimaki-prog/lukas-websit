@@ -189,6 +189,7 @@ async function AffiliatesSection() {
     commission_bps: number;
     clicks: number;
     active: boolean;
+    tenant_id: string | null;
   }[];
 
   const { data: refRows } = await supabase

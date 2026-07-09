@@ -5,7 +5,11 @@ import { subscriptionLabel, hasActiveSubscription } from "@/lib/subscription";
 import { syncTenantSubscription } from "@/lib/billing-sync";
 import { PlanCards } from "@/components/billing/plan-cards";
 import { Badge } from "@/components/ui/badge";
-import { getActiveAffiliate, tenantReferralCode } from "@/lib/affiliates";
+import {
+  getActiveAffiliate,
+  getAffiliateForTenant,
+  tenantReferralCode,
+} from "@/lib/affiliates";
 
 export const metadata = { title: "Billing · Sitovai" };
 
@@ -83,7 +87,12 @@ export default async function BillingPage({
         )}
       </div>
 
-      {(await getActiveAffiliate(await tenantReferralCode(ctx.tenantId))) ? (
+      {(await getAffiliateForTenant(ctx.tenantId)) ? (
+        <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4 text-sm text-indigo-800 dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-300">
+          ⭐ You&apos;re a Sitovai partner — a 20% partner discount is applied
+          automatically at checkout, on every invoice.
+        </div>
+      ) : (await getActiveAffiliate(await tenantReferralCode(ctx.tenantId))) ? (
         <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
           🎉 You joined through a partner link — a 10% discount is applied
           automatically at checkout, on every invoice.

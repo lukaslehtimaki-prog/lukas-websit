@@ -17,6 +17,11 @@ create table if not exists public.affiliates (
 -- Only the service role touches this table (admin UI + public click counter).
 alter table public.affiliates enable row level security;
 
+-- An affiliate who is also a Sitovai customer: linking their workspace gives
+-- them the partner discount on their own subscription.
+alter table public.affiliates
+  add column if not exists tenant_id uuid unique references public.tenants(id) on delete set null;
+
 alter table public.tenants add column if not exists referred_by_code text;
 
 -- Atomic click counter, called via RPC from the ?ref= handler.
