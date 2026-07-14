@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 const CONTACT = "lukas.lehtimaki1@gmail.com";
-const UPDATED = "4 July 2026";
+const UPDATED = "9 July 2026";
 
 export default function PrivacyPage() {
   return (
@@ -58,7 +58,56 @@ export default function PrivacyPage() {
           log data, actions taken in the app, and essential cookies needed to
           keep you signed in.
         </li>
+        <li>
+          <strong className="text-zinc-200">Payout data</strong> — if you enable
+          website-sale payouts, Stripe collects the identity and bank details
+          needed to pay you. We store only your Stripe account reference and
+          payout status, never your bank details.
+        </li>
+        <li>
+          <strong className="text-zinc-200">Referral data</strong> — if you
+          arrive through a partner link, we store the partner&rsquo;s code with
+          your workspace so the associated discount and commission can be
+          applied.
+        </li>
       </UL>
+
+      <H2>2a. Website-visitor messages</H2>
+      <P>
+        Websites published through the Service can include contact and booking
+        forms. When a visitor submits one, the message (name and any contact
+        details they enter) is forwarded by email to the business the website
+        belongs to and stored in the workspace&rsquo;s inbox so the form works
+        reliably. We process this data on behalf of the workspace that operates
+        the website and do not use it for our own purposes. Visitors can ask
+        the business — or us at{" "}
+        <A href={`mailto:${CONTACT}`}>{CONTACT}</A> — to have a message
+        deleted.
+      </P>
+
+      <H2>2b. Cookies</H2>
+      <P>The Service uses a small number of first-party cookies:</P>
+      <UL>
+        <li>
+          <strong className="text-zinc-200">Authentication</strong> (essential)
+          — keeps you signed in. Set by our auth provider, Supabase.
+        </li>
+        <li>
+          <strong className="text-zinc-200">Theme</strong> (functional) —
+          remembers your light/dark preference for the dashboard.
+        </li>
+        <li>
+          <strong className="text-zinc-200">Referral</strong>{" "}
+          (<code className="text-xs">sitovai_ref</code>, functional) — set for
+          60 days when you visit through a partner link, so your sign-up gets
+          the partner discount. It contains only the partner&rsquo;s code and
+          is not used to track you across other sites.
+        </li>
+      </UL>
+      <P>
+        We use no advertising or cross-site tracking cookies and no third-party
+        analytics cookies.
+      </P>
 
       <H2>3. Business data surfaced through the Service</H2>
       <P>
@@ -115,7 +164,7 @@ export default function PrivacyPage() {
         </li>
         <li>
           <strong className="text-zinc-200">Stripe</strong> — payment
-          processing.
+          processing, and payouts for website sales (Stripe Connect).
         </li>
         <li>
           <strong className="text-zinc-200">Google</strong> — Places API for
@@ -124,6 +173,11 @@ export default function PrivacyPage() {
         <li>
           <strong className="text-zinc-200">Anthropic</strong> — AI generation of
           website copy.
+        </li>
+        <li>
+          <strong className="text-zinc-200">Resend</strong> — transactional
+          email delivery (account emails, pitch emails you send, and form
+          messages forwarded to businesses).
         </li>
       </UL>
       <P>

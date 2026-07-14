@@ -37,6 +37,33 @@ export type EnrichedLead = PlaceCandidate & {
 };
 
 /**
+ * SSRF guard: listing URLs originate from third-party data, so the probe must
+ * never be steerable at internal services. Only plain http(s) to a public
+ * hostname is allowed.
+ */
+function isProbeSafe(url: string): boolean {
+  try {
+    const u = new URL(url);
+    if (u.protocol !== "http:" && u.protocol !== "https:") return false;
+    const host = u.hostname.toLowerCase();
+    if (!host.includes(".")) return false; // bare hostnames (localhost, internal)
+    if (
+      /^(127\.|10\.|192\.168\.|169\.254\.|0\.)/.test(host) ||
+      /^172\.(1[6-9]|2\d|3[01])\./.test(host) ||
+      host.endsWith(".local") ||
+      host.endsWith(".internal") ||
+      host === "metadata.google.internal" ||
+      host.startsWith("[") // IPv6 literals
+    ) {
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * GET the site with a short timeout. Any HTTP response (even 403/404) proves a
  * server exists; network errors / timeouts mean the listed site is dead. A
  * redirect that lands on a social platform counts as social-only.
@@ -45,6 +72,7 @@ async function probeWebsite(
   url: string,
   timeoutMs = 3500,
 ): Promise<"alive" | "dead" | "social"> {
+  if (!isProbeSafe(url)) return "dead";
   try {
     const res = await fetch(url, {
       redirect: "follow",

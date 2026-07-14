@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 const CONTACT = "lukas.lehtimaki1@gmail.com";
-const UPDATED = "4 July 2026";
+const UPDATED = "9 July 2026";
 
 export default function TermsPage() {
   return (
@@ -64,6 +64,45 @@ export default function TermsPage() {
         <li>
           Except where required by law, payments are non-refundable. Plan limits
           (searches and websites per month) are shown at checkout.
+        </li>
+      </UL>
+
+      <H2>3a. Selling websites &amp; payouts</H2>
+      <UL>
+        <li>
+          You can sell websites you create with the Service to your own clients
+          using built-in Stripe payment links. To receive these payments you
+          must connect a Stripe account through the Service&rsquo;s payout
+          onboarding.
+        </li>
+        <li>
+          A platform fee of <strong className="text-zinc-200">15%</strong> of
+          each website sale made through the Service is deducted automatically
+          from the payment; the remainder is paid out to your connected Stripe
+          account under Stripe&rsquo;s own payout schedule and terms.
+        </li>
+        <li>
+          The sale is a transaction between you and your client. You are
+          responsible for delivering what you sold, for your own taxes, and for
+          handling your client&rsquo;s refund requests; where a refund is
+          issued, the platform fee for that sale is not returned unless we
+          decide otherwise.
+        </li>
+      </UL>
+
+      <H2>3b. Partner (affiliate) program</H2>
+      <UL>
+        <li>
+          Partners receive a personal referral link. Customers who sign up
+          through it get the advertised discount, and the partner earns a
+          commission on referred subscription revenue, at the rate agreed when
+          they join the program.
+        </li>
+        <li>
+          Commissions are reported in the platform and paid out manually.
+          Self-referrals, misleading promotion, and spam are prohibited and
+          forfeit unpaid commissions. We may adjust or end the program with
+          reasonable notice.
         </li>
       </UL>
 
