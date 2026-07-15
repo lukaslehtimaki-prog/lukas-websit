@@ -126,7 +126,7 @@ export function SearchComposer() {
               <span className="font-medium">Every business type</span>
               <span className="hidden text-zinc-400 dark:text-zinc-500 sm:inline">
                 {" "}
-                — sweeps 18 trades &amp; services in one go
+                — sweeps 30+ trades &amp; services in one go
               </span>
             </span>
           </label>

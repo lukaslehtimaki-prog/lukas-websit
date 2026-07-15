@@ -1,6 +1,49 @@
 // Shared content + template types for the AI website builder.
 
-export type SiteService = { title: string; description: string };
+export type SiteService = { title: string; description: string; price?: string };
+
+export type SiteTeamMember = { name: string; role: string; photo?: string | null };
+
+export type SiteSocial = { platform: SocialPlatform; url: string };
+
+export type SocialPlatform =
+  | "facebook"
+  | "instagram"
+  | "tiktok"
+  | "youtube"
+  | "linkedin"
+  | "whatsapp";
+
+/** A promotional callout band (special offer / discount code). */
+export type SiteOffer = { title: string; text: string; code?: string };
+
+/** Reorderable / toggleable body sections (hero, contact, footer are fixed). */
+export type SectionId =
+  | "stats"
+  | "about"
+  | "services"
+  | "gallery"
+  | "team"
+  | "pricing"
+  | "booking"
+  | "offer"
+  | "reviews"
+  | "faq"
+  | "cta";
+
+export const DEFAULT_SECTION_ORDER: SectionId[] = [
+  "stats",
+  "about",
+  "services",
+  "gallery",
+  "team",
+  "pricing",
+  "booking",
+  "offer",
+  "reviews",
+  "faq",
+  "cta",
+];
 
 export type SiteReview = {
   author: string;
@@ -78,6 +121,19 @@ export type SiteContent = {
   language?: string;
   /** AI-assigned design mood; narrows theme selection. */
   vibe?: Vibe;
+  /** Custom brand accent colour (hex) overriding the theme's accent. */
+  accent?: string | null;
+  /** Thin promo bar shown above the header (empty/undefined hides it). */
+  announcement?: string | null;
+  /** Team / staff members (editor-only; empty by default). */
+  team?: SiteTeamMember[];
+  /** Special-offer callout band (editor-only). */
+  offer?: SiteOffer | null;
+  /** Social profile links shown in the header and footer. */
+  socials?: SiteSocial[];
+  /** Section visibility + order overrides. */
+  hiddenSections?: SectionId[];
+  sectionOrder?: SectionId[];
   /** Explicit theme override from the editor's Style picker; wins over vibe/seed. */
   themeId?: string;
   /** Seed to reroll the visual design; when unset a hash of the name is used. */

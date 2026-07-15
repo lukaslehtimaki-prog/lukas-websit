@@ -17,24 +17,46 @@ import { checkLimit, recordUsage } from "@/lib/usage";
 // and services most likely to lack a website. Each entry is one Text Search
 // query (1 page / 20 results) — worldwide English queries work fine.
 const SWEEP_CATEGORIES = [
+  // Trades & construction
   "plumber",
   "electrician",
   "construction company",
   "roofing contractor",
   "painter decorator",
   "carpenter",
+  "flooring and tiling contractor",
+  "welding and metalwork",
+  "handyman service",
+  // Auto
   "car repair shop",
+  "car detailing and body shop",
+  "tyre service",
+  // Home services
   "heating and air conditioning",
   "cleaning service",
+  "window cleaning",
   "moving company",
   "landscaping and gardening",
+  "tree service",
+  "pest control",
   "locksmith",
+  "appliance repair",
+  // Beauty & wellness
   "barber shop",
   "beauty salon",
+  "nail salon",
   "massage therapist",
   "physiotherapy",
+  "tattoo studio",
+  // Pets
+  "veterinary clinic",
+  "pet grooming",
+  // Food & local
   "restaurant",
   "cafe bakery",
+  "florist",
+  "catering service",
+  "photographer",
 ] as const;
 
 export type SearchState = {

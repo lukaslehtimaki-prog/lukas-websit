@@ -68,11 +68,10 @@ function isProbeSafe(url: string): boolean {
  * server exists; network errors / timeouts mean the listed site is dead. A
  * redirect that lands on a social platform counts as social-only.
  */
-async function probeWebsite(
+async function probeOnce(
   url: string,
-  timeoutMs = 3500,
-): Promise<"alive" | "dead" | "social"> {
-  if (!isProbeSafe(url)) return "dead";
+  timeoutMs: number,
+): Promise<"alive" | "dead" | "social" | "retry"> {
   try {
     const res = await fetch(url, {
       redirect: "follow",
@@ -81,10 +80,24 @@ async function probeWebsite(
       headers: { "user-agent": "Mozilla/5.0 (compatible; SitovaiBot/1.0)" },
     });
     if (res.url && isSocialOrDirectoryUrl(res.url)) return "social";
-    return res.status >= 500 ? "dead" : "alive";
+    // 5xx is often transient (overloaded/maintenance) — worth one retry before
+    // calling a site dead. Any 2xx/3xx/4xx means a real server answered.
+    return res.status >= 500 ? "retry" : "alive";
   } catch {
-    return "dead";
+    // Network error or timeout — could be a slow site; retry before giving up.
+    return "retry";
   }
+}
+
+async function probeWebsite(
+  url: string,
+): Promise<"alive" | "dead" | "social"> {
+  if (!isProbeSafe(url)) return "dead";
+  const first = await probeOnce(url, 5000);
+  if (first !== "retry") return first;
+  // Second attempt with a longer timeout; only now do we trust "dead".
+  const second = await probeOnce(url, 8000);
+  return second === "retry" ? "dead" : second;
 }
 
 /** Classify every candidate's web presence; probes real URLs concurrently. */

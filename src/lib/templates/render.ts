@@ -1,6 +1,52 @@
-import type { SiteContent } from "./types";
+import type { SiteContent, SectionId, SiteSocial } from "./types";
+import { DEFAULT_SECTION_ORDER } from "./types";
 import { pickTheme, type Theme } from "./themes";
 import { t as strings } from "./i18n";
+
+// Labels for the newer sections, kept here (not in the strict SiteStrings table)
+// so a feature addition doesn't force an edit across all 10 language entries.
+type ExtraLabels = { team: string; useCode: string; announcementFallback: string };
+const EXTRA_LABELS: Record<string, ExtraLabels> = {
+  en: { team: "Meet the team", useCode: "Use code", announcementFallback: "" },
+  fi: { team: "Tiimimme", useCode: "Käytä koodia", announcementFallback: "" },
+  sv: { team: "Vårt team", useCode: "Använd koden", announcementFallback: "" },
+  de: { team: "Unser Team", useCode: "Code verwenden", announcementFallback: "" },
+  fr: { team: "Notre équipe", useCode: "Code", announcementFallback: "" },
+  es: { team: "Nuestro equipo", useCode: "Usa el código", announcementFallback: "" },
+  it: { team: "Il nostro team", useCode: "Usa il codice", announcementFallback: "" },
+  pt: { team: "A nossa equipa", useCode: "Usar código", announcementFallback: "" },
+  nl: { team: "Ons team", useCode: "Gebruik code", announcementFallback: "" },
+  zh: { team: "我们的团队", useCode: "使用优惠码", announcementFallback: "" },
+};
+function extraLabels(lang: string | undefined | null): ExtraLabels {
+  return EXTRA_LABELS[(lang ?? "en").toLowerCase()] ?? EXTRA_LABELS.en;
+}
+
+const SOCIAL_META: Record<
+  SiteSocial["platform"],
+  { label: string; icon: string }
+> = {
+  // Simple inline SVG glyphs (currentColor) — no external icon dependency.
+  facebook: { label: "Facebook", icon: `<path d="M13 22v-8h2.5l.5-3H13V9c0-.9.3-1.5 1.6-1.5H16V4.9C15.7 4.9 14.7 4.8 13.6 4.8 11.2 4.8 9.7 6.2 9.7 8.7V11H7v3h2.7v8z"/>` },
+  instagram: { label: "Instagram", icon: `<path d="M12 8.5A3.5 3.5 0 1 0 12 15.5 3.5 3.5 0 0 0 12 8.5zm5-2.6a1 1 0 1 0 0 2 1 1 0 0 0 0-2zM12 3c-2.4 0-2.7 0-3.7.06-1 .05-1.6.2-2.2.44a4.4 4.4 0 0 0-1.6 1 4.4 4.4 0 0 0-1 1.6c-.24.6-.4 1.2-.44 2.2C3 9.3 3 9.6 3 12s0 2.7.06 3.7c.05 1 .2 1.6.44 2.2.24.6.55 1.1 1 1.6.5.45 1 .76 1.6 1 .6.24 1.2.4 2.2.44 1 .05 1.3.06 3.7.06s2.7 0 3.7-.06c1-.05 1.6-.2 2.2-.44a4.6 4.6 0 0 0 2.6-2.6c.24-.6.4-1.2.44-2.2.05-1 .06-1.3.06-3.7s0-2.7-.06-3.7c-.05-1-.2-1.6-.44-2.2a4.4 4.4 0 0 0-1-1.6 4.4 4.4 0 0 0-1.6-1c-.6-.24-1.2-.4-2.2-.44C14.7 3 14.4 3 12 3zm0 1.8c2.3 0 2.6 0 3.5.05.85.04 1.3.18 1.6.3.4.16.7.35 1 .65.3.3.5.6.65 1 .12.3.26.75.3 1.6.05.9.05 1.2.05 3.5s0 2.6-.05 3.5c-.04.85-.18 1.3-.3 1.6-.16.4-.35.7-.65 1-.3.3-.6.5-1 .65-.3.12-.75.26-1.6.3-.9.05-1.2.05-3.5.05s-2.6 0-3.5-.05c-.85-.04-1.3-.18-1.6-.3a2.7 2.7 0 0 1-1-.65 2.7 2.7 0 0 1-.65-1c-.12-.3-.26-.75-.3-1.6C4.8 14.6 4.8 14.3 4.8 12s0-2.6.05-3.5c.04-.85.18-1.3.3-1.6.16-.4.35-.7.65-1 .3-.3.6-.5 1-.65.3-.12.75-.26 1.6-.3C9.4 4.8 9.7 4.8 12 4.8z"/>` },
+  tiktok: { label: "TikTok", icon: `<path d="M16.6 5.8c-.9-.6-1.5-1.5-1.7-2.6h-2.8v11.4c0 1.4-1.1 2.5-2.5 2.5S7.1 16 7.1 14.6s1.1-2.5 2.5-2.5c.3 0 .5 0 .8.1V9.4a5.3 5.3 0 0 0-.8-.06 5.2 5.2 0 1 0 5.2 5.2V8.9c1 .7 2.3 1.2 3.6 1.2V7.3c-.7 0-1.4-.2-2-.5z"/>` },
+  youtube: { label: "YouTube", icon: `<path d="M21.6 8.2s-.2-1.4-.8-2c-.75-.8-1.6-.8-2-.85C16 5.1 12 5.1 12 5.1h-.02s-4 0-6.8.2c-.4.05-1.25.05-2 .85-.6.6-.8 2-.8 2S2 9.85 2 11.5v1c0 1.65.2 3.3.2 3.3s.2 1.4.8 2c.75.8 1.74.77 2.2.86 1.6.15 6.8.2 6.8.2s4 0 6.8-.21c.4-.05 1.25-.05 2-.85.6-.6.8-2 .8-2s.2-1.65.2-3.3v-1c0-1.65-.2-3.3-.2-3.3zM9.9 14.9V9.6l5.15 2.65z"/>` },
+  linkedin: { label: "LinkedIn", icon: `<path d="M6.9 8.4H3.9V21h3zM5.4 3.8a1.75 1.75 0 1 0 0 3.5 1.75 1.75 0 0 0 0-3.5zM20.1 21v-6.9c0-3.3-.7-5.8-4.5-5.8-1.85 0-3.1 1-3.6 2h-.05V8.4h-2.9V21h3v-6.2c0-1.65.3-3.2 2.35-3.2 2 0 2 1.85 2 3.3V21z"/>` },
+  whatsapp: { label: "WhatsApp", icon: `<path d="M12 3a9 9 0 0 0-7.7 13.6L3 21l4.5-1.2A9 9 0 1 0 12 3zm0 1.8a7.2 7.2 0 0 1 6.1 11 7.2 7.2 0 0 1-9.1 2.6l-.32-.16-2.67.7.72-2.6-.2-.33A7.2 7.2 0 0 1 12 4.8zm-2.5 3c-.16 0-.42.06-.64.3-.22.24-.85.83-.85 2s.87 2.32 1 2.48c.12.16 1.7 2.7 4.2 3.68 2.08.82 2.5.66 2.95.62.45-.04 1.45-.6 1.65-1.17.2-.58.2-1.07.14-1.17-.06-.1-.22-.16-.46-.28-.24-.12-1.45-.72-1.67-.8-.22-.08-.38-.12-.54.12-.16.24-.62.8-.76.96-.14.16-.28.18-.52.06-.24-.12-1.03-.38-1.96-1.2-.72-.65-1.2-1.44-1.35-1.68-.14-.24-.02-.37.1-.5.11-.1.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.33-.76-1.82-.2-.48-.4-.42-.54-.42z"/>` },
+};
+
+function socialLinks(socials: SiteSocial[] | undefined, cls: string): string {
+  const items = (socials ?? []).filter(
+    (x) => x && x.url && SOCIAL_META[x.platform],
+  );
+  if (!items.length) return "";
+  return `<div class="${cls}">${items
+    .map((x) => {
+      const m = SOCIAL_META[x.platform];
+      return `<a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(m.label)}"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">${m.icon}</svg></a>`;
+    })
+    .join("")}</div>`;
+}
 
 // Pure renderer (safe to import on client or server). Produces a complete, standalone,
 // mobile-responsive HTML document. Visual identity comes from the resolved Theme;
@@ -19,6 +65,16 @@ function initials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   const letters = (parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "");
   return (letters || name.slice(0, 2)).toUpperCase();
+}
+
+/** Accepts #rgb / #rrggbb (with or without #); returns #rrggbb or null. */
+function normalizeHex(input: string | null | undefined): string | null {
+  if (!input) return null;
+  const h = input.trim().replace(/^#/, "");
+  if (/^[0-9a-fA-F]{3}$/.test(h))
+    return `#${h[0]}${h[0]}${h[1]}${h[1]}${h[2]}${h[2]}`.toLowerCase();
+  if (/^[0-9a-fA-F]{6}$/.test(h)) return `#${h.toLowerCase()}`;
+  return null;
 }
 
 function isLight(hex: string): boolean {
@@ -151,7 +207,7 @@ export function renderSiteToHtml(
     <div class="rows">${servicesItems
       .map(
         (sv, i) => `<article class="row"><span class="idx">${String(i + 1).padStart(2, "0")}</span>
-        <div><h3>${esc(sv.title)}</h3><p>${esc(sv.description)}</p></div></article>`,
+        <div class="row-body"><h3>${esc(sv.title)}</h3><p>${esc(sv.description)}</p></div>${sv.price ? `<span class="row-price">${esc(sv.price)}</span>` : ""}</article>`,
       )
       .join("")}</div>
   </div></section>`
@@ -159,7 +215,7 @@ export function renderSiteToHtml(
     <h2>${esc(s.services)}</h2>
     <div class="grid">${servicesItems
       .map(
-        (sv) => `<article class="card"><h3>${esc(sv.title)}</h3><p>${esc(sv.description)}</p></article>`,
+        (sv) => `<article class="card">${sv.price ? `<span class="card-price">${esc(sv.price)}</span>` : ""}<h3>${esc(sv.title)}</h3><p>${esc(sv.description)}</p></article>`,
       )
       .join("")}</div>
   </div></section>`
@@ -269,6 +325,44 @@ export function renderSiteToHtml(
     </div>
   </div></section>`;
 
+  const x = extraLabels(content.language);
+
+  const teamMembers = (content.team ?? []).filter((m) => m && m.name);
+  const teamSection = teamMembers.length
+    ? `<section id="team" class="alt"><div class="wrap">
+    <h2>${esc(x.team)}</h2>
+    <div class="grid team-grid">${teamMembers
+      .map((m) => {
+        const initials = esc(
+          m.name
+            .split(/\s+/)
+            .slice(0, 2)
+            .map((w) => w.charAt(0).toUpperCase())
+            .join(""),
+        );
+        const avatar = m.photo
+          ? `<img class="tm-photo" src="${esc(m.photo)}" alt="" loading="lazy" />`
+          : `<span class="tm-avatar">${initials}</span>`;
+        return `<article class="card team-card">${avatar}<h3>${esc(m.name)}</h3>${m.role ? `<p>${esc(m.role)}</p>` : ""}</article>`;
+      })
+      .join("")}</div>
+  </div></section>`
+    : "";
+
+  const offer = content.offer;
+  const offerBand =
+    offer && (offer.title || offer.text)
+      ? `<section id="offer" class="offer-wrap"><div class="wrap">
+    <div class="offer-band">
+      <div>
+        ${offer.title ? `<h2>${esc(offer.title)}</h2>` : ""}
+        ${offer.text ? `<p>${esc(offer.text)}</p>` : ""}
+      </div>
+      ${offer.code ? `<div class="offer-code"><span class="offer-code-label">${esc(x.useCode)}</span><span class="offer-code-val">${esc(offer.code)}</span></div>` : ""}
+    </div>
+  </div></section>`
+      : "";
+
   const contactForm =
     formAction || c.email
       ? `<h3 class="form-title">${esc(s.sendMessageTitle)}</h3>
@@ -302,8 +396,9 @@ export function renderSiteToHtml(
     : "";
 
   const aboutShort = (content.about ?? "").split(/(?<=\.)\s+/)[0] ?? "";
+  const footerSocials = socialLinks(content.socials, "foot-socials");
   const footer = `<footer class="site"><div class="wrap foot-grid">
-    <div><div class="brand">${esc(content.businessName)}</div><p class="foot-about">${esc(aboutShort)}</p></div>
+    <div><div class="brand">${esc(content.businessName)}</div><p class="foot-about">${esc(aboutShort)}</p>${footerSocials}</div>
     ${hours ? `<div><h4>${esc(s.openingHours)}</h4><ul class="hours">${hours}</ul></div>` : ""}
     <div><h4>${esc(s.contact)}</h4>
       ${c.address ? `<p>${esc(c.address)}</p>` : ""}
@@ -314,17 +409,80 @@ export function renderSiteToHtml(
   <div class="wrap copyright">© ${new Date().getFullYear()} ${esc(content.businessName)}</div>
   </footer>`;
 
+  const aboutSection =
+    content.about || highlights
+      ? `<section id="about"><div class="wrap about">
+    <div><h2>${esc(s.about)}</h2><p>${esc(content.about)}</p></div>
+    ${highlights ? `<ul class="checks">${highlights}</ul>` : ""}
+  </div></section>`
+      : "";
+
+  // Reorderable / toggleable body sections. Each entry maps a section id to its
+  // rendered HTML and its nav anchor (if any). The editor controls order and
+  // visibility via content.sectionOrder / content.hiddenSections.
+  const blocks: Record<SectionId, { html: string; nav?: [string, string] }> = {
+    stats: { html: statsSection },
+    about: { html: aboutSection },
+    services: {
+      html: servicesSection,
+      nav: servicesItems.length ? ["#services", s.navServices] : undefined,
+    },
+    gallery: {
+      html: gallerySection,
+      nav: galleryImgs.length ? ["#gallery", s.navGallery] : undefined,
+    },
+    team: {
+      html: teamSection,
+      nav: teamMembers.length ? ["#team", x.team] : undefined,
+    },
+    pricing: {
+      html: membershipSection,
+      nav: membershipSection ? ["#pricing", s.navPricing] : undefined,
+    },
+    booking: {
+      html: bookingSection,
+      nav: bookingSection ? ["#booking", s.navBooking] : undefined,
+    },
+    offer: { html: offerBand },
+    reviews: {
+      html: reviewsSection,
+      nav: reviewsList.length ? ["#reviews", s.navReviews] : undefined,
+    },
+    faq: { html: faqSection },
+    cta: { html: ctaBand },
+  };
+
+  const hidden = new Set(content.hiddenSections ?? []);
+  const requested = content.sectionOrder ?? DEFAULT_SECTION_ORDER;
+  // Honour the saved order, then append any section not mentioned in it, so a
+  // newer section still appears for sites saved before it existed.
+  const order: SectionId[] = [
+    ...requested.filter((id) => id in blocks),
+    ...DEFAULT_SECTION_ORDER.filter(
+      (id) => !requested.includes(id) && id in blocks,
+    ),
+  ];
+  const orderedBlocks = order
+    .filter((id) => !hidden.has(id))
+    .map((id) => blocks[id].html)
+    .join("\n");
+
   const navLinks = [
-    servicesItems.length ? [`#services`, s.navServices] : null,
-    galleryImgs.length ? [`#gallery`, s.navGallery] : null,
-    membershipSection ? [`#pricing`, s.navPricing] : null,
-    bookingSection ? [`#booking`, s.navBooking] : null,
-    reviewsList.length ? [`#reviews`, s.navReviews] : null,
-    [`#contact`, s.navContact],
-  ].filter(Boolean) as [string, string][];
+    ...order
+      .filter((id) => !hidden.has(id))
+      .map((id) => blocks[id].nav)
+      .filter(Boolean),
+    ["#contact", s.navContact],
+  ] as [string, string][];
   const nav = navLinks
     .map(([href, label]) => `<a href="${href}">${esc(label)}</a>`)
     .join("");
+
+  const announcementBar = content.announcement?.trim()
+    ? `<div class="promo-bar">${esc(content.announcement.trim())}</div>`
+    : "";
+  const headerSocials = socialLinks(content.socials, "head-socials");
+  const accentOverride = normalizeHex(content.accent);
 
   /* -------------------------------- html -------------------------------- */
 
@@ -344,7 +502,11 @@ export function renderSiteToHtml(
     --card: ${t.card}; --border: ${t.border}; --input-bg: ${t.inputBg};
     --radius: ${t.radius}px; --bw: ${t.borderW}px; --on-accent: ${t.onAccent};
     --hero-bg: ${t.heroBg}; --hero-text: ${t.heroText}; --hero-muted: ${t.heroMuted};
-    --hero-accent: ${heroAccent};
+    --hero-accent: ${heroAccent};${
+      accentOverride
+        ? `\n    --accent: ${accentOverride}; --accent2: ${accentOverride}; --on-accent: #ffffff;`
+        : ""
+    }
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -490,7 +652,40 @@ export function renderSiteToHtml(
   .cta-wrap { padding: 0 0 80px; }
   .cta-band { background: linear-gradient(120deg, var(--accent), var(--accent2)); color: var(--on-accent); border-radius: calc(var(--radius) + 8px); padding: 56px 40px; text-align: center; }
   .cta-band h2 { margin: 0 0 10px; }
+  .cta-band h2::before { display: none; }
   .cta-band p { margin: 0 auto 26px; max-width: 520px; opacity: .9; }
+
+  .promo-bar { background: linear-gradient(90deg, var(--accent), var(--accent2)); color: var(--on-accent); text-align: center; font-size: 14px; font-weight: 600; padding: 9px 16px; }
+  .head-socials, .foot-socials { display: flex; gap: 10px; }
+  .head-socials { display: none; }
+  @media (min-width: 880px) { .head-socials { display: flex; } }
+  .head-socials a { color: var(--muted); display: grid; place-items: center; transition: color .15s ease; }
+  .head-socials a:hover { color: var(--accent); }
+  .foot-socials { margin-top: 16px; }
+  .foot-socials a { color: var(--muted); display: grid; place-items: center; height: 34px; width: 34px; border-radius: 50%; border: var(--bw) solid var(--border); transition: color .15s ease, border-color .15s ease; }
+  .foot-socials a:hover { color: var(--accent); border-color: var(--accent); }
+
+  .row-body { flex: 1; }
+  .row-price { align-self: center; font-family: ${t.headingFont}; font-weight: 700; color: var(--accent); font-size: 18px; white-space: nowrap; }
+  .card { position: relative; }
+  .card-price { position: absolute; top: 20px; right: 22px; font-family: ${t.headingFont}; font-weight: 700; color: var(--accent); font-size: 17px; }
+  .card-price + h3 { padding-right: 64px; }
+
+  .team-grid .team-card { text-align: center; }
+  .tm-avatar { width: 76px; height: 76px; margin: 0 auto 14px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: var(--on-accent); font-family: ${t.headingFont}; font-weight: 700; font-size: 28px; }
+  .tm-photo { width: 76px; height: 76px; margin: 0 auto 14px; border-radius: 50%; object-fit: cover; display: block; }
+  .team-card h3 { color: var(--ink); margin: 0 0 2px; }
+  .team-card p { color: var(--muted); font-size: 14px; margin: 0; }
+
+  .offer-wrap { padding: 0 0 80px; }
+  .offer-band { background: var(--surface); border: var(--bw) dashed var(--accent); border-radius: calc(var(--radius) + 6px); padding: 34px 40px; display: flex; align-items: center; justify-content: space-between; gap: 28px; flex-wrap: wrap; }
+  .offer-band h2 { margin: 0 0 6px; font-size: clamp(22px, 2.6vw, 30px); }
+  .offer-band h2::before { display: none; }
+  .offer-band p { margin: 0; color: var(--muted); }
+  .offer-code { text-align: center; border-left: var(--bw) solid var(--border); padding-left: 28px; }
+  .offer-code-label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 4px; }
+  .offer-code-val { font-family: ${t.headingFont}; font-weight: 800; font-size: 24px; color: var(--accent); letter-spacing: .05em; }
+  @media (max-width: 640px) { .offer-code { border-left: 0; padding-left: 0; text-align: left; } }
 
   #contact.alt .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; }
   #contact p { color: var(--ink); }
@@ -506,7 +701,8 @@ export function renderSiteToHtml(
   .copyright { border-top: var(--bw) solid var(--border); padding-top: 18px; padding-bottom: 26px; color: var(--muted); font-size: 13.5px; }
 
   @media (max-width: 800px) {
-    .about, #contact.alt .cols, .hero-split .split, .foot-grid { grid-template-columns: 1fr; }
+    .about, #contact.alt .cols, .hero-split .split, .foot-grid, .offer-band { grid-template-columns: 1fr; }
+    .offer-band { text-align: center; }
     .hero { padding: 64px 0; }
     .hero-photo { padding: 96px 0; }
     .hero.has-divider { padding-bottom: 120px; }
@@ -517,40 +713,19 @@ export function renderSiteToHtml(
 </style>
 </head>
 <body>
+  ${announcementBar}
   <header class="site"><div class="wrap">
     <span class="brand">${esc(content.businessName)}</span>
     <div class="header-actions">
       <nav class="nav">${nav}</nav>
+      ${headerSocials}
       <a class="btn" href="${primaryHref}">${esc(content.ctaText || s.navContact)}</a>
     </div>
   </div></header>
 
   ${heroMarkup().replace('class="hero ', t.divider !== "none" ? 'class="hero has-divider ' : 'class="hero ')}
 
-  ${statsSection}
-
-  ${
-    content.about || highlights
-      ? `<section id="about"><div class="wrap about">
-    <div><h2>${esc(s.about)}</h2><p>${esc(content.about)}</p></div>
-    ${highlights ? `<ul class="checks">${highlights}</ul>` : ""}
-  </div></section>`
-      : ""
-  }
-
-  ${servicesSection}
-
-  ${gallerySection}
-
-  ${membershipSection}
-
-  ${bookingSection}
-
-  ${reviewsSection}
-
-  ${faqSection}
-
-  ${ctaBand}
+  ${orderedBlocks}
 
   <section class="alt" id="contact"><div class="wrap">
     <h2>${esc(s.contact)}</h2>

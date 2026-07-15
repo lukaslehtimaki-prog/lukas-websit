@@ -27,6 +27,10 @@ import {
   Mail,
   Send,
   Sparkles,
+  ArrowUp,
+  ArrowDown,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import {
   updateSiteContent,
@@ -45,9 +49,14 @@ import { THEMES } from "@/lib/templates/themes";
 import { SUPPORTED_LANGUAGES } from "@/lib/templates/i18n";
 import {
   TEMPLATES,
+  DEFAULT_SECTION_ORDER,
   type SiteContent,
   type MembershipPlan,
   type SiteKind,
+  type SectionId,
+  type SiteTeamMember,
+  type SiteSocial,
+  type SocialPlatform,
 } from "@/lib/templates/types";
 import { cn } from "@/lib/utils";
 
@@ -662,6 +671,14 @@ export function SiteEditor({
             </select>
           </Section>
 
+          <Section title="Sections & layout">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Reorder the page or hide sections. The hero and contact sections
+              are always shown.
+            </p>
+            <SectionManager content={content} onChange={patch} />
+          </Section>
+
           <Section title="Language">
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
               Detected from the business&apos;s country. Headings switch
@@ -786,6 +803,48 @@ export function SiteEditor({
             </div>
           </Section>
 
+          <Section title="Brand colour">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Override the theme accent used for buttons, headings and
+              highlights. Leave blank to use the theme&apos;s own colour.
+            </p>
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                value={content.accent || "#4f46e5"}
+                onChange={(e) => patch({ accent: e.target.value })}
+                aria-label="Brand colour"
+                className="h-9 w-12 cursor-pointer rounded-md border border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-950"
+              />
+              <input
+                value={content.accent ?? ""}
+                onChange={(e) => patch({ accent: e.target.value })}
+                placeholder="#0e7c5a"
+                className={cn("flex-1 font-mono", fieldCls)}
+              />
+              {content.accent ? (
+                <button
+                  onClick={() => patch({ accent: null })}
+                  className="rounded-md px-2 py-1.5 text-xs text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100"
+                >
+                  Reset
+                </button>
+              ) : null}
+            </div>
+          </Section>
+
+          <Section title="Announcement bar">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              A thin banner across the very top of the site. Great for offers,
+              opening hours, or a phone number. Leave blank to hide it.
+            </p>
+            <Text
+              label="Banner text"
+              value={content.announcement ?? ""}
+              onChange={(v) => patch({ announcement: v })}
+            />
+          </Section>
+
           <Section title="About">
             <Text label="About paragraph" value={content.about} onChange={(v) => patch({ about: v })} textarea />
             <ListEditor
@@ -835,6 +894,18 @@ export function SiteEditor({
                     rows={2}
                     className="mt-2 w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-2 py-1.5 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
                   />
+                  <input
+                    value={s.price ?? ""}
+                    onChange={(e) =>
+                      patch({
+                        services: content.services.map((x, idx) =>
+                          idx === i ? { ...x, price: e.target.value } : x,
+                        ),
+                      })
+                    }
+                    placeholder="Price (optional) — e.g. from 90 €"
+                    className="mt-2 w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-2 py-1.5 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
+                  />
                 </div>
               ))}
               <button
@@ -846,6 +917,150 @@ export function SiteEditor({
                 className="inline-flex items-center gap-1.5 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800"
               >
                 <Plus className="h-4 w-4" /> Add service
+              </button>
+            </div>
+          </Section>
+
+          <Section title="Team">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Add staff to show a &ldquo;Meet the team&rdquo; section. Leave
+              empty to hide it.
+            </p>
+            <div className="space-y-2">
+              {(content.team ?? []).map((m, i) => {
+                const team = content.team ?? [];
+                const upd = (u: Partial<SiteTeamMember>) =>
+                  patch({
+                    team: team.map((x, idx) => (idx === i ? { ...x, ...u } : x)),
+                  });
+                return (
+                  <div key={i} className="flex items-center gap-2">
+                    <input
+                      value={m.name}
+                      onChange={(e) => upd({ name: e.target.value })}
+                      placeholder="Name"
+                      className={cn("flex-1 font-medium", fieldCls)}
+                    />
+                    <input
+                      value={m.role}
+                      onChange={(e) => upd({ role: e.target.value })}
+                      placeholder="Role"
+                      className={cn("flex-1", fieldCls)}
+                    />
+                    <button
+                      onClick={() =>
+                        patch({ team: team.filter((_, idx) => idx !== i) })
+                      }
+                      className="rounded p-1 text-zinc-400 hover:text-red-600 dark:text-zinc-500"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                );
+              })}
+              <button
+                onClick={() =>
+                  patch({
+                    team: [...(content.team ?? []), { name: "", role: "" }],
+                  })
+                }
+                className="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400"
+              >
+                <Plus className="h-4 w-4" /> Add team member
+              </button>
+            </div>
+          </Section>
+
+          <Section title="Special offer">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              A highlighted offer band. Fill in a title to show it; leave the
+              title blank to hide it.
+            </p>
+            <Text
+              label="Offer title"
+              value={content.offer?.title ?? ""}
+              onChange={(v) =>
+                patch({ offer: { ...(content.offer ?? { text: "" }), title: v } })
+              }
+            />
+            <Text
+              label="Offer text"
+              value={content.offer?.text ?? ""}
+              onChange={(v) =>
+                patch({ offer: { ...(content.offer ?? { title: "" }), text: v } })
+              }
+            />
+            <Text
+              label="Discount code (optional)"
+              value={content.offer?.code ?? ""}
+              onChange={(v) =>
+                patch({
+                  offer: { ...(content.offer ?? { title: "", text: "" }), code: v },
+                })
+              }
+            />
+          </Section>
+
+          <Section title="Social links">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Shown in the header and footer. Only links you add appear.
+            </p>
+            <div className="space-y-2">
+              {(content.socials ?? []).map((soc, i) => {
+                const socials = content.socials ?? [];
+                const upd = (u: Partial<SiteSocial>) =>
+                  patch({
+                    socials: socials.map((x, idx) =>
+                      idx === i ? { ...x, ...u } : x,
+                    ),
+                  });
+                return (
+                  <div key={i} className="flex items-center gap-2">
+                    <select
+                      value={soc.platform}
+                      onChange={(e) =>
+                        upd({ platform: e.target.value as SocialPlatform })
+                      }
+                      className={cn("cursor-pointer appearance-none", fieldCls)}
+                    >
+                      <option value="facebook">Facebook</option>
+                      <option value="instagram">Instagram</option>
+                      <option value="tiktok">TikTok</option>
+                      <option value="youtube">YouTube</option>
+                      <option value="linkedin">LinkedIn</option>
+                      <option value="whatsapp">WhatsApp</option>
+                    </select>
+                    <input
+                      value={soc.url}
+                      onChange={(e) => upd({ url: e.target.value })}
+                      placeholder="https://…"
+                      className={cn("flex-1", fieldCls)}
+                    />
+                    <button
+                      onClick={() =>
+                        patch({
+                          socials: socials.filter((_, idx) => idx !== i),
+                        })
+                      }
+                      className="rounded p-1 text-zinc-400 hover:text-red-600 dark:text-zinc-500"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                );
+              })}
+              <button
+                onClick={() =>
+                  patch({
+                    socials: [
+                      ...(content.socials ?? []),
+                      { platform: "instagram", url: "" },
+                    ],
+                  })
+                }
+                className="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400"
+              >
+                <Plus className="h-4 w-4" /> Add link
               </button>
             </div>
           </Section>
@@ -1061,6 +1276,128 @@ export function SiteEditor({
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+const SECTION_LABELS: Record<SectionId, string> = {
+  stats: "Trust stats",
+  about: "About",
+  services: "Services",
+  gallery: "Gallery",
+  team: "Team",
+  pricing: "Membership pricing",
+  booking: "Booking form",
+  offer: "Special offer",
+  reviews: "Reviews",
+  faq: "FAQ",
+  cta: "Call to action",
+};
+
+/** Which sections currently have content worth showing in the manager. */
+function presentSections(content: SiteContent): Set<SectionId> {
+  const has = new Set<SectionId>();
+  if ((content.stats ?? []).length) has.add("stats");
+  if (content.about || (content.highlights ?? []).length) has.add("about");
+  if ((content.services ?? []).length) has.add("services");
+  if ((content.gallery ?? []).length) has.add("gallery");
+  if ((content.team ?? []).length) has.add("team");
+  if (content.kind === "membership" && (content.membershipPlans ?? []).length)
+    has.add("pricing");
+  if (content.kind === "booking") has.add("booking");
+  if (content.offer?.title || content.offer?.text) has.add("offer");
+  if ((content.reviews ?? []).length) has.add("reviews");
+  if ((content.faq ?? []).length) has.add("faq");
+  has.add("cta");
+  return has;
+}
+
+function SectionManager({
+  content,
+  onChange,
+}: {
+  content: SiteContent;
+  onChange: (p: Partial<SiteContent>) => void;
+}) {
+  const present = presentSections(content);
+  const requested = content.sectionOrder ?? DEFAULT_SECTION_ORDER;
+  const fullOrder: SectionId[] = [
+    ...requested.filter((id) => DEFAULT_SECTION_ORDER.includes(id)),
+    ...DEFAULT_SECTION_ORDER.filter((id) => !requested.includes(id)),
+  ];
+  const visibleOrder = fullOrder.filter((id) => present.has(id));
+  const hidden = new Set(content.hiddenSections ?? []);
+
+  function move(id: SectionId, dir: -1 | 1) {
+    const pos = visibleOrder.indexOf(id);
+    const target = pos + dir;
+    if (target < 0 || target >= visibleOrder.length) return;
+    const reordered = [...visibleOrder];
+    [reordered[pos], reordered[target]] = [reordered[target], reordered[pos]];
+    // Persist as a full order so hidden/absent sections keep their relative spot.
+    const rest = fullOrder.filter((s) => !present.has(s));
+    onChange({ sectionOrder: [...reordered, ...rest] });
+  }
+
+  function toggle(id: SectionId) {
+    const next = new Set(hidden);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    onChange({ hiddenSections: [...next] });
+  }
+
+  if (visibleOrder.length === 0)
+    return (
+      <p className="text-xs text-zinc-400 dark:text-zinc-500">
+        Add content above to enable sections.
+      </p>
+    );
+
+  return (
+    <div className="space-y-1.5">
+      {visibleOrder.map((id, i) => {
+        const isHidden = hidden.has(id);
+        return (
+          <div
+            key={id}
+            className={cn(
+              "flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 dark:border-zinc-800 dark:bg-zinc-950",
+              isHidden && "opacity-50",
+            )}
+          >
+            <span className="flex-1 text-sm text-zinc-700 dark:text-zinc-200">
+              {SECTION_LABELS[id]}
+            </span>
+            <button
+              onClick={() => move(id, -1)}
+              disabled={i === 0}
+              aria-label="Move up"
+              className="rounded p-1 text-zinc-400 hover:text-zinc-800 disabled:opacity-30 dark:text-zinc-500 dark:hover:text-zinc-100"
+            >
+              <ArrowUp className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => move(id, 1)}
+              disabled={i === visibleOrder.length - 1}
+              aria-label="Move down"
+              className="rounded p-1 text-zinc-400 hover:text-zinc-800 disabled:opacity-30 dark:text-zinc-500 dark:hover:text-zinc-100"
+            >
+              <ArrowDown className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => toggle(id)}
+              aria-label={isHidden ? "Show section" : "Hide section"}
+              className="rounded p-1 text-zinc-400 hover:text-indigo-600 dark:text-zinc-500 dark:hover:text-indigo-400"
+            >
+              {isHidden ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          </div>
+        );
+      })}
     </div>
   );
 }

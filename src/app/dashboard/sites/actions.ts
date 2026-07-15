@@ -307,6 +307,26 @@ export async function regenerateContent(
   if (existing?.gallery?.length) content.gallery = existing.gallery;
   if (existing?.payment) content.payment = existing.payment;
   if (existing?.pitch) content.pitch = existing.pitch;
+  // Preserve editor-only customisations (never AI-generated).
+  if (existing?.accent) content.accent = existing.accent;
+  if (existing?.announcement) content.announcement = existing.announcement;
+  if (existing?.team?.length) content.team = existing.team;
+  if (existing?.offer) content.offer = existing.offer;
+  if (existing?.socials?.length) content.socials = existing.socials;
+  if (existing?.sectionOrder) content.sectionOrder = existing.sectionOrder;
+  if (existing?.hiddenSections) content.hiddenSections = existing.hiddenSections;
+  // Carry over per-service prices by matching service title.
+  if (existing?.services?.length && content.services?.length) {
+    const priceByTitle = new Map(
+      existing.services
+        .filter((sv) => sv.price)
+        .map((sv) => [sv.title.trim().toLowerCase(), sv.price]),
+    );
+    content.services = content.services.map((sv) => {
+      const p = priceByTitle.get(sv.title.trim().toLowerCase());
+      return p ? { ...sv, price: p } : sv;
+    });
+  }
   await supabase
     .from("sites")
     .update({ content, updated_at: new Date().toISOString() })

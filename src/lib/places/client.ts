@@ -51,6 +51,7 @@ type GooglePlace = {
   displayName?: { text?: string };
   formattedAddress?: string;
   websiteUri?: string;
+  businessStatus?: string;
   location?: { latitude?: number; longitude?: number };
   primaryTypeDisplayName?: { text?: string };
   types?: string[];
@@ -79,11 +80,46 @@ const TEXT_SEARCH_FIELDS = [
   "places.displayName",
   "places.formattedAddress",
   "places.websiteUri",
+  "places.businessStatus",
   "places.location",
   "places.primaryTypeDisplayName",
   "places.types",
   "nextPageToken",
 ].join(",");
+
+// Place types that aren't sellable local businesses — filtered out so the
+// finder never returns a city, road, or region as a "lead".
+const NON_BUSINESS_TYPES = new Set([
+  "locality",
+  "sublocality",
+  "political",
+  "country",
+  "administrative_area_level_1",
+  "administrative_area_level_2",
+  "route",
+  "street_address",
+  "postal_code",
+  "neighborhood",
+  "bus_station",
+  "transit_station",
+  "train_station",
+  "subway_station",
+  "airport",
+]);
+
+function isSellableBusiness(p: GooglePlace): boolean {
+  // Drop permanently/temporarily closed businesses — not worth pitching.
+  if (
+    p.businessStatus === "CLOSED_PERMANENTLY" ||
+    p.businessStatus === "CLOSED_TEMPORARILY"
+  ) {
+    return false;
+  }
+  const types = p.types ?? [];
+  if (types.length && types.every((ty) => NON_BUSINESS_TYPES.has(ty)))
+    return false;
+  return true;
+}
 
 // Includes Enterprise + Atmosphere-tier fields (phone, hours, reviews) — on-demand
 // only, fetched once per site build (a deliberate, plan-limited action).
@@ -193,6 +229,7 @@ export async function searchPlaces(opts: {
       nextPageToken?: string;
     };
     for (const p of json.places ?? []) {
+      if (!isSellableBusiness(p)) continue;
       results.push(toCandidate(p));
       if (results.length >= maxResults) break;
     }
