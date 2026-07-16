@@ -46,17 +46,25 @@ export async function updateSession(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
 
-  if (!user && path.startsWith("/dashboard")) {
+  // A redirect response must carry over any refreshed auth cookies Supabase
+  // just set on supabaseResponse — otherwise a token rotation during a
+  // redirecting request is lost and the user gets silently logged out.
+  const redirectTo = (pathname: string, search?: [string, string]) => {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    url.searchParams.set("redirectTo", path);
-    return NextResponse.redirect(url);
+    url.pathname = pathname;
+    url.search = "";
+    if (search) url.searchParams.set(search[0], search[1]);
+    const res = NextResponse.redirect(url);
+    supabaseResponse.cookies.getAll().forEach((c) => res.cookies.set(c));
+    return res;
+  };
+
+  if (!user && path.startsWith("/dashboard")) {
+    return redirectTo("/login", ["redirectTo", path]);
   }
 
   if (user && (path === "/login" || path === "/signup")) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
-    return NextResponse.redirect(url);
+    return redirectTo("/dashboard");
   }
 
   return supabaseResponse;

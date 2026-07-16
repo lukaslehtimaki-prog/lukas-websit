@@ -1,9 +1,6 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
-import { desc, sql, gte } from "drizzle-orm";
 import { requireTenantContext } from "@/lib/auth/tenant";
-import { getAdminDb, schema } from "@/lib/db";
-import { env } from "@/lib/env";
 import { planLimits } from "@/lib/plans";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { siteUrl } from "@/lib/site";
@@ -13,90 +10,68 @@ import {
 } from "@/components/admin/affiliates-panel";
 
 export const metadata = { title: "Admin · Sitovai" };
+export const dynamic = "force-dynamic";
 
-type CountRow = { tenantId: string; n: number };
+type TenantRow = {
+  id: string;
+  name: string;
+  plan_id: string;
+  created_at: string;
+};
+
+/** Tally a column of tenant_ids into a per-tenant count. */
+function tally(rows: { tenant_id: string }[] | null): Map<string, number> {
+  const m = new Map<string, number>();
+  for (const r of rows ?? []) m.set(r.tenant_id, (m.get(r.tenant_id) ?? 0) + 1);
+  return m;
+}
 
 export default async function AdminPage() {
   const ctx = await requireTenantContext();
   if (!ctx.isPlatformAdmin) redirect("/dashboard");
 
-  if (!env.DATABASE_URL) {
+  // Read via the service-role client (REST) so the admin view never depends on
+  // a direct DATABASE_URL connection.
+  const supabase = createAdminClient();
+  const monthStart = new Date(
+    Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1),
+  ).toISOString();
+
+  const [tRes, mRes, lRes, sRes, uRes] = await Promise.all([
+    supabase
+      .from("tenants")
+      .select("id,name,plan_id,created_at")
+      .order("created_at", { ascending: false })
+      .limit(500),
+    supabase.from("memberships").select("tenant_id").limit(100000),
+    supabase.from("leads").select("tenant_id").limit(100000),
+    supabase.from("sites").select("tenant_id").limit(100000),
+    supabase
+      .from("usage_events")
+      .select("kind,quantity")
+      .gte("created_at", monthStart)
+      .limit(100000),
+  ]);
+
+  if (tRes.error) {
     return (
       <AdminShell>
         <Notice>
-          Set <code className="font-mono">DATABASE_URL</code> in{" "}
-          <code className="font-mono">.env.local</code> to enable the platform
-          admin view.
+          Could not read the database. Make sure migration{" "}
+          <code className="font-mono">0001_init.sql</code> has been applied and
+          the service-role key is set. ({tRes.error.message})
         </Notice>
       </AdminShell>
     );
   }
 
-  let tenantsRows: (typeof schema.tenants.$inferSelect)[] = [];
-  let members = new Map<string, number>();
-  let leads = new Map<string, number>();
-  let sites = new Map<string, number>();
-  let usageByKind = new Map<string, number>();
-
-  try {
-    const db = getAdminDb();
-    const toMap = (rows: CountRow[]) =>
-      new Map(rows.map((r) => [r.tenantId, r.n]));
-    const monthStart = new Date(
-      Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1),
-    );
-    const [t, m, l, s, u] = await Promise.all([
-      db
-        .select()
-        .from(schema.tenants)
-        .orderBy(desc(schema.tenants.createdAt))
-        .limit(200),
-      db
-        .select({
-          tenantId: schema.memberships.tenantId,
-          n: sql<number>`count(*)::int`,
-        })
-        .from(schema.memberships)
-        .groupBy(schema.memberships.tenantId),
-      db
-        .select({
-          tenantId: schema.leads.tenantId,
-          n: sql<number>`count(*)::int`,
-        })
-        .from(schema.leads)
-        .groupBy(schema.leads.tenantId),
-      db
-        .select({
-          tenantId: schema.sites.tenantId,
-          n: sql<number>`count(*)::int`,
-        })
-        .from(schema.sites)
-        .groupBy(schema.sites.tenantId),
-      db
-        .select({
-          kind: schema.usageEvents.kind,
-          // sum, not count: batch kinds record quantity = batch size
-          n: sql<number>`coalesce(sum(${schema.usageEvents.quantity}), 0)::int`,
-        })
-        .from(schema.usageEvents)
-        .where(gte(schema.usageEvents.createdAt, monthStart))
-        .groupBy(schema.usageEvents.kind),
-    ]);
-    tenantsRows = t;
-    members = toMap(m);
-    leads = toMap(l);
-    sites = toMap(s);
-    usageByKind = new Map(u.map((r) => [r.kind, r.n]));
-  } catch {
-    return (
-      <AdminShell>
-        <Notice>
-          Could not read the database. Make sure you have applied{" "}
-          <code className="font-mono">supabase/migrations/0001_init.sql</code> and
-          that <code className="font-mono">DATABASE_URL</code> is correct.
-        </Notice>
-      </AdminShell>
-    );
+  const tenantsRows = (tRes.data ?? []) as TenantRow[];
+  const members = tally(mRes.data as { tenant_id: string }[] | null);
+  const leads = tally(lRes.data as { tenant_id: string }[] | null);
+  const sites = tally(sRes.data as { tenant_id: string }[] | null);
+  const usageByKind = new Map<string, number>();
+  for (const r of (uRes.data ?? []) as { kind: string; quantity: number }[]) {
+    usageByKind.set(r.kind, (usageByKind.get(r.kind) ?? 0) + (r.quantity ?? 1));
   }
 
   return (
@@ -135,13 +110,13 @@ export default async function AdminPage() {
               <tr key={t.id}>
                 <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">{t.name}</td>
                 <td className="px-4 py-3 text-zinc-600 dark:text-zinc-300">
-                  {planLimits(t.planId).label}
+                  {planLimits(t.plan_id).label}
                 </td>
                 <td className="px-4 py-3 text-zinc-600 dark:text-zinc-300">{members.get(t.id) ?? 0}</td>
                 <td className="px-4 py-3 text-zinc-600 dark:text-zinc-300">{leads.get(t.id) ?? 0}</td>
                 <td className="px-4 py-3 text-zinc-600 dark:text-zinc-300">{sites.get(t.id) ?? 0}</td>
                 <td className="px-4 py-3 text-zinc-500 dark:text-zinc-400">
-                  {new Date(t.createdAt).toLocaleDateString()}
+                  {new Date(t.created_at).toLocaleDateString()}
                 </td>
               </tr>
             ))}

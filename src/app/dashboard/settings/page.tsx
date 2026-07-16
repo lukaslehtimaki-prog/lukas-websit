@@ -9,6 +9,7 @@ import {
 } from "@/lib/sites/connect";
 import { Appearance } from "@/components/settings/appearance";
 import { Payouts } from "@/components/settings/payouts";
+import { AccountForm } from "@/components/settings/account-form";
 
 export const metadata = { title: "Settings · Sitovai" };
 export const dynamic = "force-dynamic";
@@ -75,37 +76,26 @@ export default async function SettingsPage({
       </section>
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-          Account
-        </h2>
-        <dl className="mt-4 divide-y divide-zinc-100 text-sm dark:divide-zinc-800">
-          <div className="flex items-center justify-between py-2.5">
-            <dt className="text-zinc-500 dark:text-zinc-400">Email</dt>
-            <dd className="font-medium text-zinc-900 dark:text-zinc-100">
-              {ctx.email}
-            </dd>
-          </div>
-          <div className="flex items-center justify-between py-2.5">
-            <dt className="text-zinc-500 dark:text-zinc-400">Workspace</dt>
-            <dd className="font-medium text-zinc-900 dark:text-zinc-100">
-              {ctx.tenantName || "—"}
-            </dd>
-          </div>
-          <div className="flex items-center justify-between py-2.5">
-            <dt className="text-zinc-500 dark:text-zinc-400">Plan</dt>
-            <dd className="flex items-center gap-3">
-              <span className="font-medium text-zinc-900 dark:text-zinc-100">
-                {plan.label}
-              </span>
-              <Link
-                href="/dashboard/billing"
-                className="text-xs font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
-              >
-                Manage
-              </Link>
-            </dd>
-          </div>
-        </dl>
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+            Account
+          </h2>
+          <Link
+            href="/dashboard/billing"
+            className="text-xs font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+          >
+            Manage plan
+          </Link>
+        </div>
+        <div className="mt-4">
+          <AccountForm
+            email={ctx.email ?? ""}
+            workspaceName={ctx.tenantName ?? ""}
+            fullName={ctx.fullName ?? ""}
+            planLabel={plan.label}
+            canRename={ctx.role === "owner" || ctx.role === "admin"}
+          />
+        </div>
       </section>
     </div>
   );

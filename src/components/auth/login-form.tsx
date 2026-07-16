@@ -5,6 +5,7 @@ import Link from "next/link";
 import { signInAction, type AuthState } from "@/app/(auth)/actions";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
+import { PasswordField } from "@/components/ui/password-field";
 
 const initial: AuthState = {};
 
@@ -17,10 +18,9 @@ export function LoginForm({ redirectTo }: { redirectTo?: string }) {
         <input type="hidden" name="redirectTo" value={redirectTo} />
       ) : null}
       <Field label="Email" name="email" type="email" autoComplete="email" required />
-      <Field
+      <PasswordField
         label="Password"
         name="password"
-        type="password"
         autoComplete="current-password"
         required
       />
