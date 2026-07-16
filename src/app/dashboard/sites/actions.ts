@@ -149,7 +149,7 @@ export async function createSiteFromLead(
     return {
       error:
         limit.limit === 0
-          ? "Your workspace has no active plan. Start your 7-day free trial from Billing to generate sites."
+          ? "Your workspace has no active plan. Subscribe from Billing to generate sites."
           : `You've used all ${limit.limit} site generations on your plan this month.`,
     };
   }
@@ -211,7 +211,7 @@ export async function createSiteFromInput(
     return {
       error:
         limit.limit === 0
-          ? "Your workspace has no active plan. Start your 7-day free trial from Billing to generate sites."
+          ? "Your workspace has no active plan. Subscribe from Billing to generate sites."
           : `You've used all ${limit.limit} site generations on your plan this month.`,
     };
   }

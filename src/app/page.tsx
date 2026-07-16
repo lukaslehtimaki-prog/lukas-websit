@@ -115,7 +115,7 @@ function SiteHeader() {
               Sign in
             </Link>
             <Link href="/signup" className={cn(btnPrimary, "h-9 px-4 text-sm")}>
-              Start free
+              Get started
             </Link>
           </div>
         </div>
@@ -171,7 +171,7 @@ function Hero() {
           style={{ animationDelay: "180ms" }}
         >
           <Link href="/signup" className={cn(btnPrimary, "h-12 px-7 text-[15px]")}>
-            Start 7-day free trial <ArrowRight className="h-4 w-4" />
+            Get started <ArrowRight className="h-4 w-4" />
           </Link>
           <a href="#how" className={cn(btnGhost, "h-12 px-7 text-[15px]")}>
             See how it works
@@ -181,7 +181,7 @@ function Hero() {
           className="animate-fade-up mt-5 text-sm text-zinc-500"
           style={{ animationDelay: "220ms" }}
         >
-          7-day free trial · Full Standard access · Cancel anytime
+          Plans from €20/mo · Cancel anytime
         </p>
 
         <div className="animate-fade-up mt-16" style={{ animationDelay: "280ms" }}>
@@ -575,31 +575,18 @@ function HowItWorks() {
 
 const TIERS = [
   {
-    name: "Free trial",
-    price: "€0",
-    period: "for 7 days",
-    desc: "Full Standard access to try everything, risk-free.",
-    cta: "Start free trial",
-    href: "/signup",
-    highlight: false,
-    features: [
-      "Everything in Standard",
-      "7 days free, then €20/mo",
-      "Cancel anytime",
-    ],
-  },
-  {
     name: "Standard",
     price: "€20",
     period: "/month",
     desc: "For freelancers and solo marketers.",
-    cta: "Start free trial",
+    cta: "Get started",
     href: "/signup?plan=pro",
     highlight: true,
     badge: "Most popular",
     features: [
       "50 lead searches / month",
       "15 AI websites / month",
+      "Website message inbox",
       "1 seat",
       "Registry cross-check (FI)",
       "CSV export",
@@ -610,12 +597,13 @@ const TIERS = [
     price: "€100",
     period: "/month",
     desc: "For agencies running at scale.",
-    cta: "Start free trial",
+    cta: "Get started",
     href: "/signup?plan=premium",
     highlight: false,
     features: [
       "5,000 lead searches / month",
       "500 AI websites / month",
+      "AI pitch emails with one-click buy",
       "5 team seats",
       "Priority AI generation",
       "Everything in Standard",
@@ -629,10 +617,10 @@ function Pricing() {
       <Container>
         <SectionHeading
           eyebrow="Pricing"
-          title="Simple plans, 7-day free trial"
-          subtitle="Start free for a week. Keep going from €20/month. Cancel whenever you like."
+          title="Simple, transparent plans"
+          subtitle="Pick a plan and start today from €20/month. Cancel whenever you like."
         />
-        <div className="mx-auto mt-14 grid max-w-5xl gap-6 lg:grid-cols-3">
+        <div className="mx-auto mt-14 grid max-w-3xl gap-6 sm:grid-cols-2">
           {TIERS.map((t) => (
             <div
               key={t.name}
@@ -706,7 +694,7 @@ function Faq() {
     },
     {
       q: "Can I cancel anytime?",
-      a: "Yes. The trial runs 7 days with full Standard access, and you can cancel from the billing page in one click — before or after the trial converts.",
+      a: "Yes. You can cancel from the billing page in one click; your plan stays active until the end of the current billing period.",
     },
     {
       q: "What happens when I hit my monthly limit?",
@@ -759,10 +747,10 @@ function CtaBand() {
               href="/signup"
               className={cn(btnPrimary, "mt-9 h-12 px-8 text-[15px]")}
             >
-              Start 7-day free trial <ArrowRight className="h-4 w-4" />
+              Get started <ArrowRight className="h-4 w-4" />
             </Link>
             <p className="mt-4 text-sm text-zinc-500">
-              €20/month after trial · Cancel anytime
+              From €20/month · Cancel anytime
             </p>
           </div>
         </div>
@@ -815,7 +803,7 @@ function SiteFooter() {
             <ul className="mt-4 space-y-3 text-sm text-zinc-500">
               <li>
                 <Link href="/signup" className="transition hover:text-white">
-                  Start free trial
+                  Get started
                 </Link>
               </li>
               <li>

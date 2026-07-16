@@ -38,7 +38,7 @@ export default async function BillingPage({
       <div>
         <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Billing</h1>
         <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-          Manage your plan, trial, and payment method.
+          Manage your plan and payment method.
         </p>
       </div>
 

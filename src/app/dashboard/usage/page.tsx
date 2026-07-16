@@ -57,14 +57,14 @@ export default async function UsagePage() {
       {!active ? (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
           <span>
-            Your workspace is read-only. Start your 7-day free trial to run
-            searches and build sites.
+            Your workspace is read-only. Subscribe to a plan to run searches
+            and build sites.
           </span>
           <Link
             href="/dashboard/billing"
             className="rounded-lg bg-zinc-900 px-3 py-1.5 font-medium text-white transition hover:bg-zinc-800"
           >
-            Start free trial
+            Choose a plan
           </Link>
         </div>
       ) : null}

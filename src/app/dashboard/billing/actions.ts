@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { requireTenantContext } from "@/lib/auth/tenant";
 import { createClient } from "@/lib/supabase/server";
 import { getStripe, priceIdForPlan, isStripeConfigured } from "@/lib/stripe";
-import { TRIAL_DAYS, type PlanId } from "@/lib/plans";
+import { type PlanId } from "@/lib/plans";
 import {
   getActiveAffiliate,
   getAffiliateForTenant,
@@ -88,7 +88,7 @@ export async function startCheckout(plan: PlanId): Promise<ActionResult> {
       customer: customerId,
       line_items: [{ price: priceId, quantity: 1 }],
       subscription_data: {
-        trial_period_days: TRIAL_DAYS,
+        // No free trial for now — the subscription is charged immediately.
         metadata: {
           tenant_id: ctx.tenantId,
           ...(affiliate ? { affiliate_code: affiliate.code } : {}),

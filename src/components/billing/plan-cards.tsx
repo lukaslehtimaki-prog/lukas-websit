@@ -130,7 +130,7 @@ export function PlanCards({
                     className="inline-flex w-full items-center justify-center gap-2 rounded-[10px] bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:opacity-60"
                   >
                     {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                    Start 7-day free trial
+                    Get started
                   </button>
                 )}
               </div>

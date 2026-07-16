@@ -25,7 +25,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           {children}
         </div>
         <p className="mt-6 text-center text-xs text-zinc-500">
-          7-day free trial · Cancel anytime
+          Cancel anytime
         </p>
       </div>
     </div>

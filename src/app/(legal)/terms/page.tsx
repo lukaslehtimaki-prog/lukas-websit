@@ -45,16 +45,12 @@ export default function TermsPage() {
         be at least 18 years old and able to enter into a binding contract.
       </P>
 
-      <H2>3. Subscriptions, trials &amp; billing</H2>
+      <H2>3. Subscriptions &amp; billing</H2>
       <UL>
         <li>
           Paid plans are billed in euros (EUR) on a recurring monthly basis
-          through our payment processor, Stripe.
-        </li>
-        <li>
-          The free trial gives you access for its stated duration. Unless you
-          cancel before it ends, it converts to a paid subscription at the plan
-          price.
+          through our payment processor, Stripe. Your subscription begins when
+          you complete checkout.
         </li>
         <li>
           Subscriptions renew automatically until cancelled. You can cancel at

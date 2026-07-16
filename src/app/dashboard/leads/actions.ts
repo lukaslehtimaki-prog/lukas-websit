@@ -103,7 +103,7 @@ export async function runSearchAction(
     return {
       error:
         limit.limit === 0
-          ? "Your workspace has no active plan. Start your 7-day free trial from Billing to run searches."
+          ? "Your workspace has no active plan. Subscribe from Billing to run searches."
           : `You've used all ${limit.limit} searches on your plan this month.`,
     };
   }
