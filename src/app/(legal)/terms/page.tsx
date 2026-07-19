@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 const CONTACT = "lukas.lehtimaki1@gmail.com";
-const UPDATED = "9 July 2026";
+const UPDATED = "19 July 2026";
 
 export default function TermsPage() {
   return (
@@ -24,7 +24,7 @@ export default function TermsPage() {
       <P>
         These Terms of Service (&ldquo;Terms&rdquo;) govern your access to and
         use of Sitovai (the &ldquo;Service&rdquo;), operated by Lukas Lehtimäki, a
-        sole trader based in Finland. By creating an account or using the
+        sole trader based in Finland (Business ID / Y-tunnus: 3638129-8). By creating an account or using the
         Service, you agree to these Terms. If you do not agree, do not use the
         Service.
       </P>

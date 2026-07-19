@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 const CONTACT = "lukas.lehtimaki1@gmail.com";
-const UPDATED = "9 July 2026";
+const UPDATED = "19 July 2026";
 
 export default function PrivacyPage() {
   return (
@@ -32,7 +32,8 @@ export default function PrivacyPage() {
       <H2>1. Data controller</H2>
       <P>
         The data controller responsible for your personal data is Lukas
-        Lehtimäki, operating as a sole trader in Finland. For any privacy
+        Lehtimäki, operating as a sole trader in Finland (Business ID / Y-tunnus:
+        3638129-8). For any privacy
         questions or to exercise your rights, contact us at{" "}
         <A href={`mailto:${CONTACT}`}>{CONTACT}</A>.
       </P>
