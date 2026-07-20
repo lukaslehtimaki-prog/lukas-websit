@@ -88,10 +88,17 @@ export async function runSearchAction(
   const radiusKm = Number(formData.get("radiusKm") ?? "5") || 5;
   const allTypes = formData.get("allTypes") === "on";
   const onlyOpportunities = formData.get("onlyOpportunities") === "on";
-  if (!niche && !allTypes)
-    return { error: "Enter a niche or business type to search for." };
-  if (allTypes && !location)
-    return { error: "The every-business-type sweep needs a location." };
+  // Quick-pick niches (comma-separated) run as a mini fan-out search.
+  const pickedNiches = String(formData.get("niches") ?? "")
+    .split(",")
+    .map((n) => n.trim())
+    .filter(Boolean)
+    .slice(0, 20);
+  const usingChips = pickedNiches.length > 0;
+  if (!niche && !allTypes && !usingChips)
+    return { error: "Pick a niche or enter a business type to search for." };
+  if ((allTypes || usingChips) && !location)
+    return { error: "Choosing niches needs a location to search in." };
 
   const limit = await checkLimit(
     ctx.planId,
@@ -121,13 +128,19 @@ export async function runSearchAction(
   }
 
   const geoOpts = { lat, lng, radiusMeters: radiusKm * 1000 };
-  const queries = allTypes
-    ? SWEEP_CATEGORIES.map((c) => `${c} in ${location}`)
+  const categories = allTypes
+    ? [...SWEEP_CATEGORIES]
+    : usingChips
+      ? pickedNiches
+      : [];
+  const fanOut = categories.length > 0;
+  const queries = fanOut
+    ? categories.map((c) => `${c} in ${location}`)
     : [[niche, location].filter(Boolean).join(" in ")];
 
   let candidates: PlaceCandidate[];
   try {
-    if (allTypes) {
+    if (fanOut) {
       // Fan out, dedupe by place id (a garage can match two categories).
       const batches = await Promise.all(
         queries.map((query) =>
@@ -164,7 +177,11 @@ export async function runSearchAction(
     .insert({
       tenant_id: ctx.tenantId,
       created_by: ctx.userId,
-      niche: allTypes ? "All business types" : niche,
+      niche: allTypes
+        ? "All business types"
+        : usingChips
+          ? pickedNiches.join(", ")
+          : niche,
       location_label: label || null,
       lat,
       lng,
@@ -215,7 +232,7 @@ export async function runSearchAction(
   }
 
   await recordUsage(ctx.tenantId, ctx.userId, "lead_search", queries.length, {
-    niche: allTypes ? "all_types_sweep" : niche,
+    niche: allTypes ? "all_types_sweep" : usingChips ? "quick_pick" : niche,
     location: label,
     results: enriched.length,
   });

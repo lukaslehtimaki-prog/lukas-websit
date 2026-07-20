@@ -12,6 +12,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { runSearchAction, type SearchState } from "@/app/dashboard/leads/actions";
+import { cn } from "@/lib/utils";
 
 const initial: SearchState = {};
 
@@ -25,11 +26,37 @@ const examples = [
 const inputClass =
   "w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 py-2 pl-9 pr-3 text-sm text-zinc-900 dark:text-zinc-100 outline-none transition placeholder:text-zinc-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100";
 
+// Top high-demand niches for the quick-pick tab — the businesses most likely
+// to want a website. Ticking any runs a search across all the ticked ones.
+const NICHE_PRESETS = [
+  "Barbershop",
+  "Hair salon",
+  "Beauty salon",
+  "Nail salon",
+  "Coffee shop",
+  "Restaurant",
+  "Plumber",
+  "Electrician",
+  "Car repair",
+  "Gym",
+  "Dentist",
+  "Cleaning service",
+];
+
 export function SearchComposer() {
   const [state, formAction, pending] = useActionState(runSearchAction, initial);
   const [niche, setNiche] = useState("");
   const [location, setLocation] = useState("");
   const [allTypes, setAllTypes] = useState(false);
+  const [picked, setPicked] = useState<string[]>([]);
+
+  function toggleNiche(n: string) {
+    setAllTypes(false);
+    setPicked((prev) =>
+      prev.includes(n) ? prev.filter((x) => x !== n) : [...prev, n],
+    );
+  }
+  const usingChips = picked.length > 0;
 
   return (
     <form
@@ -47,25 +74,69 @@ export function SearchComposer() {
       </div>
 
       <div className="p-4">
+        {usingChips ? (
+          <input type="hidden" name="niches" value={picked.join(",")} />
+        ) : null}
+
+        {/* Quick-pick niches */}
+        <div className="mb-3.5">
+          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
+            Quick pick — tick the businesses you want
+          </span>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {NICHE_PRESETS.map((n) => {
+              const on = picked.includes(n);
+              return (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => toggleNiche(n)}
+                  aria-pressed={on}
+                  className={cn(
+                    "cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition",
+                    on
+                      ? "border-indigo-500 bg-indigo-600 text-white"
+                      : "border-zinc-200 bg-zinc-50/60 text-zinc-600 hover:border-indigo-300 hover:text-indigo-700 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-300 dark:hover:text-indigo-300",
+                  )}
+                >
+                  {on ? "✓ " : ""}
+                  {n}
+                </button>
+              );
+            })}
+            {usingChips ? (
+              <button
+                type="button"
+                onClick={() => setPicked([])}
+                className="cursor-pointer rounded-full px-2 py-1 text-xs text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+              >
+                Clear
+              </button>
+            ) : null}
+          </div>
+        </div>
+
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
           <label className="flex-1 space-y-1.5">
             <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
-              Niche / business type
+              {usingChips ? "Or type a niche" : "Niche / business type"}
             </span>
             <div className="relative">
               <Store className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" />
               <input
                 name="niche"
-                value={allTypes ? "" : niche}
+                value={allTypes || usingChips ? "" : niche}
                 onChange={(e) => setNiche(e.target.value)}
                 placeholder={
                   allTypes
                     ? "Every business type — plumbers, mechanics, salons…"
-                    : "e.g. plumber, electrician, barbershop"
+                    : usingChips
+                      ? `${picked.length} niche${picked.length > 1 ? "s" : ""} selected above`
+                      : "e.g. plumber, electrician, barbershop"
                 }
                 className={inputClass}
-                required={!allTypes}
-                disabled={allTypes}
+                required={!allTypes && !usingChips}
+                disabled={allTypes || usingChips}
               />
             </div>
           </label>
@@ -119,7 +190,10 @@ export function SearchComposer() {
               type="checkbox"
               name="allTypes"
               checked={allTypes}
-              onChange={(e) => setAllTypes(e.target.checked)}
+              onChange={(e) => {
+                setAllTypes(e.target.checked);
+                if (e.target.checked) setPicked([]);
+              }}
               className="h-4 w-4 cursor-pointer rounded border-zinc-300 accent-indigo-600 dark:border-zinc-700"
             />
             <span>

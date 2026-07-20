@@ -41,6 +41,7 @@ import {
   importGooglePhotosAction,
   generatePitchAction,
   sendPitchAction,
+  aiEditSiteAction,
 } from "@/app/dashboard/sites/actions";
 import { renderSiteToHtml } from "@/lib/templates/render";
 import { renderPitchEmailHtml } from "@/lib/email/pitch-template";
@@ -106,6 +107,9 @@ export function SiteEditor({
   const [pitchTo, setPitchTo] = useState("");
   const [pitchBusy, setPitchBusy] = useState<null | "draft" | "send">(null);
   const [pitchSent, setPitchSent] = useState(false);
+  const [aiInstruction, setAiInstruction] = useState("");
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiLog, setAiLog] = useState<string[]>([]);
   const [offerPrice, setOfferPrice] = useState(
     initialContent.payment?.priceStr || "500 €",
   );
@@ -210,6 +214,22 @@ export function SiteEditor({
   }
   function setPlans(next: MembershipPlan[]) {
     patch({ membershipPlans: next });
+  }
+  function runAiEdit() {
+    const instruction = aiInstruction.trim();
+    if (!instruction || aiBusy) return;
+    setAiBusy(true);
+    startTransition(async () => {
+      const r = await aiEditSiteAction(instruction, content);
+      if (r.error) {
+        setMessage(r.error);
+      } else if (r.content) {
+        setContent(r.content);
+        setAiLog((prev) => [r.summary ?? "Applied your changes.", ...prev].slice(0, 8));
+        setAiInstruction("");
+      }
+      setAiBusy(false);
+    });
   }
 
   function save() {
@@ -650,6 +670,69 @@ export function SiteEditor({
             ) : null}
           </div>
         )}
+      </div>
+
+      {/* AI editor */}
+      <div className="rounded-xl border border-violet-200 bg-gradient-to-br from-violet-50 to-indigo-50 p-4 shadow-sm dark:border-violet-500/25 dark:from-violet-500/10 dark:to-indigo-500/10">
+        <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          <span className="grid h-6 w-6 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 text-white">
+            <Sparkles className="h-3.5 w-3.5" />
+          </span>
+          Edit with AI
+        </div>
+        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          Just say what to change — no regenerating. e.g. &ldquo;set the first
+          service to 120 €&rdquo;, &ldquo;hide the FAQ and move reviews up&rdquo;,
+          &ldquo;add a 15% off offer with code SPRING&rdquo;, &ldquo;make the
+          brand colour green&rdquo;.
+        </p>
+        <div className="mt-3 flex gap-2">
+          <input
+            value={aiInstruction}
+            onChange={(e) => setAiInstruction(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                runAiEdit();
+              }
+            }}
+            placeholder="Tell the AI what to change…"
+            disabled={aiBusy}
+            className={cn("flex-1", fieldCls)}
+          />
+          <button
+            onClick={runAiEdit}
+            disabled={aiBusy || !aiInstruction.trim()}
+            className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:brightness-110 disabled:opacity-60"
+          >
+            {aiBusy ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+            Apply
+          </button>
+        </div>
+        {aiLog.length ? (
+          <ul className="mt-3 space-y-1.5">
+            {aiLog.map((entry, i) => (
+              <li
+                key={i}
+                className="flex items-start gap-2 text-xs text-zinc-600 dark:text-zinc-300"
+              >
+                <Sparkles className="mt-0.5 h-3 w-3 shrink-0 text-violet-500" />
+                <span>{entry}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {aiLog.length ? (
+          <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-500">
+            Changes are applied to the preview — click{" "}
+            <span className="font-medium">Save</span> to keep them, or Undo isn&apos;t
+            available yet so Save only when happy.
+          </p>
+        ) : null}
       </div>
 
       <div className="grid gap-5 lg:grid-cols-2">

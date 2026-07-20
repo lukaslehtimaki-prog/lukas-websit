@@ -20,6 +20,7 @@ import {
 } from "@/lib/email/pitch-template";
 import { getPlaceDetails, resolvePlace } from "@/lib/places/client";
 import { generateWebsiteContent, fallbackContent } from "@/lib/ai/website-content";
+import { editSiteContentAI } from "@/lib/ai/edit-site";
 import {
   inferSiteKind,
   defaultMembershipPlans,
@@ -397,6 +398,25 @@ export async function uploadSiteImageAction(
     return { url };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Upload failed." };
+  }
+}
+
+export async function aiEditSiteAction(
+  instruction: string,
+  content: SiteContent,
+): Promise<{ content?: SiteContent; summary?: string; error?: string }> {
+  await requireTenantContext();
+  if (!isAIConfigured())
+    return { error: "Add ANTHROPIC_API_KEY to use the AI editor." };
+  const text = instruction.trim();
+  if (!text) return { error: "Tell the AI what to change." };
+  if (text.length > 1000)
+    return { error: "Keep the instruction under 1000 characters." };
+  try {
+    const r = await editSiteContentAI(content, text);
+    return { content: r.content, summary: r.summary };
+  } catch {
+    return { error: "The AI editor couldn't apply that. Try rephrasing." };
   }
 }
 

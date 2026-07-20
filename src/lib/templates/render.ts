@@ -521,13 +521,34 @@ export function renderSiteToHtml(
   section h2::before { content: ""; display: block; width: 46px; height: 4px; border-radius: 99px; background: linear-gradient(90deg, var(--accent), var(--accent2)); margin-bottom: 16px; }
 
   header.site { position: sticky; top: 0; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4); border-bottom: var(--bw) solid var(--border); z-index: 10; }
-  header.site .wrap { display: flex; align-items: center; justify-content: space-between; height: 66px; }
+  header.site > .wrap { display: flex; align-items: center; justify-content: space-between; height: 66px; }
   .brand { font-family: ${t.headingFont}; font-weight: 700; font-size: 21px; color: var(--ink); }
   .header-actions { display: flex; align-items: center; gap: 24px; }
   .nav { display: none; gap: 22px; align-items: center; }
   .nav a { color: var(--ink); text-decoration: none; font-size: 15px; font-weight: 500; opacity: .8; }
   .nav a:hover { opacity: 1; color: var(--accent); }
   @media (min-width: 880px) { .nav { display: flex; } }
+
+  /* Mobile menu (checkbox toggle — no JS needed) */
+  .nav-toggle { display: none; }
+  .hamburger { display: none; flex-direction: column; justify-content: center; gap: 5px; width: 42px; height: 42px; cursor: pointer; border-radius: 10px; border: var(--bw) solid var(--border); }
+  .hamburger span { display: block; width: 20px; height: 2px; margin: 0 auto; background: var(--ink); border-radius: 2px; transition: transform .2s ease, opacity .2s ease; }
+  .mobile-menu { display: none; }
+  @media (max-width: 879px) {
+    .hamburger { display: flex; }
+    .header-actions .header-cta { display: none; }
+    .mobile-menu { position: absolute; top: 100%; left: 0; right: 0; background: var(--bg); border-top: var(--bw) solid var(--border); box-shadow: 0 16px 30px rgba(0,0,0,.14); }
+    .nav-toggle:checked ~ .mobile-menu { display: block; }
+    .nav-toggle:checked ~ .wrap .hamburger span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-toggle:checked ~ .wrap .hamburger span:nth-child(2) { opacity: 0; }
+    .nav-toggle:checked ~ .wrap .hamburger span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu > .wrap { display: flex; flex-direction: column; gap: 2px; padding-top: 10px; padding-bottom: 18px; height: auto; }
+    .mobile-menu nav { display: flex; flex-direction: column; }
+    .mobile-menu nav a { padding: 13px 4px; font-size: 16px; font-weight: 500; color: var(--ink); text-decoration: none; border-bottom: var(--bw) solid var(--border); }
+    .mobile-menu .btn { margin-top: 14px; text-align: center; }
+    .mobile-socials { display: flex; gap: 14px; padding: 12px 4px 0; }
+    .mobile-socials a { color: var(--muted); }
+  }
 
   .btn { display: inline-block; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: var(--on-accent); padding: 13px 26px; border-radius: var(--radius); text-decoration: none; font-weight: 600; border: 0; cursor: pointer; font-size: 15.5px; box-shadow: 0 8px 22px color-mix(in srgb, var(--accent) 32%, transparent); transition: filter .2s ease, transform .2s ease, box-shadow .2s ease; }
   .btn:hover { filter: brightness(1.07); transform: translateY(-2px); box-shadow: 0 14px 30px color-mix(in srgb, var(--accent) 42%, transparent); }
@@ -714,14 +735,23 @@ export function renderSiteToHtml(
 </head>
 <body>
   ${announcementBar}
-  <header class="site"><div class="wrap">
-    <span class="brand">${esc(content.businessName)}</span>
-    <div class="header-actions">
-      <nav class="nav">${nav}</nav>
-      ${headerSocials}
-      <a class="btn" href="${primaryHref}">${esc(content.ctaText || s.navContact)}</a>
+  <header class="site">
+    <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true" />
+    <div class="wrap">
+      <span class="brand">${esc(content.businessName)}</span>
+      <div class="header-actions">
+        <nav class="nav">${nav}</nav>
+        ${headerSocials}
+        <a class="btn header-cta" href="${primaryHref}">${esc(content.ctaText || s.navContact)}</a>
+        <label for="nav-toggle" class="hamburger" aria-label="Menu"><span></span><span></span><span></span></label>
+      </div>
     </div>
-  </div></header>
+    <div class="mobile-menu"><div class="wrap">
+      <nav>${nav}</nav>
+      ${headerSocials ? headerSocials.replace("head-socials", "mobile-socials") : ""}
+      <a class="btn" href="${primaryHref}">${esc(content.ctaText || s.navContact)}</a>
+    </div></div>
+  </header>
 
   ${heroMarkup().replace('class="hero ', t.divider !== "none" ? 'class="hero has-divider ' : 'class="hero ')}
 
