@@ -140,6 +140,10 @@ export type SiteContent = {
   designSeed?: number;
   /** Set when a pitch email was sent, for outreach tracking. */
   pitch?: { sentAt: string; to: string };
+  /** Private key for the shareable client review/buy link (/r/{id}?k=…). */
+  reviewKey?: string;
+  /** The client's email, for outreach + records (editor-set). */
+  clientEmail?: string;
   /** Stripe payment-link sale info, auto-created for pitch emails. */
   payment?: {
     productId: string;

@@ -31,6 +31,7 @@ import {
   ArrowDown,
   Eye,
   EyeOff,
+  Link2,
 } from "lucide-react";
 import {
   updateSiteContent,
@@ -42,6 +43,7 @@ import {
   generatePitchAction,
   sendPitchAction,
   aiEditSiteAction,
+  ensureClientLinkAction,
 } from "@/app/dashboard/sites/actions";
 import { renderSiteToHtml } from "@/lib/templates/render";
 import { renderPitchEmailHtml } from "@/lib/email/pitch-template";
@@ -110,6 +112,9 @@ export function SiteEditor({
   const [aiInstruction, setAiInstruction] = useState("");
   const [aiBusy, setAiBusy] = useState(false);
   const [aiLog, setAiLog] = useState<string[]>([]);
+  const [clientEmail, setClientEmail] = useState(initialContent.clientEmail ?? "");
+  const [clientUrl, setClientUrl] = useState("");
+  const [clientBusy, setClientBusy] = useState(false);
   const [offerPrice, setOfferPrice] = useState(
     initialContent.payment?.priceStr || "500 €",
   );
@@ -214,6 +219,19 @@ export function SiteEditor({
   }
   function setPlans(next: MembershipPlan[]) {
     patch({ membershipPlans: next });
+  }
+  function makeClientLink() {
+    setClientBusy(true);
+    startTransition(async () => {
+      const r = await ensureClientLinkAction(siteId, clientEmail);
+      if (r.error) setMessage(r.error);
+      else if (r.url) {
+        setClientUrl(r.url);
+        navigator.clipboard?.writeText(r.url).catch(() => {});
+        setMessage("Client link ready — copied ✓");
+      }
+      setClientBusy(false);
+    });
   }
   function runAiEdit() {
     const instruction = aiInstruction.trim();
@@ -731,6 +749,66 @@ export function SiteEditor({
             Changes are applied to the preview — click{" "}
             <span className="font-medium">Save</span> to keep them, or Undo isn&apos;t
             available yet so Save only when happy.
+          </p>
+        ) : null}
+      </div>
+
+      {/* Client review + buy link */}
+      <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          <span className="grid h-6 w-6 place-items-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-300">
+            <Link2 className="h-3.5 w-3.5" />
+          </span>
+          Client review link
+        </div>
+        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          A private link the client opens to see their finished site with a
+          &ldquo;Get this website&rdquo; button — no login needed. Works even
+          before you publish. Buying marks the site Sold.
+        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <input
+            value={clientEmail}
+            onChange={(e) => setClientEmail(e.target.value)}
+            placeholder="Client email (optional)"
+            type="email"
+            className={cn("flex-1 min-w-[12rem]", fieldCls)}
+          />
+          <button
+            onClick={makeClientLink}
+            disabled={clientBusy || isPending}
+            className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:opacity-60"
+          >
+            {clientBusy ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
+            {clientUrl ? "Copy link" : "Create link"}
+          </button>
+        </div>
+        {clientUrl ? (
+          <div className="mt-2 flex items-center gap-2">
+            <input
+              readOnly
+              value={clientUrl}
+              onFocus={(e) => e.currentTarget.select()}
+              className={cn("flex-1 font-mono text-xs", fieldCls)}
+            />
+            <a
+              href={clientUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            >
+              <ExternalLink className="h-4 w-4" /> Open
+            </a>
+          </div>
+        ) : null}
+        {clientUrl && !content.payment?.link ? (
+          <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
+            Tip: set a price in the pitch panel to add a working Buy button to
+            this link.
           </p>
         ) : null}
       </div>

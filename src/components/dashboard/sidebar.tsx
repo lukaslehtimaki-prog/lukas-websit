@@ -12,6 +12,7 @@ import {
   CreditCard,
   Shield,
   Settings,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +30,7 @@ const nav: NavItem[] = [
   { href: "/dashboard/messages", label: "Messages", icon: Inbox },
   { href: "/dashboard/usage", label: "Usage", icon: BarChart3 },
   { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
+  { href: "/dashboard/guide", label: "How to sell", icon: BookOpen },
 ];
 
 export function Sidebar({ isPlatformAdmin }: { isPlatformAdmin: boolean }) {

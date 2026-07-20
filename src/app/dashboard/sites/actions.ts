@@ -316,6 +316,8 @@ export async function regenerateContent(
   if (existing?.socials?.length) content.socials = existing.socials;
   if (existing?.sectionOrder) content.sectionOrder = existing.sectionOrder;
   if (existing?.hiddenSections) content.hiddenSections = existing.hiddenSections;
+  if (existing?.reviewKey) content.reviewKey = existing.reviewKey;
+  if (existing?.clientEmail) content.clientEmail = existing.clientEmail;
   // Carry over per-service prices by matching service title.
   if (existing?.services?.length && content.services?.length) {
     const priceByTitle = new Map(
@@ -354,6 +356,8 @@ export async function updateSiteContent(
   const existing = (row as any)?.content as SiteContent | undefined;
   if (existing?.payment) content.payment = existing.payment;
   if (existing?.pitch) content.pitch = existing.pitch;
+  if (existing?.reviewKey && !content.reviewKey)
+    content.reviewKey = existing.reviewKey;
 
   const patch: Record<string, any> = {
     content,
@@ -399,6 +403,44 @@ export async function uploadSiteImageAction(
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Upload failed." };
   }
+}
+
+export async function ensureClientLinkAction(
+  siteId: string,
+  clientEmail?: string,
+): Promise<{ url?: string; error?: string }> {
+  await requireTenantContext();
+  const supabase = await createClient();
+  const { data: site } = await supabase
+    .from("sites")
+    .select("content")
+    .eq("id", siteId)
+    .maybeSingle();
+  if (!site) return { error: "Site not found." };
+  const content = (site as any).content as SiteContent;
+
+  let changed = false;
+  if (!content.reviewKey) {
+    content.reviewKey = crypto.randomUUID().replace(/-/g, "").slice(0, 20);
+    changed = true;
+  }
+  const email = clientEmail?.trim();
+  if (email !== undefined && email !== (content.clientEmail ?? "")) {
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return { error: "Enter a valid client email (or leave it blank)." };
+    content.clientEmail = email || undefined;
+    changed = true;
+  }
+  if (changed) {
+    await supabase
+      .from("sites")
+      .update({ content, updated_at: new Date().toISOString() })
+      .eq("id", siteId);
+  }
+
+  const h = await headers();
+  const base = h.get("origin") ?? `https://${h.get("host") ?? "localhost:3000"}`;
+  return { url: `${base}/r/${siteId}?k=${content.reviewKey}` };
 }
 
 export async function aiEditSiteAction(
