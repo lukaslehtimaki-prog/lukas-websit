@@ -132,6 +132,8 @@ function Hero() {
     <section className="relative overflow-hidden pt-14">
       {/* backdrop — living WebGL Aether shader, lightly scrimmed for readability */}
       <div className="pointer-events-none absolute inset-0 -z-10">
+        {/* clean static fallback shown only if a device can't run WebGL */}
+        <div className="absolute inset-0 bg-[radial-gradient(75%_55%_at_50%_22%,rgba(99,102,241,0.18),rgba(139,92,246,0.08),transparent_72%)]" />
         <AetherShader className="opacity-95" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,6,10,0.5)_0%,rgba(6,6,10,0.08)_20%,rgba(6,6,10,0.14)_58%,#06060a_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(50%_36%_at_50%_45%,rgba(6,6,10,0.5),transparent_72%)]" />
