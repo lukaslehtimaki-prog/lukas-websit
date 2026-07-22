@@ -130,11 +130,11 @@ function SiteHeader() {
 function Hero() {
   return (
     <section className="relative overflow-hidden pt-14">
-      {/* backdrop — living WebGL Aether shader, scrimmed for readability */}
+      {/* backdrop — living WebGL Aether shader, lightly scrimmed for readability */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <AetherShader className="opacity-80" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,6,10,0.66)_0%,rgba(6,6,10,0.24)_30%,rgba(6,6,10,0.30)_62%,#06060a_100%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(58%_42%_at_50%_46%,rgba(6,6,10,0.45),transparent_72%)]" />
+        <AetherShader className="opacity-95" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,6,10,0.5)_0%,rgba(6,6,10,0.08)_20%,rgba(6,6,10,0.14)_58%,#06060a_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(50%_36%_at_50%_45%,rgba(6,6,10,0.5),transparent_72%)]" />
         <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-b from-transparent to-[#06060a]" />
       </div>
 
