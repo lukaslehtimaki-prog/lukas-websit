@@ -58,7 +58,9 @@ export function AetherShader({ className, dprMax = 1.6 }: { className?: string; 
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     if (reduce) { canvas.style.display = "none"; return; }
 
-    const gl = canvas.getContext("webgl2", { alpha: true, antialias: true, preserveDrawingBuffer: true });
+    // Opaque context (no alpha / no preserved buffer) composites reliably and
+    // continuously — fixes the "only repaints on zoom" bug on some GPUs.
+    const gl = canvas.getContext("webgl2", { alpha: false, antialias: true });
     if (!gl) { canvas.style.display = "none"; return; }
 
     const compile = (type: number, src: string) => {
@@ -94,7 +96,7 @@ export function AetherShader({ className, dprMax = 1.6 }: { className?: string; 
 
     const uTime = gl.getUniformLocation(prog, "time");
     const uRes = gl.getUniformLocation(prog, "resolution");
-    gl.clearColor(0, 0, 0, 0);
+    gl.clearColor(0, 0, 0, 1);
 
     const fit = () => {
       // Render at a bold, capped internal resolution (smaller = bigger, brighter
@@ -114,6 +116,9 @@ export function AetherShader({ className, dprMax = 1.6 }: { className?: string; 
     let raf = 0;
     const start = performance.now();
     const loop = () => {
+      gl.useProgram(prog);
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.uniform1f(uTime, 1.6 + (performance.now() - start) * 0.0009); // start mid-pattern, calm drift
       gl.uniform2f(uRes, canvas.width, canvas.height);
@@ -135,7 +140,7 @@ export function AetherShader({ className, dprMax = 1.6 }: { className?: string; 
       ref={canvasRef}
       aria-hidden="true"
       className={className}
-      style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }}
+      style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block", transform: "translateZ(0)", willChange: "transform" }}
     />
   );
 }
