@@ -14,6 +14,7 @@ import {
   MousePointerClick,
 } from "lucide-react";
 import { Container } from "@/components/ui/container";
+import { AetherShader } from "@/components/ui/aether-hero";
 import { cn } from "@/lib/utils";
 
 export default function Home() {
@@ -129,12 +130,12 @@ function SiteHeader() {
 function Hero() {
   return (
     <section className="relative overflow-hidden pt-14">
-      {/* backdrop */}
+      {/* backdrop — living WebGL Aether shader, scrimmed for readability */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-grid-dark bg-grid-fade" />
-        <div className="animate-aurora absolute left-1/2 top-[-22%] h-[560px] w-[980px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(99,102,241,0.32),rgba(139,92,246,0.16),transparent)] blur-3xl" />
-        <div className="absolute right-[-10%] top-[30%] h-[380px] w-[380px] rounded-full bg-[radial-gradient(closest-side,rgba(34,211,238,0.14),transparent)] blur-3xl" />
-        <div className="absolute left-[-8%] top-[46%] h-[320px] w-[320px] rounded-full bg-[radial-gradient(closest-side,rgba(139,92,246,0.14),transparent)] blur-3xl" />
+        <AetherShader className="opacity-80" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,6,10,0.66)_0%,rgba(6,6,10,0.24)_30%,rgba(6,6,10,0.30)_62%,#06060a_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(58%_42%_at_50%_46%,rgba(6,6,10,0.45),transparent_72%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-b from-transparent to-[#06060a]" />
       </div>
 
       <Container className="pb-24 pt-24 text-center sm:pt-32">
