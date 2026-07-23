@@ -13,6 +13,7 @@ import {
   type Resolved,
 } from "@/components/theme/theme-provider";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { BrandMark } from "@/components/ui/brand";
 
 export const dynamic = "force-dynamic";
 
@@ -35,9 +36,7 @@ export default async function DashboardLayout({
           href="/dashboard"
           className="flex h-16 items-center gap-2.5 border-b border-zinc-100 dark:border-zinc-800 px-5 text-[15px] font-semibold tracking-tight text-zinc-900 dark:text-zinc-100"
         >
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 via-violet-500 to-cyan-400 text-sm font-bold text-white shadow-[0_2px_12px_-2px_rgba(99,102,241,0.5)]">
-            S
-          </span>
+          <BrandMark size={32} className="shadow-[0_2px_12px_-2px_rgba(99,102,241,0.5)]" />
           Sitovai
         </Link>
         <Sidebar isPlatformAdmin={ctx.isPlatformAdmin} />
@@ -63,9 +62,7 @@ export default async function DashboardLayout({
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b border-zinc-200/70 dark:border-zinc-800/70 bg-white/80 dark:bg-zinc-900/80 px-6 backdrop-blur-md">
           <div className="flex items-center gap-2.5 font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 md:hidden">
-            <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 via-violet-500 to-cyan-400 text-xs font-bold text-white">
-              S
-            </span>
+            <BrandMark size={28} />
             Sitovai
           </div>
           <div className="ml-auto flex items-center gap-3">

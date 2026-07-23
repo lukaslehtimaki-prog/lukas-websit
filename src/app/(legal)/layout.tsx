@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Container } from "@/components/ui/container";
+import { BrandMark } from "@/components/ui/brand";
 
 export default function LegalLayout({ children }: { children: ReactNode }) {
   return (
@@ -12,9 +13,7 @@ export default function LegalLayout({ children }: { children: ReactNode }) {
             href="/"
             className="flex items-center gap-2.5 font-semibold tracking-tight text-white"
           >
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 via-violet-500 to-cyan-400 text-[15px] font-bold text-white shadow-[0_0_20px_-4px_rgba(99,102,241,0.8)]">
-              S
-            </span>
+            <BrandMark size={32} className="shadow-[0_0_20px_-4px_rgba(99,102,241,0.8)]" />
             <span className="text-[17px]">Sitovai</span>
           </Link>
           <Link

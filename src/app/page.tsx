@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { AuroraBackdrop } from "@/components/ui/aether-hero";
+import { BrandMark } from "@/components/ui/brand";
 import {
   Tilt3D,
   ParticleField,
@@ -51,9 +52,7 @@ function Logo({ className }: { className?: string }) {
         className,
       )}
     >
-      <span className="grid h-7 w-7 place-items-center rounded-[7px] bg-gradient-to-br from-indigo-500 via-violet-500 to-cyan-400 text-[14px] font-bold text-[#05060a]">
-        S
-      </span>
+      <BrandMark size={28} className="rounded-[7px]" />
       Sitovai
     </Link>
   );

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { BrandMark } from "@/components/ui/brand";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
@@ -16,9 +17,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           href="/"
           className="mb-8 flex items-center justify-center gap-2.5 text-lg font-semibold tracking-tight text-white"
         >
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-indigo-500 via-violet-500 to-cyan-400 text-[16px] font-bold text-white shadow-[0_0_24px_-4px_rgba(99,102,241,0.8)]">
-            S
-          </span>
+          <BrandMark size={36} className="rounded-xl shadow-[0_0_24px_-4px_rgba(99,102,241,0.8)]" />
           Sitovai
         </Link>
         <div className="rounded-2xl border border-white/10 bg-white p-8 shadow-[0_0_0_1px_rgba(165,180,252,0.15),0_0_80px_-16px_rgba(99,102,241,0.45),0_40px_100px_-32px_rgba(0,0,0,0.9)]">
