@@ -221,6 +221,68 @@ body {
   animation: marquee-x 30s linear infinite;
 }
 
+/* ---------- Spotlight card (cursor-tracked glow) ---------- */
+.spot-card {
+  position: relative;
+  overflow: hidden;
+}
+.spot-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  background: radial-gradient(
+    340px circle at var(--sx, 50%) var(--sy, 50%),
+    rgba(129, 140, 248, 0.13),
+    transparent 65%
+  );
+}
+.spot-card:hover::before {
+  opacity: 1;
+}
+
+/* ---------- Animated gradient border (highlight pricing card) ---------- */
+.grad-border {
+  position: relative;
+}
+.grad-border::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--gb-angle, 0deg),
+    rgba(99, 102, 241, 0.9),
+    rgba(34, 211, 238, 0.5),
+    rgba(167, 139, 250, 0.9),
+    rgba(99, 102, 241, 0.9)
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: gb-spin 6s linear infinite;
+}
+@property --gb-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes gb-spin {
+  to {
+    --gb-angle: 360deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grad-border::after {
+    animation: none;
+  }
+}
+
 /* ---------- FAQ details polish ---------- */
 details.faq summary::-webkit-details-marker {
   display: none;

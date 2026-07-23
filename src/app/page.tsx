@@ -13,6 +13,13 @@ import {
 } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { AuroraBackdrop } from "@/components/ui/aether-hero";
+import {
+  Tilt3D,
+  ParticleField,
+  Reveal,
+  SpotCard,
+  ParallaxDrift,
+} from "@/components/ui/wow";
 import { cn } from "@/lib/utils";
 
 export default function Home() {
@@ -136,8 +143,11 @@ function Hero() {
     <section className="relative overflow-hidden border-b border-white/[0.07]">
       {/* backdrop — animated CSS aurora pushed to the right + grid + scrim */}
       <div className="pointer-events-none absolute inset-0 z-0">
-        <AuroraBackdrop className="opacity-70" />
+        <ParallaxDrift strength={22} className="absolute inset-[-3%]">
+          <AuroraBackdrop className="opacity-70" />
+        </ParallaxDrift>
         <div className="absolute inset-0 bg-grid-dark bg-grid-fade opacity-25" />
+        <ParticleField count={80} />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,6,10,0.88)_0%,rgba(5,6,10,0.55)_40%,rgba(5,6,10,0.25)_100%)]" />
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#05060a]" />
       </div>
@@ -203,9 +213,11 @@ function Hero() {
             </dl>
           </div>
 
-          {/* product window */}
+          {/* product window — pointer-tracked 3D tilt */}
           <div className="animate-fade-up lg:pl-2" style={{ animationDelay: "200ms" }}>
-            <HeroPreview />
+            <Tilt3D className="relative">
+              <HeroPreview />
+            </Tilt3D>
           </div>
         </div>
       </Container>
@@ -380,49 +392,53 @@ function Features() {
   return (
     <section id="features" className="scroll-mt-20 border-b border-white/[0.07] py-24">
       <Container>
-        <SectionHead
-          eyebrow="Product"
-          title="From cold search to shipped website"
-          subtitle="The full workflow a freelancer or agency needs to find local businesses and win them as clients."
-        />
+        <Reveal>
+          <SectionHead
+            eyebrow="Product"
+            title="From cold search to shipped website"
+            subtitle="The full workflow a freelancer or agency needs to find local businesses and win them as clients."
+          />
+        </Reveal>
 
         <div className="grid gap-4 lg:grid-cols-6">
           {FEATURES.map((f, i) => (
-            <div
+            <Reveal
               key={f.title}
-              className={cn(
-                "group relative rounded-2xl border border-white/[0.08] bg-[#0b0c12] p-7 transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300/25 hover:bg-[#0d0e16]",
-                "wide" in f && f.wide ? "lg:col-span-3" : "lg:col-span-2",
-              )}
+              delay={i * 70}
+              className={cn("wide" in f && f.wide ? "lg:col-span-3" : "lg:col-span-2")}
             >
-              <div className="flex items-center justify-between">
-                <span className="grid h-11 w-11 place-items-center rounded-[11px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-transparent text-indigo-300">
-                  <f.icon className="h-5 w-5" />
-                </span>
-                <span className="font-display text-[13px] font-semibold text-zinc-700 transition group-hover:text-indigo-400/70">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-              </div>
-              <h3 className="font-display mt-5 text-lg font-semibold tracking-tight text-white">
-                {f.title}
-              </h3>
-              <p className="mt-2 text-[15px] leading-7 text-zinc-500">{f.body}</p>
-            </div>
+              <SpotCard className="group h-full rounded-2xl border border-white/[0.08] bg-[#0b0c12] p-7 transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300/25 hover:bg-[#0d0e16]">
+                <div className="flex items-center justify-between">
+                  <span className="grid h-11 w-11 place-items-center rounded-[11px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-transparent text-indigo-300">
+                    <f.icon className="h-5 w-5" />
+                  </span>
+                  <span className="font-display text-[13px] font-semibold text-zinc-700 transition group-hover:text-indigo-400/70">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                </div>
+                <h3 className="font-display mt-5 text-lg font-semibold tracking-tight text-white">
+                  {f.title}
+                </h3>
+                <p className="mt-2 text-[15px] leading-7 text-zinc-500">{f.body}</p>
+              </SpotCard>
+            </Reveal>
           ))}
 
           {/* filler card with CTA to keep the grid balanced */}
-          <Link
-            href="/signup"
-            className="group relative flex flex-col justify-between rounded-2xl border border-indigo-400/25 bg-gradient-to-b from-indigo-500/[0.12] to-transparent p-7 transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300/40 lg:col-span-2"
-          >
-            <p className="font-display text-lg font-semibold tracking-tight text-white">
-              Try it on your own town
-            </p>
-            <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-indigo-300">
-              Start a search
-              <ArrowUpRight className="h-4 w-4 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </span>
-          </Link>
+          <Reveal delay={FEATURES.length * 70} className="lg:col-span-2">
+            <Link
+              href="/signup"
+              className="group relative flex h-full flex-col justify-between rounded-2xl border border-indigo-400/25 bg-gradient-to-b from-indigo-500/[0.12] to-transparent p-7 transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300/40"
+            >
+              <p className="font-display text-lg font-semibold tracking-tight text-white">
+                Try it on your own town
+              </p>
+              <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-indigo-300">
+                Start a search
+                <ArrowUpRight className="h-4 w-4 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </span>
+            </Link>
+          </Reveal>
         </div>
       </Container>
     </section>
@@ -449,22 +465,26 @@ function HowItWorks() {
   return (
     <section id="how" className="scroll-mt-20 border-b border-white/[0.07] py-24">
       <Container>
-        <SectionHead
-          eyebrow="How it works"
-          title="Three steps to a new client"
-          subtitle="No scraping, no spreadsheets — the whole pipeline lives in one dashboard."
-        />
+        <Reveal>
+          <SectionHead
+            eyebrow="How it works"
+            title="Three steps to a new client"
+            subtitle="No scraping, no spreadsheets — the whole pipeline lives in one dashboard."
+          />
+        </Reveal>
         <div className="grid gap-x-10 gap-y-12 md:grid-cols-3">
           {steps.map((s, i) => (
-            <div key={s.title} className="border-t border-white/[0.09] pt-6">
-              <div className="font-display text-[13px] font-semibold text-indigo-400">
-                {String(i + 1).padStart(2, "0")}
+            <Reveal key={s.title} delay={i * 110}>
+              <div className="border-t border-white/[0.09] pt-6">
+                <div className="font-display text-[13px] font-semibold text-indigo-400">
+                  {String(i + 1).padStart(2, "0")}
+                </div>
+                <h3 className="font-display mt-3 text-xl font-semibold tracking-tight text-white">
+                  {s.title}
+                </h3>
+                <p className="mt-2.5 text-[15px] leading-7 text-zinc-500">{s.body}</p>
               </div>
-              <h3 className="font-display mt-3 text-xl font-semibold tracking-tight text-white">
-                {s.title}
-              </h3>
-              <p className="mt-2.5 text-[15px] leading-7 text-zinc-500">{s.body}</p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </Container>
@@ -516,19 +536,21 @@ function Pricing() {
   return (
     <section id="pricing" className="scroll-mt-20 border-b border-white/[0.07] py-24">
       <Container>
-        <SectionHead
-          eyebrow="Pricing"
-          title="Simple, transparent plans"
-          subtitle="Pick a plan and start today from €20/month. Cancel whenever you like — payments handled by Stripe."
-        />
+        <Reveal>
+          <SectionHead
+            eyebrow="Pricing"
+            title="Simple, transparent plans"
+            subtitle="Pick a plan and start today from €20/month. Cancel whenever you like — payments handled by Stripe."
+          />
+        </Reveal>
         <div className="grid max-w-4xl gap-4 sm:grid-cols-2">
-          {TIERS.map((t) => (
+          {TIERS.map((t, ti) => (
+            <Reveal key={t.name} delay={ti * 120}>
             <div
-              key={t.name}
               className={cn(
-                "relative flex flex-col rounded-2xl border p-8",
+                "relative flex h-full flex-col rounded-2xl border p-8",
                 t.highlight
-                  ? "border-indigo-400/35 bg-gradient-to-b from-indigo-500/[0.12] to-transparent"
+                  ? "grad-border border-indigo-400/35 bg-gradient-to-b from-indigo-500/[0.12] to-transparent"
                   : "border-white/[0.08] bg-[#0b0c12]",
               )}
             >
@@ -563,6 +585,7 @@ function Pricing() {
                 ))}
               </ul>
             </div>
+            </Reveal>
           ))}
         </div>
         <p className="mt-8 text-sm text-zinc-600">
@@ -642,6 +665,7 @@ function CtaBand() {
   return (
     <section className="py-24">
       <Container>
+        <Reveal>
         <div className="relative overflow-hidden rounded-3xl border border-white/[0.09] px-8 py-20 text-center">
           <div className="pointer-events-none absolute inset-0">
             <div className="absolute left-1/2 top-[-45%] h-[400px] w-[760px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(99,102,241,0.28),transparent)] blur-3xl" />
@@ -665,6 +689,7 @@ function CtaBand() {
             </p>
           </div>
         </div>
+        </Reveal>
       </Container>
     </section>
   );
