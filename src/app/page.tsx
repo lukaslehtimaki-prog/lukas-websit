@@ -14,7 +14,7 @@ import {
   MousePointerClick,
 } from "lucide-react";
 import { Container } from "@/components/ui/container";
-import { AetherShader } from "@/components/ui/aether-hero";
+import { AuroraBackdrop } from "@/components/ui/aether-hero";
 import { cn } from "@/lib/utils";
 
 export default function Home() {
@@ -130,14 +130,12 @@ function SiteHeader() {
 function Hero() {
   return (
     <section className="relative overflow-hidden pt-14">
-      {/* backdrop — living WebGL Aether shader, lightly scrimmed for readability */}
+      {/* backdrop — CSS animated aurora (reliable on every device) + grid + scrim */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        {/* clean static fallback shown only if a device can't run WebGL */}
-        <div className="absolute inset-0 bg-[radial-gradient(75%_55%_at_50%_22%,rgba(99,102,241,0.18),rgba(139,92,246,0.08),transparent_72%)]" />
-        <AetherShader className="opacity-95" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,6,10,0.5)_0%,rgba(6,6,10,0.08)_20%,rgba(6,6,10,0.14)_58%,#06060a_100%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(50%_36%_at_50%_45%,rgba(6,6,10,0.5),transparent_72%)]" />
-        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-b from-transparent to-[#06060a]" />
+        <AuroraBackdrop />
+        <div className="absolute inset-0 bg-grid-dark bg-grid-fade opacity-30" />
+        <div className="absolute inset-0 bg-[radial-gradient(46%_34%_at_50%_46%,rgba(6,6,10,0.34),transparent_72%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-b from-transparent to-[#06060a]" />
       </div>
 
       <Container className="pb-24 pt-24 text-center sm:pt-32">
