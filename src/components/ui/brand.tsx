@@ -1,9 +1,11 @@
 import React from "react";
 
 /**
- * Sitovai brand mark — a location pin (find local businesses) inside the
- * indigo→violet→cyan tile. Server-safe (no hooks); the gradient id is static
- * because every instance renders the same gradient, so a shared def is fine.
+ * SitovAI brand mark — a browser window (the website builder) filled with the
+ * indigo→violet→cyan gradient. Server-safe (no hooks); the gradient id is
+ * static because every instance renders the same gradient, so a shared def is
+ * fine. Full-bleed 32×32 so it reads at favicon size and existing rounded/
+ * shadow utility classes still line up with the tile.
  */
 export function BrandMark({
   size = 28,
@@ -36,13 +38,30 @@ export function BrandMark({
         </linearGradient>
       </defs>
       <rect width="32" height="32" rx="8" fill="url(#sitovai-mark)" />
-      <path
-        fill="#fff"
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M16 6.5c-4.3 0-7.8 3.4-7.8 7.6 0 5.4 6.7 10.8 7.3 11.3l.5.4.5-.4c.6-.5 7.3-5.9 7.3-11.3 0-4.2-3.5-7.6-7.8-7.6Zm0 10.4a2.8 2.8 0 1 1 0-5.6 2.8 2.8 0 0 1 0 5.6Z"
-      />
+      {/* browser toolbar dots + divider */}
+      <circle cx="6.5" cy="6" r="1.15" fill="#fff" fillOpacity=".9" />
+      <circle cx="10" cy="6" r="1.15" fill="#fff" fillOpacity=".9" />
+      <circle cx="13.5" cy="6" r="1.15" fill="#fff" fillOpacity=".9" />
+      <rect x="0" y="9.2" width="32" height="0.9" fill="#fff" fillOpacity=".12" />
+      {/* page layout */}
+      <rect x="6" y="13.5" width="20" height="5" rx="1.6" fill="#fff" fillOpacity=".9" />
+      <rect x="6" y="21.5" width="14" height="2.6" rx="1.3" fill="#fff" fillOpacity=".5" />
+      <rect x="6" y="26" width="9" height="2.6" rx="1.3" fill="#fff" fillOpacity=".38" />
     </svg>
+  );
+}
+
+/**
+ * SitovAI wordmark — the name with the trailing "AI" set in brand cyan so the
+ * "AI" reads out of "Sitovai". Renders as a single inline element: inherits
+ * font/size/weight from the parent, only the "AI" overrides colour. Drop in
+ * next to <BrandMark/> where the logo lockup appears.
+ */
+export function Wordmark({ className }: { className?: string }) {
+  return (
+    <span className={className}>
+      Sitov<span className="text-[#22d3ee]">AI</span>
+    </span>
   );
 }
 

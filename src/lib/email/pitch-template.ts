@@ -223,7 +223,11 @@ export function renderPitchEmailHtml(opts: {
           <div style="padding:10px 0 4px;">${button(opts.liveUrl, s.viewSite, "#4f46e5")}</div>
           ${offerBlock}
         </td></tr>
-        <tr><td style="padding:16px 34px;border-top:1px solid #f0f0f2;" align="center">
+        <tr><td style="padding:18px 34px 20px;border-top:1px solid #f0f0f2;" align="center">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto 8px;"><tr>
+            <td style="vertical-align:middle;"><img src="https://sitovai.com/brand-mark.png" width="18" height="18" alt="Sitovai" style="display:block;width:18px;height:18px;border:0;border-radius:5px;" /></td>
+            <td style="padding-left:7px;font-family:${font};font-size:14px;font-weight:700;color:#3f3f46;vertical-align:middle;">Sitovai</td>
+          </tr></table>
           <p style="margin:0;font-family:${font};font-size:12px;color:#a1a1aa;">${esc(s.footer.replace("{sender}", opts.senderName))}</p>
         </td></tr>
       </table>

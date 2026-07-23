@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Container } from "@/components/ui/container";
-import { BrandMark } from "@/components/ui/brand";
+import { BrandMark, Wordmark } from "@/components/ui/brand";
 
 export default function LegalLayout({ children }: { children: ReactNode }) {
   return (
@@ -14,7 +14,7 @@ export default function LegalLayout({ children }: { children: ReactNode }) {
             className="flex items-center gap-2.5 font-semibold tracking-tight text-white"
           >
             <BrandMark size={32} className="shadow-[0_0_20px_-4px_rgba(99,102,241,0.8)]" />
-            <span className="text-[17px]">Sitovai</span>
+            <Wordmark className="text-[17px]" />
           </Link>
           <Link
             href="/"

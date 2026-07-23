@@ -13,7 +13,7 @@ import {
   type Resolved,
 } from "@/components/theme/theme-provider";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
-import { BrandMark } from "@/components/ui/brand";
+import { BrandMark, Wordmark } from "@/components/ui/brand";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +37,7 @@ export default async function DashboardLayout({
           className="flex h-16 items-center gap-2.5 border-b border-zinc-100 dark:border-zinc-800 px-5 text-[15px] font-semibold tracking-tight text-zinc-900 dark:text-zinc-100"
         >
           <BrandMark size={32} className="shadow-[0_2px_12px_-2px_rgba(99,102,241,0.5)]" />
-          Sitovai
+          <Wordmark />
         </Link>
         <Sidebar isPlatformAdmin={ctx.isPlatformAdmin} />
         <div className="mt-auto p-4">
@@ -63,7 +63,7 @@ export default async function DashboardLayout({
         <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b border-zinc-200/70 dark:border-zinc-800/70 bg-white/80 dark:bg-zinc-900/80 px-6 backdrop-blur-md">
           <div className="flex items-center gap-2.5 font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 md:hidden">
             <BrandMark size={28} />
-            Sitovai
+            <Wordmark />
           </div>
           <div className="ml-auto flex items-center gap-3">
             <ThemeToggle />

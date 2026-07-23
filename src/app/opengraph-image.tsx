@@ -46,18 +46,22 @@ export default function Image() {
               height: "76px",
               borderRadius: "18px",
               display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              flexDirection: "column",
+              padding: "16px 14px 0 14px",
               background: "linear-gradient(135deg, #6366f1, #8b5cf6 55%, #22d3ee)",
-              fontSize: "44px",
-              fontWeight: 700,
-              color: "white",
             }}
           >
-            S
+            <div style={{ display: "flex" }}>
+              <div style={{ display: "flex", width: "7px", height: "7px", borderRadius: "9px", background: "rgba(255,255,255,0.9)", marginRight: "5px" }} />
+              <div style={{ display: "flex", width: "7px", height: "7px", borderRadius: "9px", background: "rgba(255,255,255,0.9)", marginRight: "5px" }} />
+              <div style={{ display: "flex", width: "7px", height: "7px", borderRadius: "9px", background: "rgba(255,255,255,0.9)" }} />
+            </div>
+            <div style={{ display: "flex", width: "44px", height: "12px", borderRadius: "4px", background: "rgba(255,255,255,0.9)", marginTop: "11px" }} />
+            <div style={{ display: "flex", width: "30px", height: "6px", borderRadius: "3px", background: "rgba(255,255,255,0.5)", marginTop: "7px" }} />
           </div>
-          <div style={{ marginLeft: "24px", fontSize: "44px", fontWeight: 700 }}>
-            Sitovai
+          <div style={{ marginLeft: "24px", fontSize: "44px", fontWeight: 700, display: "flex" }}>
+            <div style={{ display: "flex" }}>Sitov</div>
+            <div style={{ display: "flex", color: "#22d3ee" }}>AI</div>
           </div>
         </div>
 
