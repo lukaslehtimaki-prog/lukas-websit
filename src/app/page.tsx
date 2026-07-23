@@ -129,16 +129,17 @@ function SiteHeader() {
 
 function Hero() {
   return (
-    <section className="relative overflow-hidden pt-14">
+    <section className="relative flex min-h-[92vh] items-center overflow-hidden pt-14">
       {/* backdrop — CSS animated aurora (reliable on every device) + grid + scrim */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
+      <div className="pointer-events-none absolute inset-0 z-0">
         <AuroraBackdrop />
-        <div className="absolute inset-0 bg-grid-dark bg-grid-fade opacity-30" />
-        <div className="absolute inset-0 bg-[radial-gradient(46%_34%_at_50%_46%,rgba(6,6,10,0.34),transparent_72%)]" />
+        <div className="absolute inset-0 bg-grid-dark bg-grid-fade opacity-20" />
+        <div className="absolute inset-0 bg-[radial-gradient(46%_36%_at_50%_46%,rgba(6,6,10,0.42),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,6,10,0.35),transparent_18%,transparent_70%,#06060a)]" />
         <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-b from-transparent to-[#06060a]" />
       </div>
 
-      <Container className="pb-24 pt-24 text-center sm:pt-32">
+      <Container className="relative z-10 pb-24 pt-24 text-center sm:pt-32">
         <div className="animate-fade-up">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[13px] text-zinc-300 backdrop-blur">
             <Sparkles className="h-3.5 w-3.5 text-indigo-300" />
@@ -150,7 +151,7 @@ function Hero() {
         </div>
 
         <h1
-          className="animate-fade-up mx-auto mt-7 max-w-4xl text-balance text-[2.6rem] font-semibold leading-[1.05] tracking-tight sm:text-7xl"
+          className="animate-fade-up mx-auto mt-7 max-w-5xl text-balance text-5xl font-bold leading-[1.02] tracking-tight sm:text-8xl"
           style={{ animationDelay: "60ms" }}
         >
           <span className="text-shimmer">Find businesses with no website.</span>
