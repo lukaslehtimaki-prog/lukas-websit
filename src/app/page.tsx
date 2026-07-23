@@ -6,12 +6,10 @@ import {
   Users,
   Check,
   ArrowRight,
-  Sparkles,
+  ArrowUpRight,
   MapPin,
   FileSpreadsheet,
-  Zap,
   Plus,
-  MousePointerClick,
 } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { AuroraBackdrop } from "@/components/ui/aether-hero";
@@ -19,12 +17,11 @@ import { cn } from "@/lib/utils";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col bg-[#06060a] text-zinc-100 selection:bg-indigo-500/30">
+    <div className="flex min-h-screen flex-col bg-[#05060a] text-zinc-100 selection:bg-indigo-500/30">
       <SiteHeader />
       <main className="flex-1">
         <Hero />
         <LogosStrip />
-        <StatsBand />
         <Features />
         <HowItWorks />
         <Pricing />
@@ -43,24 +40,33 @@ function Logo({ className }: { className?: string }) {
     <Link
       href="/"
       className={cn(
-        "flex items-center gap-2.5 font-semibold tracking-tight text-white",
+        "font-display flex items-center gap-2.5 text-[16px] font-semibold tracking-tight text-white",
         className,
       )}
     >
-      <span className="relative grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 via-violet-500 to-cyan-400 text-[15px] font-bold text-white shadow-[0_0_20px_-4px_rgba(99,102,241,0.8)]">
+      <span className="grid h-7 w-7 place-items-center rounded-[7px] bg-gradient-to-br from-indigo-500 via-violet-500 to-cyan-400 text-[14px] font-bold text-[#05060a]">
         S
       </span>
-      <span className="text-[17px]">Sitovai</span>
+      Sitovai
     </Link>
   );
 }
 
 const btnPrimary =
-  "inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 font-medium text-white shadow-[0_8px_30px_-8px_rgba(99,102,241,0.7)] transition-all duration-200 hover:shadow-[0_8px_40px_-6px_rgba(99,102,241,0.9)] hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60";
+  "inline-flex items-center justify-center gap-2 rounded-[10px] bg-zinc-100 font-semibold text-[#05060a] transition-all duration-150 hover:-translate-y-px hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60";
 const btnGhost =
-  "inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 font-medium text-zinc-200 backdrop-blur transition-all duration-200 hover:border-white/20 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60";
+  "inline-flex items-center justify-center gap-2 rounded-[10px] border border-white/15 bg-white/[0.04] font-semibold text-zinc-100 backdrop-blur transition-all duration-150 hover:border-white/25 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60";
 
-function SectionHeading({
+function Eyebrow({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+      {children}
+    </p>
+  );
+}
+
+/** Editorial section head: title left, description right. */
+function SectionHead({
   eyebrow,
   title,
   subtitle,
@@ -70,15 +76,15 @@ function SectionHeading({
   subtitle?: string;
 }) {
   return (
-    <div className="mx-auto max-w-2xl text-center">
-      <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-indigo-400/20 bg-indigo-500/10 px-3 py-1 text-xs font-medium uppercase tracking-widest text-indigo-300">
-        {eyebrow}
-      </p>
-      <h2 className="text-balance text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-        {title}
-      </h2>
+    <div className="mb-12 flex flex-wrap items-end justify-between gap-x-16 gap-y-5">
+      <div className="max-w-xl">
+        <Eyebrow>{eyebrow}</Eyebrow>
+        <h2 className="font-display mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          {title}
+        </h2>
+      </div>
       {subtitle ? (
-        <p className="mt-4 text-lg leading-8 text-zinc-400">{subtitle}</p>
+        <p className="max-w-sm text-[15px] leading-7 text-zinc-500">{subtitle}</p>
       ) : null}
     </div>
   );
@@ -88,37 +94,35 @@ function SectionHeading({
 
 function SiteHeader() {
   return (
-    <header className="fixed inset-x-0 top-0 z-50">
-      <Container className="pt-4">
-        <div className="glass-strong flex h-14 items-center justify-between rounded-2xl px-4 pl-5">
-          <Logo />
-          <nav className="hidden items-center gap-7 text-sm text-zinc-400 md:flex">
-            {[
-              ["#features", "Features"],
-              ["#how", "How it works"],
-              ["#pricing", "Pricing"],
-              ["#faq", "FAQ"],
-            ].map(([href, label]) => (
-              <a
-                key={href}
-                href={href}
-                className="rounded-md transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60"
-              >
-                {label}
-              </a>
-            ))}
-          </nav>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/login"
-              className="hidden h-9 items-center rounded-xl px-3.5 text-sm font-medium text-zinc-300 transition hover:text-white sm:inline-flex"
+    <header className="sticky top-0 z-50 border-b border-white/[0.07] bg-[#05060a]/60 backdrop-blur-xl">
+      <Container className="flex h-16 items-center justify-between">
+        <Logo />
+        <nav className="hidden items-center gap-8 text-sm text-zinc-400 md:flex">
+          {[
+            ["#features", "Features"],
+            ["#how", "How it works"],
+            ["#pricing", "Pricing"],
+            ["#faq", "FAQ"],
+          ].map(([href, label]) => (
+            <a
+              key={href}
+              href={href}
+              className="rounded-md transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60"
             >
-              Sign in
-            </Link>
-            <Link href="/signup" className={cn(btnPrimary, "h-9 px-4 text-sm")}>
-              Get started
-            </Link>
-          </div>
+              {label}
+            </a>
+          ))}
+        </nav>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/login"
+            className="hidden h-9 items-center rounded-[10px] px-3.5 text-sm font-medium text-zinc-300 transition hover:text-white sm:inline-flex"
+          >
+            Sign in
+          </Link>
+          <Link href="/signup" className={cn(btnPrimary, "h-9 px-4 text-sm")}>
+            Get started
+          </Link>
         </div>
       </Container>
     </header>
@@ -129,65 +133,80 @@ function SiteHeader() {
 
 function Hero() {
   return (
-    <section className="relative flex min-h-[92vh] items-center overflow-hidden pt-14">
-      {/* backdrop — CSS animated aurora (reliable on every device) + grid + scrim */}
+    <section className="relative overflow-hidden border-b border-white/[0.07]">
+      {/* backdrop — animated CSS aurora pushed to the right + grid + scrim */}
       <div className="pointer-events-none absolute inset-0 z-0">
-        <AuroraBackdrop />
-        <div className="absolute inset-0 bg-grid-dark bg-grid-fade opacity-20" />
-        <div className="absolute inset-0 bg-[radial-gradient(46%_36%_at_50%_46%,rgba(6,6,10,0.42),transparent_70%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,6,10,0.35),transparent_18%,transparent_70%,#06060a)]" />
-        <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-b from-transparent to-[#06060a]" />
+        <AuroraBackdrop className="opacity-70" />
+        <div className="absolute inset-0 bg-grid-dark bg-grid-fade opacity-25" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,6,10,0.88)_0%,rgba(5,6,10,0.55)_40%,rgba(5,6,10,0.25)_100%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#05060a]" />
       </div>
 
-      <Container className="relative z-10 pb-24 pt-24 text-center sm:pt-32">
-        <div className="animate-fade-up">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[13px] text-zinc-300 backdrop-blur">
-            <Sparkles className="h-3.5 w-3.5 text-indigo-300" />
-            AI lead-gen for local businesses
-            <span className="ml-1 hidden rounded-full bg-indigo-500/20 px-2 py-0.5 text-[11px] font-medium text-indigo-300 sm:inline">
-              New
-            </span>
-          </span>
-        </div>
+      <Container className="relative z-10">
+        <div className="grid items-center gap-14 py-24 sm:py-28 lg:min-h-[88vh] lg:grid-cols-[1.05fr_0.95fr] lg:gap-10 lg:py-20">
+          {/* copy */}
+          <div className="max-w-2xl">
+            <div className="animate-fade-up">
+              <span className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-[#0c0e15]/70 px-4 py-1.5 text-[12.5px] font-medium text-zinc-400 backdrop-blur">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_0_3px_rgba(52,211,153,0.15)]" />
+                Live · lead finder + AI website builder
+              </span>
+            </div>
 
-        <h1
-          className="animate-fade-up mx-auto mt-7 max-w-5xl text-balance text-5xl font-bold leading-[1.02] tracking-tight sm:text-8xl"
-          style={{ animationDelay: "60ms" }}
-        >
-          <span className="text-shimmer">Find businesses with no website.</span>
-          <br />
-          <span className="text-gradient">Build them one with AI.</span>
-        </h1>
+            <h1
+              className="font-display animate-fade-up mt-7 text-balance text-5xl font-bold leading-[1.02] tracking-tight sm:text-6xl xl:text-7xl"
+              style={{ animationDelay: "60ms" }}
+            >
+              Find businesses with no website.{" "}
+              <span className="text-gradient">Build them one with AI.</span>
+            </h1>
 
-        <p
-          className="animate-fade-up mx-auto mt-7 max-w-2xl text-lg leading-8 text-zinc-400"
-          style={{ animationDelay: "120ms" }}
-        >
-          Sitovai scans Google Places worldwide, enriches every lead with
-          registry data, and turns the best ones into ready-to-launch websites
-          — written in the business&apos;s own language.
-        </p>
+            <p
+              className="animate-fade-up mt-7 max-w-xl text-lg leading-8 text-zinc-400"
+              style={{ animationDelay: "120ms" }}
+            >
+              Sitovai scans Google Places worldwide, enriches every lead with
+              registry data, and turns the best ones into ready-to-launch
+              websites — written in the business&apos;s own language.
+            </p>
 
-        <div
-          className="animate-fade-up mt-10 flex flex-wrap items-center justify-center gap-3"
-          style={{ animationDelay: "180ms" }}
-        >
-          <Link href="/signup" className={cn(btnPrimary, "h-12 px-7 text-[15px]")}>
-            Get started <ArrowRight className="h-4 w-4" />
-          </Link>
-          <a href="#how" className={cn(btnGhost, "h-12 px-7 text-[15px]")}>
-            See how it works
-          </a>
-        </div>
-        <p
-          className="animate-fade-up mt-5 text-sm text-zinc-500"
-          style={{ animationDelay: "220ms" }}
-        >
-          Plans from €20/mo · Cancel anytime
-        </p>
+            <div
+              className="animate-fade-up mt-9 flex flex-wrap items-center gap-3"
+              style={{ animationDelay: "180ms" }}
+            >
+              <Link href="/signup" className={cn(btnPrimary, "h-12 px-7 text-[15px]")}>
+                Get started <ArrowRight className="h-4 w-4" />
+              </Link>
+              <a href="#how" className={cn(btnGhost, "h-12 px-7 text-[15px]")}>
+                See how it works
+              </a>
+            </div>
 
-        <div className="animate-fade-up mt-16" style={{ animationDelay: "280ms" }}>
-          <HeroPreview />
+            {/* inline stat strip replaces the old stats band */}
+            <dl
+              className="animate-fade-up mt-12 flex flex-wrap gap-x-10 gap-y-6 border-t border-white/[0.07] pt-7"
+              style={{ animationDelay: "240ms" }}
+            >
+              {[
+                ["~40", "leads per search"],
+                ["< 60 s", "lead to draft site"],
+                ["10", "site languages"],
+              ].map(([v, l]) => (
+                <div key={l}>
+                  <dt className="sr-only">{l}</dt>
+                  <dd className="font-display text-2xl font-semibold tracking-tight text-white">
+                    {v}
+                  </dd>
+                  <dd className="mt-1 text-[13px] text-zinc-500">{l}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          {/* product window */}
+          <div className="animate-fade-up lg:pl-2" style={{ animationDelay: "200ms" }}>
+            <HeroPreview />
+          </div>
         </div>
       </Container>
     </section>
@@ -200,34 +219,30 @@ function HeroPreview() {
       name: "Parturi-Kampaamo Aalto",
       area: "Tampere",
       yt: "3312445-1",
-      status: "No website",
     },
     {
       name: "Kahvila Siilinjärvi",
       area: "Kuopio",
       yt: "2988771-4",
-      status: "No website",
     },
     {
       name: "Autohuolto Mäkinen",
       area: "Lahti",
       yt: "3120997-8",
-      status: "No website",
     },
   ];
   return (
-    <div className="relative mx-auto max-w-4xl">
-      {/* halo behind the window */}
-      <div className="pointer-events-none absolute -inset-x-8 -top-10 bottom-0 -z-10 rounded-[40px] bg-[radial-gradient(closest-side,rgba(99,102,241,0.22),transparent)] blur-2xl" />
+    <div className="relative">
+      <div className="pointer-events-none absolute -inset-x-6 -inset-y-8 rounded-[36px] bg-[radial-gradient(closest-side,rgba(99,102,241,0.16),transparent)] blur-2xl" />
 
-      <div className="glow-ring overflow-hidden rounded-2xl border border-white/10 bg-[#0b0b12] text-left">
+      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0b0c12]/90 shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)] backdrop-blur">
         {/* window chrome */}
-        <div className="flex items-center gap-2 border-b border-white/5 bg-white/[0.03] px-4 py-3">
-          <span className="h-3 w-3 rounded-full bg-white/15" />
-          <span className="h-3 w-3 rounded-full bg-white/15" />
-          <span className="h-3 w-3 rounded-full bg-white/15" />
-          <span className="ml-3 rounded-md bg-white/5 px-3 py-1 text-xs text-zinc-500 ring-1 ring-white/10">
-            sitovai.com / dashboard / leads
+        <div className="flex items-center gap-2 border-b border-white/[0.06] bg-white/[0.02] px-4 py-3">
+          <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
+          <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
+          <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
+          <span className="ml-3 rounded-md bg-white/5 px-3 py-1 font-mono text-[11px] text-zinc-500 ring-1 ring-white/10">
+            sitovai.com/dashboard/leads
           </span>
         </div>
 
@@ -243,56 +258,44 @@ function HeroPreview() {
             </span>
           </div>
 
-          <div className="overflow-hidden rounded-xl border border-white/5">
-            <div className="grid grid-cols-[1.6fr_0.9fr_0.9fr_auto] gap-2 border-b border-white/5 bg-white/[0.03] px-4 py-2.5 text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+          <div className="overflow-hidden rounded-xl border border-white/[0.06]">
+            <div className="grid grid-cols-[1.5fr_0.8fr_auto] gap-2 border-b border-white/[0.06] bg-white/[0.02] px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-500">
               <span>Business</span>
-              <span>Website</span>
               <span>Registry</span>
               <span />
             </div>
             {rows.map((r) => (
               <div
                 key={r.yt}
-                className="grid grid-cols-[1.6fr_0.9fr_0.9fr_auto] items-center gap-2 px-4 py-3 text-sm [&:not(:last-child)]:border-b [&:not(:last-child)]:border-white/5"
+                className="grid grid-cols-[1.5fr_0.8fr_auto] items-center gap-2 px-4 py-3.5 text-sm [&:not(:last-child)]:border-b [&:not(:last-child)]:border-white/[0.06]"
               >
                 <div className="min-w-0">
                   <div className="truncate font-medium text-zinc-200">{r.name}</div>
-                  <div className="text-xs text-zinc-500">{r.area}</div>
+                  <div className="mt-0.5 flex items-center gap-2 text-xs text-zinc-500">
+                    {r.area}
+                    <span className="inline-flex items-center rounded-full border border-amber-400/20 bg-amber-500/10 px-2 py-px text-[10.5px] font-medium text-amber-300">
+                      No website
+                    </span>
+                  </div>
                 </div>
-                <span className="inline-flex w-fit items-center rounded-full border border-amber-400/20 bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-300">
-                  {r.status}
-                </span>
                 <span className="font-mono text-xs text-emerald-400">{r.yt}</span>
-                <span className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 px-2.5 py-1 text-xs font-medium text-white shadow-[0_4px_14px_-4px_rgba(99,102,241,0.8)]">
-                  <Sparkles className="h-3 w-3" /> Build site
+                <span className="inline-flex items-center gap-1.5 rounded-[8px] bg-zinc-100 px-2.5 py-1.5 text-xs font-semibold text-[#05060a]">
+                  Build site <ArrowUpRight className="h-3 w-3" />
                 </span>
               </div>
             ))}
           </div>
-        </div>
-      </div>
 
-      {/* floating accent cards */}
-      <div className="animate-float absolute -right-4 -top-8 hidden rounded-xl border border-white/10 bg-[#0d0d16]/90 px-4 py-3 text-left shadow-2xl backdrop-blur lg:block">
-        <div className="flex items-center gap-2 text-xs font-medium text-zinc-300">
-          <span className="grid h-6 w-6 place-items-center rounded-md bg-emerald-500/15 text-emerald-300">
-            <Check className="h-3.5 w-3.5" />
-          </span>
-          Site generated in 42 s
-        </div>
-        <p className="mt-1 pl-8 font-mono text-[11px] text-zinc-500">
-          kahvila-siilinjarvi · preview ready
-        </p>
-      </div>
-      <div
-        className="animate-float absolute -left-6 bottom-10 hidden rounded-xl border border-white/10 bg-[#0d0d16]/90 px-4 py-3 text-left shadow-2xl backdrop-blur lg:block"
-        style={{ animationDelay: "1.4s" }}
-      >
-        <div className="flex items-center gap-2 text-xs font-medium text-zinc-300">
-          <span className="grid h-6 w-6 place-items-center rounded-md bg-indigo-500/15 text-indigo-300">
-            <ShieldCheck className="h-3.5 w-3.5" />
-          </span>
-          Registry verified · 3312445-1
+          {/* generation status line */}
+          <div className="mt-4 flex items-center gap-2.5 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-[13px] text-zinc-400">
+            <span className="grid h-6 w-6 place-items-center rounded-md bg-emerald-500/15 text-emerald-300">
+              <Check className="h-3.5 w-3.5" />
+            </span>
+            kahvila-siilinjarvi.fi drafted in 42 s
+            <span className="ml-auto font-mono text-[11px] text-zinc-600">
+              fi · Moderni
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -311,25 +314,25 @@ function LogosStrip() {
   ];
   const row = [...items, ...items];
   return (
-    <section className="border-y border-white/5 bg-white/[0.015] py-9">
-      <Container>
-        <p className="mb-6 text-center text-xs font-medium uppercase tracking-widest text-zinc-500">
+    <section className="border-b border-white/[0.07] py-8">
+      <Container className="flex flex-wrap items-center gap-x-10 gap-y-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-600">
           Powered by
         </p>
         <div
-          className="overflow-hidden"
+          className="min-w-0 flex-1 overflow-hidden"
           style={{
             maskImage:
-              "linear-gradient(to right, transparent, #000 12%, #000 88%, transparent)",
+              "linear-gradient(to right, transparent, #000 10%, #000 90%, transparent)",
             WebkitMaskImage:
-              "linear-gradient(to right, transparent, #000 12%, #000 88%, transparent)",
+              "linear-gradient(to right, transparent, #000 10%, #000 90%, transparent)",
           }}
         >
           <div className="animate-marquee flex w-max items-center gap-14 pr-14">
             {row.map((i, idx) => (
               <span
                 key={`${i}-${idx}`}
-                className="whitespace-nowrap text-sm font-medium text-zinc-500"
+                className="whitespace-nowrap text-sm font-medium text-zinc-600"
               >
                 {i}
               </span>
@@ -341,187 +344,88 @@ function LogosStrip() {
   );
 }
 
-/* -------------------------------- stats band -------------------------------- */
-
-function StatsBand() {
-  const stats = [
-    { value: "~40", label: "businesses surfaced per search" },
-    { value: "< 60 s", label: "from lead to a full draft website" },
-    { value: "10", label: "languages for generated websites" },
-    { value: "1 click", label: "CSV export of every lead list" },
-  ];
-  return (
-    <section className="py-16">
-      <Container>
-        <div className="grid gap-8 rounded-2xl border border-white/5 bg-white/[0.02] px-8 py-10 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((s) => (
-            <div key={s.label} className="text-center">
-              <div className="text-gradient text-4xl font-semibold tracking-tight">
-                {s.value}
-              </div>
-              <p className="mt-2 text-sm leading-6 text-zinc-500">{s.label}</p>
-            </div>
-          ))}
-        </div>
-      </Container>
-    </section>
-  );
-}
-
 /* --------------------------------- features --------------------------------- */
+
+const FEATURES = [
+  {
+    icon: Search,
+    title: "Chat-style lead finder",
+    body: "Describe a niche and a location. Sitovai queries Google Places and returns a clean list with website status detected instantly.",
+    wide: true,
+  },
+  {
+    icon: Globe,
+    title: "AI website builder",
+    body: "Turn a lead into a mobile-ready site in seconds — in the business's own language. Preview live, edit inline, export.",
+    wide: true,
+  },
+  {
+    icon: ShieldCheck,
+    title: "Registry cross-check",
+    body: "Finnish leads are matched to the official YTJ registry — business ID, industry code, registration date.",
+  },
+  {
+    icon: Users,
+    title: "Built-in CRM",
+    body: "Track lead status from new to won, invite your team, and keep every workspace isolated.",
+  },
+  {
+    icon: FileSpreadsheet,
+    title: "One-click export",
+    body: "Download any lead list as CSV for your outreach tool, or export a finished site as ready-to-host files.",
+  },
+] as const;
 
 function Features() {
   return (
-    <section id="features" className="scroll-mt-24 py-24">
+    <section id="features" className="scroll-mt-20 border-b border-white/[0.07] py-24">
       <Container>
-        <SectionHeading
-          eyebrow="Everything in one place"
+        <SectionHead
+          eyebrow="Product"
           title="From cold search to shipped website"
           subtitle="The full workflow a freelancer or agency needs to find local businesses and win them as clients."
         />
 
-        <div className="mt-14 grid gap-5 lg:grid-cols-6">
-          {/* Lead finder — large */}
-          <BentoCard className="lg:col-span-3">
-            <FeatureIcon>
-              <Search className="h-5 w-5" />
-            </FeatureIcon>
-            <h3 className="text-lg font-semibold tracking-tight text-white">
-              Chat-style lead finder
-            </h3>
-            <p className="mt-2 text-[15px] leading-7 text-zinc-400">
-              Describe a niche and a location. Sitovai queries Google Places and
-              returns a clean list with website status detected instantly.
-            </p>
-            <div className="mt-6 rounded-xl border border-white/5 bg-black/30 p-3">
-              <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-zinc-400">
-                <Search className="h-4 w-4 text-indigo-400" />
-                kampaamot Tampereella ilman nettisivuja…
-                <span className="ml-auto rounded-md bg-gradient-to-r from-indigo-500 to-violet-500 px-2 py-0.5 text-xs font-medium text-white">
-                  Search
+        <div className="grid gap-4 lg:grid-cols-6">
+          {FEATURES.map((f, i) => (
+            <div
+              key={f.title}
+              className={cn(
+                "group relative rounded-2xl border border-white/[0.08] bg-[#0b0c12] p-7 transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300/25 hover:bg-[#0d0e16]",
+                "wide" in f && f.wide ? "lg:col-span-3" : "lg:col-span-2",
+              )}
+            >
+              <div className="flex items-center justify-between">
+                <span className="grid h-11 w-11 place-items-center rounded-[11px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-transparent text-indigo-300">
+                  <f.icon className="h-5 w-5" />
+                </span>
+                <span className="font-display text-[13px] font-semibold text-zinc-700 transition group-hover:text-indigo-400/70">
+                  {String(i + 1).padStart(2, "0")}
                 </span>
               </div>
-              <div className="mt-2 flex gap-2">
-                {["Barbershop", "Tampere", "5 km", "No website"].map((chip) => (
-                  <span
-                    key={chip}
-                    className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-zinc-400"
-                  >
-                    {chip}
-                  </span>
-                ))}
-              </div>
+              <h3 className="font-display mt-5 text-lg font-semibold tracking-tight text-white">
+                {f.title}
+              </h3>
+              <p className="mt-2 text-[15px] leading-7 text-zinc-500">{f.body}</p>
             </div>
-          </BentoCard>
+          ))}
 
-          {/* AI builder — large */}
-          <BentoCard className="lg:col-span-3">
-            <FeatureIcon>
-              <Globe className="h-5 w-5" />
-            </FeatureIcon>
-            <h3 className="text-lg font-semibold tracking-tight text-white">
-              AI website builder
-            </h3>
-            <p className="mt-2 text-[15px] leading-7 text-zinc-400">
-              Turn a lead into a mobile-ready site in seconds — in the
-              business&apos;s own language. Preview live, edit inline, export.
+          {/* filler card with CTA to keep the grid balanced */}
+          <Link
+            href="/signup"
+            className="group relative flex flex-col justify-between rounded-2xl border border-indigo-400/25 bg-gradient-to-b from-indigo-500/[0.12] to-transparent p-7 transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300/40 lg:col-span-2"
+          >
+            <p className="font-display text-lg font-semibold tracking-tight text-white">
+              Try it on your own town
             </p>
-            <div className="mt-6 grid grid-cols-3 gap-2">
-              {["Moderni", "Klassinen", "Rohkea"].map((t, i) => (
-                <div
-                  key={t}
-                  className={cn(
-                    "rounded-lg border p-2.5 text-center",
-                    i === 0
-                      ? "border-indigo-400/40 bg-indigo-500/10"
-                      : "border-white/5 bg-black/30",
-                  )}
-                >
-                  <div
-                    className={cn(
-                      "mx-auto mb-2 h-8 w-full rounded",
-                      i === 0
-                        ? "bg-gradient-to-br from-indigo-500/60 to-violet-500/40"
-                        : "bg-white/10",
-                    )}
-                  />
-                  <span
-                    className={cn(
-                      "text-[11px] font-medium",
-                      i === 0 ? "text-indigo-300" : "text-zinc-500",
-                    )}
-                  >
-                    {t}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </BentoCard>
-
-          {/* three small */}
-          <BentoCard className="lg:col-span-2">
-            <FeatureIcon>
-              <ShieldCheck className="h-5 w-5" />
-            </FeatureIcon>
-            <h3 className="text-lg font-semibold tracking-tight text-white">
-              Registry cross-check
-            </h3>
-            <p className="mt-2 text-[15px] leading-7 text-zinc-400">
-              Finnish leads are matched to the official YTJ registry —
-              business ID, industry code, registration date.
-            </p>
-          </BentoCard>
-
-          <BentoCard className="lg:col-span-2">
-            <FeatureIcon>
-              <Users className="h-5 w-5" />
-            </FeatureIcon>
-            <h3 className="text-lg font-semibold tracking-tight text-white">
-              Built-in CRM
-            </h3>
-            <p className="mt-2 text-[15px] leading-7 text-zinc-400">
-              Track lead status from &ldquo;new&rdquo; to &ldquo;won&rdquo;,
-              invite your team, and keep every workspace isolated.
-            </p>
-          </BentoCard>
-
-          <BentoCard className="lg:col-span-2">
-            <FeatureIcon>
-              <FileSpreadsheet className="h-5 w-5" />
-            </FeatureIcon>
-            <h3 className="text-lg font-semibold tracking-tight text-white">
-              One-click export
-            </h3>
-            <p className="mt-2 text-[15px] leading-7 text-zinc-400">
-              Download any lead list as CSV for your outreach tool, or export a
-              finished site as ready-to-host files.
-            </p>
-          </BentoCard>
+            <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-indigo-300">
+              Start a search
+              <ArrowUpRight className="h-4 w-4 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </span>
+          </Link>
         </div>
       </Container>
     </section>
-  );
-}
-
-function BentoCard({
-  className,
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={cn("card-dark card-dark-hover rounded-2xl p-7", className)}>
-      {children}
-    </div>
-  );
-}
-
-function FeatureIcon({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mb-4 grid h-11 w-11 place-items-center rounded-xl border border-indigo-400/20 bg-indigo-500/10 text-indigo-300">
-      {children}
-    </div>
   );
 }
 
@@ -530,41 +434,36 @@ function FeatureIcon({ children }: { children: React.ReactNode }) {
 function HowItWorks() {
   const steps = [
     {
-      icon: <MousePointerClick className="h-5 w-5" />,
       title: "Describe your target",
       body: "Type a niche and a town, set a radius. Sitovai queries Google Places behind the scenes.",
     },
     {
-      icon: <Zap className="h-5 w-5" />,
       title: "Get qualified leads",
       body: "See who has no website, enriched with registry data where available. Filter, tag, and export.",
     },
     {
-      icon: <Globe className="h-5 w-5" />,
       title: "Ship their website",
       body: "Generate a polished site in the local language from real business data. Preview, tweak, hand it over.",
     },
   ];
   return (
-    <section id="how" className="relative overflow-hidden scroll-mt-24 border-y border-white/5 bg-white/[0.015] py-24">
-      <div className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[300px] w-[700px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(99,102,241,0.1),transparent)] blur-3xl" />
+    <section id="how" className="scroll-mt-20 border-b border-white/[0.07] py-24">
       <Container>
-        <SectionHeading eyebrow="How it works" title="Three steps to a new client" />
-        <div className="relative mt-16 grid gap-10 md:grid-cols-3">
-          {/* connecting line */}
-          <div className="pointer-events-none absolute left-[16.66%] right-[16.66%] top-6 hidden h-px bg-gradient-to-r from-indigo-500/50 via-violet-500/50 to-cyan-400/50 md:block" />
+        <SectionHead
+          eyebrow="How it works"
+          title="Three steps to a new client"
+          subtitle="No scraping, no spreadsheets — the whole pipeline lives in one dashboard."
+        />
+        <div className="grid gap-x-10 gap-y-12 md:grid-cols-3">
           {steps.map((s, i) => (
-            <div key={s.title} className="relative text-center md:text-left">
-              <div className="relative z-10 mx-auto grid h-12 w-12 place-items-center rounded-2xl border border-indigo-400/30 bg-[#0b0b14] text-indigo-300 shadow-[0_0_30px_-6px_rgba(99,102,241,0.5)] md:mx-0">
-                {s.icon}
+            <div key={s.title} className="border-t border-white/[0.09] pt-6">
+              <div className="font-display text-[13px] font-semibold text-indigo-400">
+                {String(i + 1).padStart(2, "0")}
               </div>
-              <div className="mt-5 text-xs font-semibold uppercase tracking-widest text-indigo-400">
-                Step {i + 1}
-              </div>
-              <h3 className="mt-1.5 text-xl font-semibold tracking-tight text-white">
+              <h3 className="font-display mt-3 text-xl font-semibold tracking-tight text-white">
                 {s.title}
               </h3>
-              <p className="mt-2 text-[15px] leading-7 text-zinc-400">{s.body}</p>
+              <p className="mt-2.5 text-[15px] leading-7 text-zinc-500">{s.body}</p>
             </div>
           ))}
         </div>
@@ -615,33 +514,33 @@ const TIERS = [
 
 function Pricing() {
   return (
-    <section id="pricing" className="scroll-mt-24 py-24">
+    <section id="pricing" className="scroll-mt-20 border-b border-white/[0.07] py-24">
       <Container>
-        <SectionHeading
+        <SectionHead
           eyebrow="Pricing"
           title="Simple, transparent plans"
-          subtitle="Pick a plan and start today from €20/month. Cancel whenever you like."
+          subtitle="Pick a plan and start today from €20/month. Cancel whenever you like — payments handled by Stripe."
         />
-        <div className="mx-auto mt-14 grid max-w-3xl gap-6 sm:grid-cols-2">
+        <div className="grid max-w-4xl gap-4 sm:grid-cols-2">
           {TIERS.map((t) => (
             <div
               key={t.name}
               className={cn(
-                "relative flex flex-col rounded-2xl p-7",
+                "relative flex flex-col rounded-2xl border p-8",
                 t.highlight
-                  ? "border border-indigo-400/40 bg-gradient-to-b from-indigo-500/[0.14] to-violet-500/[0.05] shadow-[0_0_60px_-12px_rgba(99,102,241,0.45)]"
-                  : "card-dark",
+                  ? "border-indigo-400/35 bg-gradient-to-b from-indigo-500/[0.12] to-transparent"
+                  : "border-white/[0.08] bg-[#0b0c12]",
               )}
             >
               {"badge" in t && t.badge ? (
-                <span className="absolute -top-3 left-7 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 px-3 py-1 text-xs font-medium text-white shadow-[0_4px_20px_-4px_rgba(99,102,241,0.8)]">
+                <span className="absolute -top-3 left-8 rounded-full border border-indigo-400/40 bg-[#0b0c17] px-3 py-1 text-xs font-semibold text-indigo-300">
                   {t.badge}
                 </span>
               ) : null}
-              <h3 className="text-lg font-semibold text-white">{t.name}</h3>
+              <h3 className="font-display text-lg font-semibold text-white">{t.name}</h3>
               <p className="mt-1 text-sm text-zinc-500">{t.desc}</p>
-              <div className="mt-5 flex items-baseline gap-1">
-                <span className="text-4xl font-semibold tracking-tight text-white">
+              <div className="mt-6 flex items-baseline gap-1.5">
+                <span className="font-display text-5xl font-semibold tracking-tight text-white">
                   {t.price}
                 </span>
                 <span className="text-sm text-zinc-500">{t.period}</span>
@@ -649,13 +548,13 @@ function Pricing() {
               <Link
                 href={t.href}
                 className={cn(
-                  "mt-6 h-10 w-full text-sm",
+                  "mt-7 h-11 w-full text-sm",
                   t.highlight ? btnPrimary : btnGhost,
                 )}
               >
                 {t.cta}
               </Link>
-              <ul className="mt-7 space-y-3 text-sm">
+              <ul className="mt-8 space-y-3 border-t border-white/[0.07] pt-7 text-sm">
                 {t.features.map((f) => (
                   <li key={f} className="flex items-start gap-2.5 text-zinc-400">
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-indigo-400" />
@@ -666,8 +565,8 @@ function Pricing() {
             </div>
           ))}
         </div>
-        <p className="mt-8 text-center text-sm text-zinc-500">
-          Prices in EUR, VAT where applicable. Payments handled securely by Stripe.
+        <p className="mt-8 text-sm text-zinc-600">
+          Prices in EUR, VAT where applicable.
         </p>
       </Container>
     </section>
@@ -704,22 +603,33 @@ function Faq() {
     },
   ];
   return (
-    <section id="faq" className="scroll-mt-24 border-t border-white/5 py-24">
-      <Container className="max-w-3xl">
-        <SectionHeading eyebrow="FAQ" title="Questions, answered" />
-        <div className="mt-12 space-y-3">
-          {faqs.map((f) => (
-            <details
-              key={f.q}
-              className="faq group rounded-xl border border-white/10 bg-white/[0.03] px-5 transition hover:border-white/20"
-            >
-              <summary className="flex items-center justify-between gap-4 py-4 text-[15px] font-medium text-zinc-200">
-                {f.q}
-                <Plus className="faq-icon h-4 w-4 shrink-0 text-zinc-500" />
-              </summary>
-              <p className="pb-5 text-[15px] leading-7 text-zinc-400">{f.a}</p>
-            </details>
-          ))}
+    <section id="faq" className="scroll-mt-20 border-b border-white/[0.07] py-24">
+      <Container>
+        <div className="grid gap-x-20 gap-y-10 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <Eyebrow>FAQ</Eyebrow>
+            <h2 className="font-display mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+              Questions, answered
+            </h2>
+            <p className="mt-4 max-w-xs text-[15px] leading-7 text-zinc-500">
+              Anything else? Reach us any time from the dashboard once you&apos;re
+              in.
+            </p>
+          </div>
+          <div>
+            {faqs.map((f) => (
+              <details
+                key={f.q}
+                className="faq group border-b border-white/[0.08] first:border-t"
+              >
+                <summary className="flex items-center justify-between gap-4 py-5 text-[15px] font-medium text-zinc-200 transition hover:text-white">
+                  {f.q}
+                  <Plus className="faq-icon h-4 w-4 shrink-0 text-zinc-600" />
+                </summary>
+                <p className="pb-6 pr-8 text-[15px] leading-7 text-zinc-500">{f.a}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </Container>
     </section>
@@ -730,16 +640,15 @@ function Faq() {
 
 function CtaBand() {
   return (
-    <section className="pb-28">
+    <section className="py-24">
       <Container>
-        <div className="bg-noise relative overflow-hidden rounded-3xl border border-white/10 px-8 py-20 text-center">
-          <div className="pointer-events-none absolute inset-0 -z-0">
-            <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/[0.16] via-violet-500/[0.08] to-transparent" />
-            <div className="absolute left-1/2 top-[-40%] h-[380px] w-[700px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(99,102,241,0.35),transparent)] blur-3xl" />
-            <div className="absolute inset-0 bg-grid-dark bg-grid-fade opacity-60" />
+        <div className="relative overflow-hidden rounded-3xl border border-white/[0.09] px-8 py-20 text-center">
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute left-1/2 top-[-45%] h-[400px] w-[760px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(99,102,241,0.28),transparent)] blur-3xl" />
+            <div className="absolute inset-0 bg-grid-dark bg-grid-fade opacity-40" />
           </div>
           <div className="relative">
-            <h2 className="mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+            <h2 className="font-display mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight text-white sm:text-5xl">
               Start finding no-website leads today
             </h2>
             <p className="mx-auto mt-5 max-w-xl text-lg text-zinc-400">
@@ -765,7 +674,7 @@ function CtaBand() {
 
 function SiteFooter() {
   return (
-    <footer className="border-t border-white/5 pb-10 pt-16">
+    <footer className="border-t border-white/[0.07] pb-10 pt-16">
       <Container>
         <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>
@@ -776,36 +685,32 @@ function SiteFooter() {
             </p>
           </div>
           <div>
-            <p className="text-sm font-semibold text-zinc-300">Product</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+              Product
+            </p>
             <ul className="mt-4 space-y-3 text-sm text-zinc-500">
-              <li>
-                <a href="#features" className="transition hover:text-white">
-                  Features
-                </a>
-              </li>
-              <li>
-                <a href="#how" className="transition hover:text-white">
-                  How it works
-                </a>
-              </li>
-              <li>
-                <a href="#pricing" className="transition hover:text-white">
-                  Pricing
-                </a>
-              </li>
-              <li>
-                <a href="#faq" className="transition hover:text-white">
-                  FAQ
-                </a>
-              </li>
+              {[
+                ["#features", "Features"],
+                ["#how", "How it works"],
+                ["#pricing", "Pricing"],
+                ["#faq", "FAQ"],
+              ].map(([href, label]) => (
+                <li key={href}>
+                  <a href={href} className="transition hover:text-white">
+                    {label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
           <div>
-            <p className="text-sm font-semibold text-zinc-300">Get started</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+              Get started
+            </p>
             <ul className="mt-4 space-y-3 text-sm text-zinc-500">
               <li>
                 <Link href="/signup" className="transition hover:text-white">
-                  Get started
+                  Create account
                 </Link>
               </li>
               <li>
@@ -816,7 +721,7 @@ function SiteFooter() {
             </ul>
           </div>
         </div>
-        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/5 pt-6 text-sm text-zinc-500 sm:flex-row">
+        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/[0.07] pt-6 text-sm text-zinc-500 sm:flex-row">
           <p>© {new Date().getFullYear()} Sitovai. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="transition hover:text-white">
