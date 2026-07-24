@@ -14,6 +14,7 @@ import {
 import { Container } from "@/components/ui/container";
 import { AuroraBackdrop } from "@/components/ui/aether-hero";
 import { BrandMark, Wordmark } from "@/components/ui/brand";
+import { MobileNav } from "@/components/ui/mobile-nav";
 import {
   Tilt3D,
   ParticleField,
@@ -129,6 +130,7 @@ function SiteHeader() {
           <Link href="/signup" className={cn(btnPrimary, "h-9 px-4 text-sm")}>
             Get started
           </Link>
+          <MobileNav />
         </div>
       </Container>
     </header>
