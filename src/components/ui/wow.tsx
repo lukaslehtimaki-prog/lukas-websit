@@ -197,6 +197,8 @@ export function Reveal({
 
   useEffect(() => {
     if (prefersReducedMotion()) {
+      // Reduced motion: reveal immediately instead of animating in.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setInView(true);
       return;
     }
