@@ -29,6 +29,14 @@ import { languageForCountry } from "@/lib/templates/i18n";
 import { uploadSiteImage, importPlacePhotos } from "@/lib/sites/images";
 import { ensureSitePaymentLink } from "@/lib/sites/checkout";
 import { getConnectStatus } from "@/lib/sites/connect";
+import {
+  isDomainsConfigured,
+  normalizeDomain,
+  addProjectDomain,
+  removeProjectDomain,
+  getDomainStatus,
+  dnsRecordsFor,
+} from "@/lib/sites/domains";
 import { checkLimit, recordUsage } from "@/lib/usage";
 import { hasProFeatures } from "@/lib/subscription";
 import type { BusinessInfo, SiteContent, SiteReview } from "@/lib/templates/types";
@@ -318,6 +326,10 @@ export async function regenerateContent(
   if (existing?.hiddenSections) content.hiddenSections = existing.hiddenSections;
   if (existing?.reviewKey) content.reviewKey = existing.reviewKey;
   if (existing?.clientEmail) content.clientEmail = existing.clientEmail;
+  if (existing?.customDomain) {
+    content.customDomain = existing.customDomain;
+    content.customDomainAddedAt = existing.customDomainAddedAt;
+  }
   // Carry over per-service prices by matching service title.
   if (existing?.services?.length && content.services?.length) {
     const priceByTitle = new Map(
@@ -358,6 +370,10 @@ export async function updateSiteContent(
   if (existing?.pitch) content.pitch = existing.pitch;
   if (existing?.reviewKey && !content.reviewKey)
     content.reviewKey = existing.reviewKey;
+  if (existing?.customDomain !== undefined) {
+    content.customDomain = existing.customDomain;
+    content.customDomainAddedAt = existing.customDomainAddedAt;
+  }
 
   const patch: Record<string, any> = {
     content,
@@ -403,6 +419,109 @@ export async function uploadSiteImageAction(
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Upload failed." };
   }
+}
+
+export type DomainState = {
+  domain?: string | null;
+  attached?: boolean;
+  live?: boolean;
+  records?: { type: string; name: string; value: string }[];
+  error?: string;
+};
+
+/** Attach a custom domain to this site (and to the Vercel project). */
+export async function setSiteDomainAction(
+  siteId: string,
+  input: string,
+): Promise<DomainState> {
+  await requireTenantContext();
+  if (!isDomainsConfigured())
+    return { error: "Custom domains aren't configured yet (VERCEL_API_TOKEN)." };
+
+  const host = normalizeDomain(input);
+  if (!host)
+    return { error: "Enter a valid domain, e.g. clientbusiness.com" };
+
+  const supabase = await createClient();
+  // One site per domain — otherwise the proxy can't resolve it unambiguously.
+  const { data: clash } = await supabase
+    .from("sites")
+    .select("id")
+    .eq("content->>customDomain", host)
+    .neq("id", siteId)
+    .maybeSingle();
+  if (clash) return { error: "That domain is already used by another site." };
+
+  const added = await addProjectDomain(host);
+  if ("error" in added) return { error: added.error };
+
+  const { data: site } = await supabase
+    .from("sites")
+    .select("content")
+    .eq("id", siteId)
+    .maybeSingle();
+  if (!site) return { error: "Site not found." };
+  const content = (site as any).content as SiteContent;
+  content.customDomain = host;
+  content.customDomainAddedAt = new Date().toISOString();
+  await supabase
+    .from("sites")
+    .update({ content, updated_at: new Date().toISOString() })
+    .eq("id", siteId);
+
+  const status = await getDomainStatus(host);
+  revalidatePath(`/dashboard/sites/${siteId}`);
+  return {
+    domain: host,
+    attached: status.attached,
+    live: status.live,
+    records: dnsRecordsFor(host),
+  };
+}
+
+export async function checkSiteDomainAction(
+  siteId: string,
+): Promise<DomainState> {
+  await requireTenantContext();
+  const supabase = await createClient();
+  const { data: site } = await supabase
+    .from("sites")
+    .select("content")
+    .eq("id", siteId)
+    .maybeSingle();
+  const host = ((site as any)?.content as SiteContent | undefined)?.customDomain;
+  if (!host) return { error: "No custom domain set for this site." };
+  const status = await getDomainStatus(host);
+  return {
+    domain: host,
+    attached: status.attached,
+    live: status.live,
+    records: dnsRecordsFor(host),
+  };
+}
+
+export async function removeSiteDomainAction(
+  siteId: string,
+): Promise<DomainState> {
+  await requireTenantContext();
+  const supabase = await createClient();
+  const { data: site } = await supabase
+    .from("sites")
+    .select("content")
+    .eq("id", siteId)
+    .maybeSingle();
+  if (!site) return { error: "Site not found." };
+  const content = (site as any).content as SiteContent;
+  const host = content.customDomain;
+  if (host) await removeProjectDomain(host);
+  content.customDomain = null;
+  delete content.customDomainAddedAt;
+  await supabase
+    .from("sites")
+    .update({ content, updated_at: new Date().toISOString() })
+    .eq("id", siteId);
+  revalidatePath(`/dashboard/sites/${siteId}`);
+  return { domain: null };
 }
 
 export async function ensureClientLinkAction(
@@ -699,6 +818,16 @@ export async function importGooglePhotosAction(
 export async function deleteSite(siteId: string): Promise<void> {
   await requireTenantContext();
   const supabase = await createClient();
+  // Release any custom domain so it can be reused and doesn't linger on the
+  // Vercel project after the site is gone.
+  const { data: site } = await supabase
+    .from("sites")
+    .select("content")
+    .eq("id", siteId)
+    .maybeSingle();
+  const host = ((site as any)?.content as SiteContent | undefined)?.customDomain;
+  if (host) await removeProjectDomain(host);
+
   await supabase.from("sites").delete().eq("id", siteId);
   revalidatePath("/dashboard/sites");
   redirect("/dashboard/sites");

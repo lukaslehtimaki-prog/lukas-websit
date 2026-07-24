@@ -68,7 +68,11 @@ const STEPS: Step[] = [
   {
     icon: <Link2 className="h-5 w-5" />,
     title: "Put it on their own domain (optional)",
-    body: "Want it on their own address like theirbusiness.com? You’ll be able to paste the domain on the site and follow the DNS steps to point it at Sitovai. (Coming shortly — for now the shareable link works everywhere.)",
+    body: "Want it on their own address like theirbusiness.com? Open the site, paste the domain in “Custom domain”, and hit Connect. Sitovai shows the exact DNS record to give the client (or their registrar) — once it’s pointed, the site serves on their domain with HTTPS handled automatically.",
+    bullets: [
+      "Works for a domain they already own, or one you buy for them and charge on.",
+      "The site must be published; hit Check after the DNS is set.",
+    ],
   },
 ];
 

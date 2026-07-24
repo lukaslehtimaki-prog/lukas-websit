@@ -1,4 +1,4 @@
-import { type NextFetchEvent, type NextRequest } from "next/server";
+import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/proxy";
 import { env } from "@/lib/env";
 
@@ -10,7 +10,54 @@ import { env } from "@/lib/env";
 const REF_COOKIE = "sitovai_ref";
 const REF_RE = /^[a-z0-9-]{3,32}$/;
 
+/** Hosts that serve the Sitovai app itself (everything else is a client domain). */
+function isAppHost(host: string): boolean {
+  const h = host.split(":")[0];
+  return (
+    h === "sitovai.com" ||
+    h.endsWith(".sitovai.com") ||
+    h.endsWith(".vercel.app") ||
+    h === "localhost" ||
+    h === "127.0.0.1"
+  );
+}
+
+/** Look up the published site attached to a custom domain. */
+async function siteIdForDomain(host: string): Promise<string | null> {
+  if (!env.NEXT_PUBLIC_SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) return null;
+  try {
+    const url =
+      `${env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/sites` +
+      `?select=id,status&content->>customDomain=eq.${encodeURIComponent(host)}&limit=1`;
+    const res = await fetch(url, {
+      headers: {
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+      },
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const rows = (await res.json()) as { id: string; status: string }[];
+    const row = rows[0];
+    return row && row.status === "published" ? row.id : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function proxy(request: NextRequest, event: NextFetchEvent) {
+  // A client's custom domain serves that client's site, nothing else.
+  const host = (request.headers.get("host") ?? "").toLowerCase();
+  if (host && !isAppHost(host)) {
+    const siteId = await siteIdForDomain(host.split(":")[0]);
+    if (siteId) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/s/${siteId}`;
+      url.search = "";
+      return NextResponse.rewrite(url);
+    }
+  }
+
   const response = await updateSession(request);
 
   // Affiliate link: ?ref=CODE → remember for 60 days (last touch wins) and

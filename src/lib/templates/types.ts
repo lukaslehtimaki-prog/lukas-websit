@@ -140,6 +140,9 @@ export type SiteContent = {
   designSeed?: number;
   /** Set when a pitch email was sent, for outreach tracking. */
   pitch?: { sentAt: string; to: string };
+  /** Custom domain this site is served on (lowercase host, no protocol). */
+  customDomain?: string | null;
+  customDomainAddedAt?: string;
   /** Private key for the shareable client review/buy link (/r/{id}?k=…). */
   reviewKey?: string;
   /** The client's email, for outreach + records (editor-set). */

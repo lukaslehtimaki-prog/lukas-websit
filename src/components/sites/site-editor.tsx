@@ -44,6 +44,10 @@ import {
   sendPitchAction,
   aiEditSiteAction,
   ensureClientLinkAction,
+  setSiteDomainAction,
+  checkSiteDomainAction,
+  removeSiteDomainAction,
+  type DomainState,
 } from "@/app/dashboard/sites/actions";
 import { renderSiteToHtml } from "@/lib/templates/render";
 import { renderPitchEmailHtml } from "@/lib/email/pitch-template";
@@ -115,6 +119,13 @@ export function SiteEditor({
   const [clientEmail, setClientEmail] = useState(initialContent.clientEmail ?? "");
   const [clientUrl, setClientUrl] = useState("");
   const [clientBusy, setClientBusy] = useState(false);
+  const [domainInput, setDomainInput] = useState(initialContent.customDomain ?? "");
+  const [domain, setDomain] = useState<DomainState>({
+    domain: initialContent.customDomain ?? null,
+  });
+  const [domainBusy, setDomainBusy] = useState<null | "save" | "check" | "remove">(
+    null,
+  );
   const [offerPrice, setOfferPrice] = useState(
     initialContent.payment?.priceStr || "500 €",
   );
@@ -219,6 +230,40 @@ export function SiteEditor({
   }
   function setPlans(next: MembershipPlan[]) {
     patch({ membershipPlans: next });
+  }
+  function saveDomain() {
+    setDomainBusy("save");
+    startTransition(async () => {
+      const r = await setSiteDomainAction(siteId, domainInput);
+      setDomain(r);
+      if (r.error) setMessage(r.error);
+      else setMessage("Domain connected — add the DNS record below.");
+      setDomainBusy(null);
+    });
+  }
+  function checkDomain() {
+    setDomainBusy("check");
+    startTransition(async () => {
+      const r = await checkSiteDomainAction(siteId);
+      setDomain(r);
+      if (r.error) setMessage(r.error);
+      else
+        setMessage(
+          r.live ? "Domain is live ✓" : "DNS not pointing here yet — can take up to an hour.",
+        );
+      setDomainBusy(null);
+    });
+  }
+  function removeDomain() {
+    if (!confirm("Disconnect this domain from the site?")) return;
+    setDomainBusy("remove");
+    startTransition(async () => {
+      const r = await removeSiteDomainAction(siteId);
+      setDomain(r);
+      setDomainInput("");
+      setMessage(r.error ?? "Domain disconnected.");
+      setDomainBusy(null);
+    });
   }
   function makeClientLink() {
     setClientBusy(true);
@@ -809,6 +854,110 @@ export function SiteEditor({
           <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
             Tip: set a price in the pitch panel to add a working Buy button to
             this link.
+          </p>
+        ) : null}
+      </div>
+
+      {/* Custom domain */}
+      <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          <span className="grid h-6 w-6 place-items-center rounded-full bg-sky-100 text-sky-600 dark:bg-sky-500/15 dark:text-sky-300">
+            <Globe className="h-3.5 w-3.5" />
+          </span>
+          Custom domain
+          {domain.domain && domain.live ? (
+            <span className="ml-auto rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+              Live ✓
+            </span>
+          ) : domain.domain ? (
+            <span className="ml-auto rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-500/15 dark:text-amber-300">
+              Waiting for DNS
+            </span>
+          ) : null}
+        </div>
+        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          Put the site on the client&apos;s own address. Paste the domain, then
+          give them the DNS record below — the site must be published.
+        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <input
+            value={domainInput}
+            onChange={(e) => setDomainInput(e.target.value)}
+            placeholder="clientbusiness.com"
+            className={cn("flex-1 min-w-[12rem] font-mono text-sm", fieldCls)}
+          />
+          <button
+            onClick={saveDomain}
+            disabled={domainBusy !== null || isPending || !domainInput.trim()}
+            className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-500 disabled:opacity-60"
+          >
+            {domainBusy === "save" ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Globe className="h-4 w-4" />
+            )}
+            {domain.domain ? "Update" : "Connect"}
+          </button>
+          {domain.domain ? (
+            <>
+              <button
+                onClick={checkDomain}
+                disabled={domainBusy !== null}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              >
+                {domainBusy === "check" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4" />
+                )}
+                Check
+              </button>
+              <button
+                onClick={removeDomain}
+                disabled={domainBusy !== null}
+                className="rounded-lg px-3 py-2 text-sm text-zinc-500 hover:text-red-600 dark:text-zinc-400"
+              >
+                Disconnect
+              </button>
+            </>
+          ) : null}
+        </div>
+
+        {domain.records?.length ? (
+          <div className="mt-3 rounded-lg border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-950">
+            <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+              Add this DNS record at the domain&apos;s registrar (GoDaddy,
+              Porkbun, Namecheap…):
+            </p>
+            <table className="mt-2 w-full text-left text-xs">
+              <thead className="text-zinc-500 dark:text-zinc-400">
+                <tr>
+                  <th className="pb-1 pr-4 font-medium">Type</th>
+                  <th className="pb-1 pr-4 font-medium">Name / Host</th>
+                  <th className="pb-1 font-medium">Value</th>
+                </tr>
+              </thead>
+              <tbody className="font-mono text-zinc-800 dark:text-zinc-200">
+                {domain.records.map((r, i) => (
+                  <tr key={i}>
+                    <td className="pr-4">{r.type}</td>
+                    <td className="pr-4">{r.name}</td>
+                    <td className="break-all">{r.value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+              Delete any existing A/CNAME record on that name first. DNS usually
+              updates within minutes (can take up to an hour), then hit{" "}
+              <span className="font-medium">Check</span>. HTTPS is issued
+              automatically.
+            </p>
+          </div>
+        ) : null}
+        {status !== "published" && domain.domain ? (
+          <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
+            Publish the site for the domain to serve it.
           </p>
         ) : null}
       </div>
