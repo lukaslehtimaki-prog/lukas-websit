@@ -5,18 +5,26 @@ import { t as strings } from "./i18n";
 
 // Labels for the newer sections, kept here (not in the strict SiteStrings table)
 // so a feature addition doesn't force an edit across all 10 language entries.
-type ExtraLabels = { team: string; useCode: string; announcementFallback: string };
+type ExtraLabels = {
+  team: string;
+  useCode: string;
+  announcementFallback: string;
+  chatGreeting: string; // {name} placeholder
+  chatPlaceholder: string;
+  chatSend: string;
+  chatTitle: string; // {name} placeholder
+};
 const EXTRA_LABELS: Record<string, ExtraLabels> = {
-  en: { team: "Meet the team", useCode: "Use code", announcementFallback: "" },
-  fi: { team: "Tiimimme", useCode: "Käytä koodia", announcementFallback: "" },
-  sv: { team: "Vårt team", useCode: "Använd koden", announcementFallback: "" },
-  de: { team: "Unser Team", useCode: "Code verwenden", announcementFallback: "" },
-  fr: { team: "Notre équipe", useCode: "Code", announcementFallback: "" },
-  es: { team: "Nuestro equipo", useCode: "Usa el código", announcementFallback: "" },
-  it: { team: "Il nostro team", useCode: "Usa il codice", announcementFallback: "" },
-  pt: { team: "A nossa equipa", useCode: "Usar código", announcementFallback: "" },
-  nl: { team: "Ons team", useCode: "Gebruik code", announcementFallback: "" },
-  zh: { team: "我们的团队", useCode: "使用优惠码", announcementFallback: "" },
+  en: { team: "Meet the team", useCode: "Use code", announcementFallback: "", chatGreeting: "Hi! Ask me anything about {name}.", chatPlaceholder: "Type a message…", chatSend: "Send", chatTitle: "Chat with {name}" },
+  fi: { team: "Tiimimme", useCode: "Käytä koodia", announcementFallback: "", chatGreeting: "Hei! Kysy minulta mitä tahansa yrityksestä {name}.", chatPlaceholder: "Kirjoita viesti…", chatSend: "Lähetä", chatTitle: "Chat: {name}" },
+  sv: { team: "Vårt team", useCode: "Använd koden", announcementFallback: "", chatGreeting: "Hej! Fråga mig vad som helst om {name}.", chatPlaceholder: "Skriv ett meddelande…", chatSend: "Skicka", chatTitle: "Chatta med {name}" },
+  de: { team: "Unser Team", useCode: "Code verwenden", announcementFallback: "", chatGreeting: "Hallo! Fragen Sie mich alles über {name}.", chatPlaceholder: "Nachricht schreiben…", chatSend: "Senden", chatTitle: "Chat mit {name}" },
+  fr: { team: "Notre équipe", useCode: "Code", announcementFallback: "", chatGreeting: "Bonjour ! Posez-moi vos questions sur {name}.", chatPlaceholder: "Écrivez un message…", chatSend: "Envoyer", chatTitle: "Chat avec {name}" },
+  es: { team: "Nuestro equipo", useCode: "Usa el código", announcementFallback: "", chatGreeting: "¡Hola! Pregúntame lo que quieras sobre {name}.", chatPlaceholder: "Escribe un mensaje…", chatSend: "Enviar", chatTitle: "Chat con {name}" },
+  it: { team: "Il nostro team", useCode: "Usa il codice", announcementFallback: "", chatGreeting: "Ciao! Chiedimi pure qualsiasi cosa su {name}.", chatPlaceholder: "Scrivi un messaggio…", chatSend: "Invia", chatTitle: "Chat con {name}" },
+  pt: { team: "A nossa equipa", useCode: "Usar código", announcementFallback: "", chatGreeting: "Olá! Pergunte-me qualquer coisa sobre {name}.", chatPlaceholder: "Escreva uma mensagem…", chatSend: "Enviar", chatTitle: "Conversar com {name}" },
+  nl: { team: "Ons team", useCode: "Gebruik code", announcementFallback: "", chatGreeting: "Hoi! Vraag me gerust iets over {name}.", chatPlaceholder: "Typ een bericht…", chatSend: "Verstuur", chatTitle: "Chat met {name}" },
+  zh: { team: "我们的团队", useCode: "使用优惠码", announcementFallback: "", chatGreeting: "您好！欢迎咨询关于{name}的任何问题。", chatPlaceholder: "输入消息…", chatSend: "发送", chatTitle: "与{name}聊天" },
 };
 function extraLabels(lang: string | undefined | null): ExtraLabels {
   return EXTRA_LABELS[(lang ?? "en").toLowerCase()] ?? EXTRA_LABELS.en;
@@ -46,6 +54,120 @@ function socialLinks(socials: SiteSocial[] | undefined, cls: string): string {
       return `<a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(m.label)}"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">${m.icon}</svg></a>`;
     })
     .join("")}</div>`;
+}
+
+/**
+ * AI chatbot widget: a floating bubble that expands into a small chat panel.
+ * Vanilla JS, no dependencies — matches the reveal-animation script already
+ * inlined into every generated page. All visitor/AI text is inserted via
+ * textContent, never innerHTML, so nothing typed in chat can inject markup.
+ */
+function chatWidgetHtml(opts: {
+  endpoint: string;
+  businessName: string;
+  lang: string;
+}): string {
+  const x = extraLabels(opts.lang);
+  const greeting = x.chatGreeting.replace("{name}", opts.businessName);
+  const title = x.chatTitle.replace("{name}", opts.businessName);
+  return `
+  <div id="sv-chat-root" data-endpoint="${esc(opts.endpoint)}" data-greeting="${esc(greeting)}">
+    <button id="sv-chat-toggle" type="button" aria-label="${esc(title)}" aria-expanded="false">
+      <svg class="sv-chat-icon-open" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      <svg class="sv-chat-icon-close" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <div id="sv-chat-panel" role="dialog" aria-label="${esc(title)}">
+      <div class="sv-chat-head">
+        <span class="sv-chat-avatar">${esc(initials(opts.businessName))}</span>
+        <span class="sv-chat-head-name">${esc(title)}</span>
+      </div>
+      <div id="sv-chat-log" aria-live="polite"></div>
+      <form id="sv-chat-form">
+        <input id="sv-chat-input" type="text" autocomplete="off" placeholder="${esc(x.chatPlaceholder)}" maxlength="2000" aria-label="${esc(x.chatPlaceholder)}" />
+        <button type="submit" aria-label="${esc(x.chatSend)}">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+  <script>
+  (function () {
+    var root = document.getElementById("sv-chat-root");
+    if (!root) return;
+    var endpoint = root.getAttribute("data-endpoint");
+    var greeting = root.getAttribute("data-greeting");
+    var toggle = document.getElementById("sv-chat-toggle");
+    var panel = document.getElementById("sv-chat-panel");
+    var log = document.getElementById("sv-chat-log");
+    var form = document.getElementById("sv-chat-form");
+    var input = document.getElementById("sv-chat-input");
+    var open = false;
+    var greeted = false;
+    var sessionId;
+    try {
+      sessionId = sessionStorage.getItem("sv_chat_sid");
+      if (!sessionId) {
+        sessionId = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+        sessionStorage.setItem("sv_chat_sid", sessionId);
+      }
+    } catch (e) { sessionId = String(Date.now()) + Math.random().toString(16).slice(2); }
+
+    function addBubble(role, text) {
+      var row = document.createElement("div");
+      row.className = "sv-chat-row " + (role === "user" ? "sv-chat-row-user" : "sv-chat-row-bot");
+      var bubble = document.createElement("div");
+      bubble.className = "sv-chat-bubble";
+      bubble.textContent = text;
+      row.appendChild(bubble);
+      log.appendChild(row);
+      log.scrollTop = log.scrollHeight;
+      return row;
+    }
+    function setOpen(v) {
+      open = v;
+      panel.classList.toggle("sv-chat-open", open);
+      toggle.setAttribute("aria-expanded", String(open));
+      toggle.classList.toggle("sv-chat-toggle-open", open);
+      if (open) {
+        if (!greeted) { greeted = true; addBubble("assistant", greeting); }
+        setTimeout(function () { input.focus(); }, 50);
+      }
+    }
+    toggle.addEventListener("click", function () { setOpen(!open); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && open) setOpen(false);
+    });
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var text = input.value.trim();
+      if (!text) return;
+      addBubble("user", text);
+      input.value = "";
+      input.disabled = true;
+      var typing = addBubble("assistant", "…");
+      typing.classList.add("sv-chat-typing");
+      fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId: sessionId, message: text }),
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          typing.remove();
+          addBubble("assistant", (data && data.reply) || "Sorry, something went wrong.");
+        })
+        .catch(function () {
+          typing.remove();
+          addBubble("assistant", "Sorry, I couldn't send that — please try again.");
+        })
+        .then(function () {
+          input.disabled = false;
+          input.focus();
+        });
+    });
+  })();
+  </script>`;
 }
 
 // Pure renderer (safe to import on client or server). Produces a complete, standalone,
@@ -135,6 +257,19 @@ export function renderSiteToHtml(
   const honeypot = formAction
     ? `<input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;height:0;width:0;opacity:0;" />`
     : "";
+  // The chat endpoint lives at the same origin as the form endpoint — derive
+  // it instead of threading a whole new opt through every caller.
+  const chatEndpoint = formAction
+    ? formAction.replace("/api/f/", "/api/c/")
+    : null;
+  const chatWidget =
+    content.chatbotEnabled && chatEndpoint
+      ? chatWidgetHtml({
+          endpoint: chatEndpoint,
+          businessName: content.businessName,
+          lang: content.language ?? "en",
+        })
+      : "";
 
   /* ------------------------------- pieces ------------------------------- */
 
@@ -743,6 +878,35 @@ export function renderSiteToHtml(
     .hero-img { max-width: 100%; height: 240px; }
     .row { gap: 18px; }
   }
+
+  /* AI chat widget */
+  #sv-chat-toggle { position: fixed; right: 20px; bottom: 20px; z-index: 9998; width: 58px; height: 58px; border-radius: 50%; border: 0; cursor: pointer; display: grid; place-items: center; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: var(--on-accent); box-shadow: 0 10px 28px color-mix(in srgb, var(--accent) 40%, transparent); transition: transform .2s ease, box-shadow .2s ease; }
+  #sv-chat-toggle:hover { transform: translateY(-2px) scale(1.04); }
+  #sv-chat-toggle:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 3px; }
+  .sv-chat-icon-close { display: none; }
+  #sv-chat-toggle.sv-chat-toggle-open .sv-chat-icon-open { display: none; }
+  #sv-chat-toggle.sv-chat-toggle-open .sv-chat-icon-close { display: block; }
+  #sv-chat-panel { position: fixed; right: 20px; bottom: 90px; z-index: 9998; width: 360px; max-width: calc(100vw - 40px); height: 480px; max-height: calc(100vh - 130px); background: var(--bg); border: var(--bw) solid var(--border); border-radius: calc(var(--radius) + 8px); box-shadow: 0 24px 60px rgba(0,0,0,.28); display: flex; flex-direction: column; overflow: hidden; opacity: 0; transform: translateY(12px) scale(.98); pointer-events: none; transition: opacity .18s ease, transform .18s ease; }
+  #sv-chat-panel.sv-chat-open { opacity: 1; transform: none; pointer-events: auto; }
+  .sv-chat-head { display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: var(--on-accent); flex-shrink: 0; }
+  .sv-chat-avatar { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,.22); display: grid; place-items: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .sv-chat-head-name { font-weight: 600; font-size: 14.5px; }
+  #sv-chat-log { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .sv-chat-row { display: flex; }
+  .sv-chat-row-user { justify-content: flex-end; }
+  .sv-chat-row-bot { justify-content: flex-start; }
+  .sv-chat-bubble { max-width: 82%; padding: 10px 13px; border-radius: 14px; font-size: 14px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+  .sv-chat-row-user .sv-chat-bubble { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: var(--on-accent); border-bottom-right-radius: 4px; }
+  .sv-chat-row-bot .sv-chat-bubble { background: var(--surface); color: var(--ink); border: var(--bw) solid var(--border); border-bottom-left-radius: 4px; }
+  .sv-chat-typing .sv-chat-bubble { opacity: .5; }
+  #sv-chat-form { display: flex; gap: 8px; padding: 12px; border-top: var(--bw) solid var(--border); flex-shrink: 0; }
+  #sv-chat-input { flex: 1; min-width: 0; padding: 10px 13px; border-radius: 999px; border: var(--bw) solid var(--border); background: var(--input-bg); color: var(--ink); font: inherit; font-size: 14px; }
+  #sv-chat-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+  #sv-chat-form button { flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%; border: 0; cursor: pointer; display: grid; place-items: center; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: var(--on-accent); }
+  @media (max-width: 480px) {
+    #sv-chat-panel { right: 12px; left: 12px; bottom: 84px; width: auto; max-width: none; height: min(480px, calc(100vh - 120px)); }
+    #sv-chat-toggle { right: 14px; bottom: 14px; }
+  }
 </style>
 </head>
 <body>
@@ -784,6 +948,7 @@ export function renderSiteToHtml(
   </div></section>
 
   ${footer}
+  ${chatWidget}
   <script>
   (function () {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;

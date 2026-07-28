@@ -106,15 +106,15 @@ export async function POST(req: NextRequest) {
             await syncSubscription(sub);
           }
         } else if (session.mode === "payment") {
-          // A business may have bought its website through a pitch-email
-          // payment link. Metadata is copied from the link to the session;
-          // fall back to the link itself if it ever isn't.
+          // A business may have bought its website (or the AI chatbot add-on)
+          // through a payment link. Metadata is copied from the link to the
+          // session; fall back to the link itself if it ever isn't.
           let meta = session.metadata ?? {};
           if (!meta.site_id && typeof session.payment_link === "string") {
             const pl = await stripe.paymentLinks.retrieve(session.payment_link);
             meta = pl.metadata ?? {};
           }
-          if (meta.kind !== "site_sale" || !meta.site_id) break;
+          if (!meta.site_id) break;
           const siteId = meta.site_id;
           const { data: site } = await supabase
             .from("sites")
@@ -123,7 +123,9 @@ export async function POST(req: NextRequest) {
             .maybeSingle();
           const content = (site as { content?: Record<string, unknown> } | null)
             ?.content;
-          if (content && typeof content === "object") {
+          if (!content || typeof content !== "object") break;
+
+          if (meta.kind === "site_sale") {
             const payment =
               (content.payment as Record<string, unknown> | undefined) ?? {};
             await supabase
@@ -132,6 +134,26 @@ export async function POST(req: NextRequest) {
                 content: {
                   ...content,
                   payment: { ...payment, paidAt: new Date().toISOString() },
+                },
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", siteId);
+          } else if (meta.kind === "chatbot_addon") {
+            const chatbotPayment =
+              (content.chatbotPayment as Record<string, unknown> | undefined) ??
+              {};
+            await supabase
+              .from("sites")
+              .update({
+                content: {
+                  ...content,
+                  chatbotPayment: {
+                    ...chatbotPayment,
+                    paidAt: new Date().toISOString(),
+                  },
+                  // Buying it turns it on immediately — the agency can still
+                  // toggle it off later (e.g. a lapsed maintenance plan).
+                  chatbotEnabled: true,
                 },
                 updated_at: new Date().toISOString(),
               })

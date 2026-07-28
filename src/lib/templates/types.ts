@@ -158,6 +158,20 @@ export type SiteContent = {
     startedAt?: string | null;
     canceledAt?: string | null;
   };
+  /** Whether the AI chatbot widget is live on the published site. */
+  chatbotEnabled?: boolean;
+  /** One-time AI-chatbot add-on sale (separate purchase from the site itself). */
+  chatbotPayment?: {
+    productId: string;
+    priceId: string;
+    linkId: string;
+    link: string;
+    priceStr: string;
+    amount: number;
+    currency: string;
+    dest?: string | null;
+    paidAt?: string | null;
+  };
   /** Private key for the shareable client review/buy link (/r/{id}?k=…). */
   reviewKey?: string;
   /** The client's email, for outreach + records (editor-set). */

@@ -240,3 +240,98 @@ export async function ensureMaintenanceLink(opts: {
     changed: true,
   };
 }
+
+export type SiteChatbotPayment = NonNullable<SiteContent["chatbotPayment"]>;
+
+/**
+ * One-time payment link for the AI-chatbot add-on — a separate purchase from
+ * the site itself, same routing rules as the sale link. Deliberately its own
+ * Product (not bundled into the site's), so it can be pitched and sold
+ * independently, before or after the site sells.
+ */
+export async function ensureChatbotPaymentLink(opts: {
+  siteId: string;
+  tenantId: string;
+  content: SiteContent;
+  priceStr: string;
+  liveUrl: string;
+  platformDirect: boolean;
+  connectAccountId?: string | null;
+}): Promise<
+  { payment: SiteChatbotPayment; changed: boolean } | { error: string }
+> {
+  if (!isStripeConfigured())
+    return { error: "Stripe is not configured (STRIPE_SECRET_KEY)." };
+  const dest = opts.platformDirect ? null : (opts.connectAccountId ?? null);
+  if (!opts.platformDirect && !dest)
+    return {
+      error: "Connect Stripe payouts in Settings to sell the AI chatbot add-on.",
+    };
+  const parsed = parsePrice(opts.priceStr);
+  if (!parsed) return { error: "Enter a valid price (e.g. 199 €)." };
+
+  const existing = opts.content.chatbotPayment;
+  if (
+    existing?.link &&
+    existing.amount === parsed.amount &&
+    existing.currency === parsed.currency &&
+    (existing.dest ?? null) === dest
+  ) {
+    return { payment: existing, changed: false };
+  }
+
+  const stripe = getStripe();
+  let productId = existing?.productId;
+  if (!productId) {
+    const product = await stripe.products.create({
+      name: `AI Chatbot — ${opts.content.businessName}`.slice(0, 250),
+      metadata: {
+        kind: "chatbot_addon",
+        site_id: opts.siteId,
+        tenant_id: opts.tenantId,
+      },
+    });
+    productId = product.id;
+  }
+  const price = await stripe.prices.create({
+    product: productId,
+    unit_amount: parsed.amount,
+    currency: parsed.currency,
+  });
+  const link = await stripe.paymentLinks.create({
+    line_items: [{ price: price.id, quantity: 1 }],
+    metadata: {
+      kind: "chatbot_addon",
+      site_id: opts.siteId,
+      tenant_id: opts.tenantId,
+    },
+    after_completion: { type: "redirect", redirect: { url: opts.liveUrl } },
+    ...(dest
+      ? {
+          transfer_data: { destination: dest },
+          application_fee_amount: Math.round(
+            (parsed.amount * PLATFORM_COMMISSION_PCT) / 100,
+          ),
+        }
+      : {}),
+  });
+  if (existing?.linkId && existing.linkId !== link.id) {
+    await stripe.paymentLinks
+      .update(existing.linkId, { active: false })
+      .catch(() => {});
+  }
+  return {
+    payment: {
+      productId,
+      priceId: price.id,
+      linkId: link.id,
+      link: link.url,
+      priceStr: opts.priceStr.trim(),
+      amount: parsed.amount,
+      currency: parsed.currency,
+      dest,
+      paidAt: existing?.paidAt ?? null,
+    },
+    changed: true,
+  };
+}

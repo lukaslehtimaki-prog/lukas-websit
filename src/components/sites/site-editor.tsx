@@ -33,6 +33,7 @@ import {
   EyeOff,
   Link2,
   Wrench,
+  Bot,
 } from "lucide-react";
 import {
   updateSiteContent,
@@ -52,6 +53,9 @@ import {
   ensureMaintenanceLinkAction,
   cancelMaintenanceAction,
   type MaintenanceState,
+  ensureChatbotLinkAction,
+  setChatbotEnabledAction,
+  type ChatbotState,
 } from "@/app/dashboard/sites/actions";
 import { renderSiteToHtml } from "@/lib/templates/render";
 import { renderPitchEmailHtml } from "@/lib/email/pitch-template";
@@ -139,6 +143,16 @@ export function SiteEditor({
     status: initialContent.maintenance?.status ?? "none",
   });
   const [maintBusy, setMaintBusy] = useState<null | "save" | "cancel">(null);
+  const [chatPrice, setChatPrice] = useState(
+    initialContent.chatbotPayment?.priceStr || "199 €",
+  );
+  const [chatbot, setChatbot] = useState<ChatbotState>({
+    link: initialContent.chatbotPayment?.link,
+    priceStr: initialContent.chatbotPayment?.priceStr,
+    paid: Boolean(initialContent.chatbotPayment?.paidAt),
+    enabled: initialContent.chatbotEnabled ?? false,
+  });
+  const [chatBusy, setChatBusy] = useState<null | "save" | "toggle">(null);
   const [offerPrice, setOfferPrice] = useState(
     initialContent.payment?.priceStr || "500 €",
   );
@@ -312,6 +326,34 @@ export function SiteEditor({
       setMaintenance((prev) => ({ ...prev, ...r }));
       setMessage(r.error ?? "Maintenance plan canceled.");
       setMaintBusy(null);
+    });
+  }
+  function saveChatbotLink() {
+    setChatBusy("save");
+    startTransition(async () => {
+      const r = await ensureChatbotLinkAction(siteId, chatPrice);
+      setChatbot((prev) => ({ ...prev, ...r }));
+      if (r.error) setMessage(r.error);
+      else {
+        if (r.link) navigator.clipboard?.writeText(r.link).catch(() => {});
+        setMessage("Chatbot link ready — copied ✓");
+      }
+      setChatBusy(null);
+    });
+  }
+  function toggleChatbot() {
+    const next = !content.chatbotEnabled;
+    setChatBusy("toggle");
+    startTransition(async () => {
+      const r = await setChatbotEnabledAction(siteId, next);
+      if (r.error) {
+        setMessage(r.error);
+      } else {
+        patch({ chatbotEnabled: next });
+        setChatbot((prev) => ({ ...prev, enabled: next }));
+        setMessage(next ? "Chatbot turned on ✓" : "Chatbot turned off.");
+      }
+      setChatBusy(null);
     });
   }
   function runAiEdit() {
@@ -869,6 +911,107 @@ export function SiteEditor({
                 it activates once they subscribe.
               </p>
             ) : null}
+          </>
+        )}
+      </div>
+
+      {/* AI chatbot add-on */}
+      <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          <span className="grid h-6 w-6 place-items-center rounded-full bg-violet-100 text-violet-600 dark:bg-violet-500/15 dark:text-violet-300">
+            <Bot className="h-3.5 w-3.5" />
+          </span>
+          AI chatbot add-on
+          {content.chatbotEnabled ? (
+            <span className="ml-auto rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+              Live on site
+            </span>
+          ) : chatbot.paid ? (
+            <span className="ml-auto rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+              Paid, off
+            </span>
+          ) : null}
+        </div>
+        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          A chat bubble on the live site that answers visitor questions using
+          this business&apos;s own info (services, prices, hours, FAQ) — sell
+          it as a one-time add-on, same as the site. Upkeep can be bundled
+          into the maintenance plan above.
+        </p>
+        {!pitchAllowed ? (
+          <div className="mt-3 flex flex-wrap items-center gap-3 rounded-lg border border-dashed border-zinc-300 bg-zinc-50 p-3 dark:border-zinc-700 dark:bg-zinc-950">
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-zinc-200 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+              <Lock className="h-4 w-4" />
+            </span>
+            <p className="text-sm text-zinc-600 dark:text-zinc-300">
+              The AI chatbot is a <span className="font-semibold">Pro</span>{" "}
+              feature.
+            </p>
+            <Link
+              href="/dashboard/billing"
+              className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 px-3.5 py-2 text-sm font-medium text-white shadow-sm transition hover:brightness-110"
+            >
+              Upgrade to Pro
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <input
+                value={chatPrice}
+                onChange={(e) => setChatPrice(e.target.value)}
+                placeholder="199 €"
+                className={cn("w-32", fieldCls)}
+              />
+              <button
+                onClick={saveChatbotLink}
+                disabled={chatBusy !== null || isPending || !chatPrice.trim()}
+                className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-500 disabled:opacity-60"
+              >
+                {chatBusy === "save" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Bot className="h-4 w-4" />
+                )}
+                {chatbot.link ? "Update link" : "Create link"}
+              </button>
+              <button
+                onClick={toggleChatbot}
+                disabled={chatBusy !== null}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              >
+                {chatBusy === "toggle" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : content.chatbotEnabled ? (
+                  "Turn off"
+                ) : (
+                  "Turn on (demo)"
+                )}
+              </button>
+            </div>
+            {chatbot.link ? (
+              <div className="mt-2 flex items-center gap-2">
+                <input
+                  readOnly
+                  value={chatbot.link}
+                  onFocus={(e) => e.currentTarget.select()}
+                  className={cn("flex-1 font-mono text-xs", fieldCls)}
+                />
+                <a
+                  href={chatbot.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                >
+                  <ExternalLink className="h-4 w-4" /> Open
+                </a>
+              </div>
+            ) : null}
+            <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+              Buying activates the widget automatically. &ldquo;Turn on
+              (demo)&rdquo; lets you show it to the client free, before they
+              buy — remember to turn it off again if they don&apos;t.
+            </p>
           </>
         )}
       </div>

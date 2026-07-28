@@ -27,7 +27,11 @@ import {
 } from "@/lib/templates/site-kind";
 import { languageForCountry } from "@/lib/templates/i18n";
 import { uploadSiteImage, importPlacePhotos } from "@/lib/sites/images";
-import { ensureSitePaymentLink, ensureMaintenanceLink } from "@/lib/sites/checkout";
+import {
+  ensureSitePaymentLink,
+  ensureMaintenanceLink,
+  ensureChatbotPaymentLink,
+} from "@/lib/sites/checkout";
 import { getStripe } from "@/lib/stripe";
 import { getConnectStatus } from "@/lib/sites/connect";
 import {
@@ -332,6 +336,9 @@ export async function regenerateContent(
     content.customDomainAddedAt = existing.customDomainAddedAt;
   }
   if (existing?.maintenance) content.maintenance = existing.maintenance;
+  if (existing?.chatbotPayment) content.chatbotPayment = existing.chatbotPayment;
+  if (existing?.chatbotEnabled !== undefined)
+    content.chatbotEnabled = existing.chatbotEnabled;
   // Carry over per-service prices by matching service title.
   if (existing?.services?.length && content.services?.length) {
     const priceByTitle = new Map(
@@ -377,6 +384,9 @@ export async function updateSiteContent(
     content.customDomainAddedAt = existing.customDomainAddedAt;
   }
   if (existing?.maintenance) content.maintenance = existing.maintenance;
+  if (existing?.chatbotPayment) content.chatbotPayment = existing.chatbotPayment;
+  if (existing?.chatbotEnabled !== undefined)
+    content.chatbotEnabled = existing.chatbotEnabled;
 
   const patch: Record<string, any> = {
     content,
@@ -525,6 +535,94 @@ export async function removeSiteDomainAction(
     .eq("id", siteId);
   revalidatePath(`/dashboard/sites/${siteId}`);
   return { domain: null };
+}
+
+export type ChatbotState = {
+  link?: string;
+  priceStr?: string;
+  paid?: boolean;
+  enabled?: boolean;
+  error?: string;
+};
+
+/** Create or update the one-time AI-chatbot add-on payment link. */
+export async function ensureChatbotLinkAction(
+  siteId: string,
+  priceStr: string,
+): Promise<ChatbotState> {
+  const ctx = await requireTenantContext();
+  if (!hasProFeatures(ctx.planId, ctx.subscriptionStatus, ctx.isPlatformAdmin))
+    return { error: "The AI chatbot add-on is a Pro feature — upgrade in Billing." };
+  if (!isStripeConfigured())
+    return { error: "Billing isn't configured (STRIPE_SECRET_KEY)." };
+
+  const supabase = await createClient();
+  const { data: site } = await supabase
+    .from("sites")
+    .select("content")
+    .eq("id", siteId)
+    .maybeSingle();
+  if (!site) return { error: "Site not found." };
+  const content = (site as any).content as SiteContent;
+
+  const h = await headers();
+  const base = h.get("origin") ?? `https://${h.get("host") ?? "localhost:3000"}`;
+  const connect = ctx.isPlatformAdmin ? null : await getConnectStatus(ctx.tenantId);
+  const r = await ensureChatbotPaymentLink({
+    siteId,
+    tenantId: ctx.tenantId,
+    content,
+    priceStr,
+    liveUrl: `${base}/s/${siteId}`,
+    platformDirect: ctx.isPlatformAdmin,
+    connectAccountId: connect?.ready ? connect.accountId : null,
+  });
+  if ("error" in r) return { error: r.error };
+
+  if (r.changed) {
+    content.chatbotPayment = r.payment;
+    await supabase
+      .from("sites")
+      .update({ content, updated_at: new Date().toISOString() })
+      .eq("id", siteId);
+  }
+  revalidatePath(`/dashboard/sites/${siteId}`);
+  return {
+    link: r.payment.link,
+    priceStr: r.payment.priceStr,
+    paid: Boolean(r.payment.paidAt),
+    enabled: content.chatbotEnabled ?? false,
+  };
+}
+
+/** Manually turn the live chatbot widget on/off for this site. Pro-gated,
+ * same as creating the link — the toggle is what actually puts a working
+ * bot on the page, so it shouldn't bypass the plan gate either. */
+export async function setChatbotEnabledAction(
+  siteId: string,
+  enabled: boolean,
+): Promise<ChatbotState> {
+  const ctx = await requireTenantContext();
+  if (!hasProFeatures(ctx.planId, ctx.subscriptionStatus, ctx.isPlatformAdmin))
+    return { error: "The AI chatbot add-on is a Pro feature — upgrade in Billing." };
+  if (!isAIConfigured())
+    return { error: "Add ANTHROPIC_API_KEY to enable the chatbot." };
+
+  const supabase = await createClient();
+  const { data: site } = await supabase
+    .from("sites")
+    .select("content")
+    .eq("id", siteId)
+    .maybeSingle();
+  if (!site) return { error: "Site not found." };
+  const content = (site as any).content as SiteContent;
+  content.chatbotEnabled = enabled;
+  await supabase
+    .from("sites")
+    .update({ content, updated_at: new Date().toISOString() })
+    .eq("id", siteId);
+  revalidatePath(`/dashboard/sites/${siteId}`);
+  return { enabled };
 }
 
 export type MaintenanceState = {
