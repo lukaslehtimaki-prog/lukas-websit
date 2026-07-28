@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentType } from "react";
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -22,6 +22,24 @@ type NavItem = {
   icon: ComponentType<{ className?: string }>;
   exact?: boolean;
 };
+
+/**
+ * Tiny always-rendered dot that lights up while this link's navigation is
+ * pending (fixed size, opacity toggle — no layout shift). Prefetched routes
+ * skip the pending state entirely, so this only shows on cold navigations.
+ */
+function PendingDot() {
+  const { pending } = useLinkStatus();
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-500 transition-opacity duration-200",
+        pending ? "animate-pulse opacity-100" : "opacity-0",
+      )}
+    />
+  );
+}
 
 const nav: NavItem[] = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
@@ -57,7 +75,7 @@ export function Sidebar({ isPlatformAdmin }: { isPlatformAdmin: boolean }) {
             key={href}
             href={href}
             className={cn(
-              "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
+              "group relative flex select-none items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.98]",
               active
                 ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300"
                 : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100",
@@ -75,6 +93,7 @@ export function Sidebar({ isPlatformAdmin }: { isPlatformAdmin: boolean }) {
               )}
             />
             {label}
+            <PendingDot />
           </Link>
         );
       })}

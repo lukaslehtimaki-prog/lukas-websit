@@ -310,3 +310,89 @@ details.faq[open] .faq-icon {
     scroll-behavior: auto;
   }
 }
+
+/* ---------- Dashboard loading skeletons ---------- */
+@keyframes skel-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+.skel {
+  border-radius: 8px;
+  background: linear-gradient(90deg, #e4e4e7 25%, #f4f4f5 50%, #e4e4e7 75%);
+  background-size: 200% 100%;
+  animation: skel-shimmer 1.6s ease-in-out infinite;
+}
+.dark .skel {
+  background: linear-gradient(90deg, #27272a 25%, #3f3f46 50%, #27272a 75%);
+  background-size: 200% 100%;
+}
+
+/* ---------- Dashboard page transition ---------- */
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.page-in {
+  animation: page-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ---------- Toasts ---------- */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+}
+.toast-in {
+  animation: toast-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.toast-out {
+  animation: toast-out 0.2s ease both;
+}
+
+/* ---------- Mobile nav drawer ---------- */
+@keyframes drawer-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: none;
+  }
+}
+.drawer-in {
+  animation: drawer-in 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skel {
+    animation: none;
+  }
+  .page-in {
+    animation: none;
+  }
+  .toast-in,
+  .toast-out,
+  .drawer-in {
+    animation: none;
+  }
+}

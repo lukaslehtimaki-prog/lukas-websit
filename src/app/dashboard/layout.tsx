@@ -13,6 +13,15 @@ import {
   type Resolved,
 } from "@/components/theme/theme-provider";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { ToastProvider } from "@/components/ui/toast";
+import {
+  CommandPalette,
+  PaletteHint,
+} from "@/components/dashboard/command-palette";
+import {
+  MobileDrawer,
+  MobileNavButton,
+} from "@/components/dashboard/mobile-drawer";
 import { BrandMark, Wordmark } from "@/components/ui/brand";
 
 export const dynamic = "force-dynamic";
@@ -30,6 +39,7 @@ export default async function DashboardLayout({
 
   return (
     <ThemeProvider initialResolved={initialTheme}>
+    <ToastProvider>
     <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-950">
       <aside className="hidden w-64 shrink-0 flex-col border-r border-zinc-200/70 dark:border-zinc-800/70 bg-white dark:bg-zinc-900 md:flex">
         <Link
@@ -60,12 +70,14 @@ export default async function DashboardLayout({
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b border-zinc-200/70 dark:border-zinc-800/70 bg-white/80 dark:bg-zinc-900/80 px-6 backdrop-blur-md">
+        <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b border-zinc-200/70 dark:border-zinc-800/70 bg-white/80 dark:bg-zinc-900/80 px-4 backdrop-blur-md sm:px-6">
+          <MobileNavButton />
           <div className="flex items-center gap-2.5 font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 md:hidden">
             <BrandMark size={28} />
             <Wordmark />
           </div>
           <div className="ml-auto flex items-center gap-3">
+            <PaletteHint />
             <ThemeToggle />
             <span className="hidden h-5 w-px bg-zinc-200 dark:bg-zinc-700 sm:block" />
             <div className="hidden items-center gap-2.5 sm:flex">
@@ -78,11 +90,14 @@ export default async function DashboardLayout({
             <SignOutButton />
           </div>
         </header>
-        <main className="flex-1 px-6 py-8">
+        <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8">
           <div className="mx-auto w-full max-w-5xl">{children}</div>
         </main>
       </div>
     </div>
+    <CommandPalette />
+    <MobileDrawer isPlatformAdmin={ctx.isPlatformAdmin} />
+    </ToastProvider>
     </ThemeProvider>
   );
 }

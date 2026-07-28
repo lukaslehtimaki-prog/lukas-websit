@@ -7,8 +7,13 @@ import { LeadsTable, type LeadRow } from "@/components/leads/leads-table";
 
 export const metadata = { title: "Lead Finder · Sitovai" };
 
-export default async function LeadsPage() {
+export default async function LeadsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
   await requireTenantContext();
+  const { q } = await searchParams;
   const supabase = await createClient();
   const { data } = await supabase
     .from("leads")
@@ -76,7 +81,7 @@ export default async function LeadsPage() {
       ) : null}
 
       <SearchComposer />
-      <LeadsTable leads={leads} />
+      <LeadsTable leads={leads} initialQuery={q ?? ""} />
     </div>
   );
 }

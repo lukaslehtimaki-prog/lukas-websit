@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-[10px] font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 focus-visible:ring-offset-2";
+  "inline-flex select-none touch-manipulation items-center justify-center gap-2 rounded-[10px] font-medium transition-all duration-150 ease-out active:scale-[0.97] active:duration-75 disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 focus-visible:ring-offset-2";
 
 const sizes = {
   sm: "h-9 px-3.5 text-sm",

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Search, Globe, ArrowRight } from "lucide-react";
 import { requireTenantContext } from "@/lib/auth/tenant";
 import { createClient } from "@/lib/supabase/server";
+import { CountUp } from "@/components/dashboard/count-up";
 
 export const metadata = { title: "Overview · Sitovai" };
 
@@ -72,7 +73,9 @@ function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5">
       <p className="text-sm text-zinc-500 dark:text-zinc-400">{label}</p>
-      <p className="mt-1 text-3xl font-semibold text-zinc-900 dark:text-zinc-100">{value}</p>
+      <p className="mt-1 text-3xl font-semibold text-zinc-900 dark:text-zinc-100">
+        <CountUp value={value} />
+      </p>
     </div>
   );
 }
@@ -91,7 +94,7 @@ function ActionCard({
   return (
     <Link
       href={href}
-      className="group flex items-start gap-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 transition hover:border-indigo-300 hover:shadow-sm"
+      className="group flex select-none items-start gap-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 transition-all duration-150 hover:border-indigo-300 hover:shadow-sm active:scale-[0.99]"
     >
       <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
         {icon}

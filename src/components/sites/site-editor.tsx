@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -9,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import Link from "next/link";
+import { useToast, type ToastVariant } from "@/components/ui/toast";
 import {
   ArrowLeft,
   Download,
@@ -110,7 +112,16 @@ export function SiteEditor({
   const [content, setContent] = useState<SiteContent>(initialContent);
   const [templateId, setTemplateId] = useState(initialTemplateId);
   const [status, setStatus] = useState(initialStatus);
-  const [message, setMessage] = useState<string | null>(null);
+  const { toast } = useToast();
+  // All action feedback goes through toasts now. Kept the old setMessage name
+  // so the ~30 call sites read unchanged; "✓" in a message implies success.
+  const setMessage = useCallback(
+    (msg: string | null, variant?: ToastVariant) => {
+      if (!msg) return;
+      toast(msg, variant ?? (msg.includes("✓") ? "success" : "info"));
+    },
+    [toast],
+  );
   const [origin, setOrigin] = useState("");
   const [uploading, setUploading] = useState<
     null | "hero" | "gallery" | "google"
@@ -187,30 +198,43 @@ export function SiteEditor({
   }, [offerPrice]);
   const liveUrl = `${origin}/s/${siteId}`;
 
+  // The preview is debounced: rebuilding the full site HTML AND reloading the
+  // iframe document on every keystroke made typing feel laggy. Inputs update
+  // `content` instantly; the iframe catches up 350ms after typing pauses.
+  const [previewContent, setPreviewContent] = useState(initialContent);
+  const [previewTemplateId, setPreviewTemplateId] = useState(initialTemplateId);
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setPreviewContent(content);
+      setPreviewTemplateId(templateId);
+    }, 350);
+    return () => clearTimeout(t);
+  }, [content, templateId]);
+
   const html = useMemo(
     () =>
-      renderSiteToHtml(content, templateId, {
+      renderSiteToHtml(previewContent, previewTemplateId, {
         // Absolute URL: works from the srcDoc preview iframe and from
         // downloaded HTML hosted anywhere.
         formAction: origin ? `${origin}/api/f/${siteId}` : null,
       }),
-    [content, templateId, origin, siteId],
+    [previewContent, previewTemplateId, origin, siteId],
   );
   const emailHtml = useMemo(
     () =>
       pitch
         ? renderPitchEmailHtml({
             body: pitch.body,
-            businessName: content.businessName,
-            tagline: content.tagline,
-            language: content.language ?? "fi",
+            businessName: previewContent.businessName,
+            tagline: previewContent.tagline,
+            language: previewContent.language ?? "fi",
             liveUrl,
             senderName,
-            heroImage: content.heroImage,
+            heroImage: previewContent.heroImage,
             offer: { price: offerPrice, paymentLink: offerLink },
           })
         : "",
-    [pitch, content, liveUrl, senderName, offerPrice, offerLink],
+    [pitch, previewContent, liveUrl, senderName, offerPrice, offerLink],
   );
 
   function patch(p: Partial<SiteContent>) {
@@ -240,7 +264,7 @@ export function SiteEditor({
     startTransition(async () => {
       const r = await importGooglePhotosAction(siteId);
       if (r.error) {
-        setMessage(r.error);
+        setMessage(r.error, "error");
       } else if (r.urls?.length) {
         const hadHero = Boolean(content.heroImage);
         patch({
@@ -263,7 +287,7 @@ export function SiteEditor({
     startTransition(async () => {
       const r = await setSiteDomainAction(siteId, domainInput);
       setDomain(r);
-      if (r.error) setMessage(r.error);
+      if (r.error) setMessage(r.error, "error");
       else setMessage("Domain connected — add the DNS record below.");
       setDomainBusy(null);
     });
@@ -273,7 +297,7 @@ export function SiteEditor({
     startTransition(async () => {
       const r = await checkSiteDomainAction(siteId);
       setDomain(r);
-      if (r.error) setMessage(r.error);
+      if (r.error) setMessage(r.error, "error");
       else
         setMessage(
           r.live ? "Domain is live ✓" : "DNS not pointing here yet — can take up to an hour.",
@@ -288,7 +312,7 @@ export function SiteEditor({
       const r = await removeSiteDomainAction(siteId);
       setDomain(r);
       setDomainInput("");
-      setMessage(r.error ?? "Domain disconnected.");
+      setMessage(r.error ?? "Domain disconnected.", r.error ? "error" : "info");
       setDomainBusy(null);
     });
   }
@@ -296,7 +320,7 @@ export function SiteEditor({
     setClientBusy(true);
     startTransition(async () => {
       const r = await ensureClientLinkAction(siteId, clientEmail);
-      if (r.error) setMessage(r.error);
+      if (r.error) setMessage(r.error, "error");
       else if (r.url) {
         setClientUrl(r.url);
         navigator.clipboard?.writeText(r.url).catch(() => {});
@@ -310,7 +334,7 @@ export function SiteEditor({
     startTransition(async () => {
       const r = await ensureMaintenanceLinkAction(siteId, maintPrice);
       setMaintenance(r);
-      if (r.error) setMessage(r.error);
+      if (r.error) setMessage(r.error, "error");
       else {
         if (r.link) navigator.clipboard?.writeText(r.link).catch(() => {});
         setMessage("Maintenance link ready — copied ✓");
@@ -324,7 +348,10 @@ export function SiteEditor({
     startTransition(async () => {
       const r = await cancelMaintenanceAction(siteId);
       setMaintenance((prev) => ({ ...prev, ...r }));
-      setMessage(r.error ?? "Maintenance plan canceled.");
+      setMessage(
+        r.error ?? "Maintenance plan canceled.",
+        r.error ? "error" : "info",
+      );
       setMaintBusy(null);
     });
   }
@@ -333,7 +360,7 @@ export function SiteEditor({
     startTransition(async () => {
       const r = await ensureChatbotLinkAction(siteId, chatPrice);
       setChatbot((prev) => ({ ...prev, ...r }));
-      if (r.error) setMessage(r.error);
+      if (r.error) setMessage(r.error, "error");
       else {
         if (r.link) navigator.clipboard?.writeText(r.link).catch(() => {});
         setMessage("Chatbot link ready — copied ✓");
@@ -347,7 +374,7 @@ export function SiteEditor({
     startTransition(async () => {
       const r = await setChatbotEnabledAction(siteId, next);
       if (r.error) {
-        setMessage(r.error);
+        setMessage(r.error, "error");
       } else {
         patch({ chatbotEnabled: next });
         setChatbot((prev) => ({ ...prev, enabled: next }));
@@ -363,7 +390,7 @@ export function SiteEditor({
     startTransition(async () => {
       const r = await aiEditSiteAction(instruction, content);
       if (r.error) {
-        setMessage(r.error);
+        setMessage(r.error, "error");
       } else if (r.content) {
         setContent(r.content);
         setAiLog((prev) => [r.summary ?? "Applied your changes.", ...prev].slice(0, 8));
@@ -376,7 +403,7 @@ export function SiteEditor({
   function save() {
     startTransition(async () => {
       const r = await updateSiteContent(siteId, content, templateId);
-      setMessage(r.error ?? "Saved ✓");
+      setMessage(r.error ?? "Saved ✓", r.error ? "error" : "success");
     });
   }
   function regenerate() {
@@ -384,7 +411,7 @@ export function SiteEditor({
     startTransition(async () => {
       const r = await regenerateContent(siteId);
       if (r.content) setContent(r.content);
-      setMessage(r.error ?? "Regenerated ✓");
+      setMessage(r.error ?? "Regenerated ✓", r.error ? "error" : "success");
     });
   }
   function changeStatus(s: string) {
@@ -410,7 +437,7 @@ export function SiteEditor({
     startTransition(async () => {
       const r = await generatePitchAction(siteId, offerPrice);
       if (r.error) {
-        setMessage(r.error);
+        setMessage(r.error, "error");
       } else {
         setPitch({ subject: r.subject ?? "", body: r.body ?? "" });
         if (r.to) setPitchTo((prev) => prev || r.to || "");
@@ -430,7 +457,7 @@ export function SiteEditor({
         paymentLink: offerLink,
       });
       if (r.error) {
-        setMessage(r.error);
+        setMessage(r.error, "error");
       } else {
         setPitchSent(true);
         setStatus("published");
@@ -445,7 +472,7 @@ export function SiteEditor({
     fd.append("file", file);
     const r = await uploadSiteImageAction(fd);
     if (r.error) {
-      setMessage(r.error);
+      setMessage(r.error, "error");
       return null;
     }
     return r.url ?? null;
@@ -556,9 +583,6 @@ export function SiteEditor({
         </select>
 
         <div className="ml-auto flex items-center gap-2">
-          {message ? (
-            <span className="text-xs text-zinc-500 dark:text-zinc-400">{message}</span>
-          ) : null}
           {aiEnabled ? (
             <button
               onClick={regenerate}

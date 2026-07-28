@@ -128,9 +128,17 @@ function RegistryBadge({ status, businessId }: { status: string; businessId: str
   );
 }
 
-export function LeadsTable({ leads }: { leads: LeadRow[] }) {
-  const [noWebOnly, setNoWebOnly] = useState(true);
-  const [query, setQuery] = useState("");
+export function LeadsTable({
+  leads,
+  initialQuery = "",
+}: {
+  leads: LeadRow[];
+  initialQuery?: string;
+}) {
+  // A palette lead-result deep-links here as /dashboard/leads?q=<name>; start
+  // with the website filter off so the searched lead can't be filtered away.
+  const [noWebOnly, setNoWebOnly] = useState(!initialQuery);
+  const [query, setQuery] = useState(initialQuery);
   const [, startTransition] = useTransition();
 
   const filtered = useMemo(() => {

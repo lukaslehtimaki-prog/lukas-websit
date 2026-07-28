@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import {
   Search,
   Loader2,
@@ -15,6 +15,74 @@ import { runSearchAction, type SearchState } from "@/app/dashboard/leads/actions
 import { cn } from "@/lib/utils";
 
 const initial: SearchState = {};
+
+// What the search action actually does, surfaced as stages. The action is a
+// single server round-trip, so stage progression is time-based on the client —
+// honest about the order of work, approximate about the timing.
+const STAGES: { label: string; at: number }[] = [
+  { label: "Searching Google Places", at: 0 },
+  { label: "Checking which businesses have a real website", at: 5 },
+  { label: "Cross-referencing the business registry", at: 14 },
+  { label: "Scoring and saving your leads", at: 22 },
+];
+
+function SearchProgress({ sweep }: { sweep: boolean }) {
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setElapsed((e) => e + 0.5), 500);
+    return () => clearInterval(t);
+  }, []);
+  // Sweeps fan out over 30+ queries and take noticeably longer.
+  const estimate = sweep ? 55 : 28;
+  const pct = Math.min(92, (elapsed / estimate) * 100);
+  const activeIdx = STAGES.reduce(
+    (acc, s, i) => (elapsed >= s.at ? i : acc),
+    0,
+  );
+
+  return (
+    <div
+      aria-live="polite"
+      className="mt-3 rounded-xl border border-indigo-100 bg-indigo-50/50 p-3.5 dark:border-indigo-500/20 dark:bg-indigo-500/5"
+    >
+      <div className="h-1.5 overflow-hidden rounded-full bg-indigo-100 dark:bg-indigo-500/15">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-[width] duration-500 ease-linear"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <ul className="mt-3 space-y-1.5">
+        {STAGES.map((s, i) => {
+          const done = i < activeIdx;
+          const active = i === activeIdx;
+          return (
+            <li
+              key={s.label}
+              className={cn(
+                "flex items-center gap-2 text-sm transition-colors duration-300",
+                done && "text-zinc-400 dark:text-zinc-500",
+                active && "font-medium text-indigo-700 dark:text-indigo-300",
+                !done && !active && "text-zinc-400/70 dark:text-zinc-600",
+              )}
+            >
+              {done ? (
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+              ) : active ? (
+                <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+              ) : (
+                <span className="grid h-4 w-4 shrink-0 place-items-center">
+                  <span className="h-1.5 w-1.5 rounded-full bg-current opacity-40" />
+                </span>
+              )}
+              {s.label}
+              {active && sweep && i === 0 ? " (30+ business types)" : ""}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
 
 const examples = [
   { niche: "Plumber", location: "Helsinki" },
@@ -238,6 +306,8 @@ export function SearchComposer() {
             </button>
           ))}
         </div>
+
+        {pending ? <SearchProgress sweep={allTypes} /> : null}
 
         {state.error ? (
           <p
