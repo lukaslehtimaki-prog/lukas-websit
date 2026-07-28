@@ -9,6 +9,7 @@ import {
   CreditCard,
   Link2,
   Wrench,
+  Bot,
   Download,
   ArrowRight,
 } from "lucide-react";
@@ -84,6 +85,17 @@ const STEPS: Step[] = [
       "€500 once + €20–100/month is a normal local-agency structure — price it however feels right per client.",
       "This is the highest-leverage step: it turns a one-time sale into ongoing income for work you're already doing.",
     ],
+  },
+  {
+    icon: <Bot className="h-5 w-5" />,
+    title: "Upsell an AI chatbot (Pro plan)",
+    body: "For clients with a bit more budget, add an AI chatbot that answers visitors' questions right on the site — grounded only in that business's own info (hours, prices, services), so it never makes things up. Set a price in “AI chatbot add-on” on the site; buying it turns the widget on automatically.",
+    bullets: [
+      "One-time price, same as the website itself — bundle it into the same pitch or offer it as a follow-up once they're already a customer.",
+      "Requires the Pro plan. It folds into the same monthly maintenance retainer as the website, so there's no separate recurring charge to manage.",
+      "Use “Turn on (demo)” to show it live to the client before they buy — just remember to turn it off again if they pass.",
+    ],
+    href: { label: "Upgrade to Pro", to: "/dashboard/billing" },
   },
   {
     icon: <Download className="h-5 w-5" />,
