@@ -32,6 +32,7 @@ import {
   Eye,
   EyeOff,
   Link2,
+  Wrench,
 } from "lucide-react";
 import {
   updateSiteContent,
@@ -48,6 +49,9 @@ import {
   checkSiteDomainAction,
   removeSiteDomainAction,
   type DomainState,
+  ensureMaintenanceLinkAction,
+  cancelMaintenanceAction,
+  type MaintenanceState,
 } from "@/app/dashboard/sites/actions";
 import { renderSiteToHtml } from "@/lib/templates/render";
 import { renderPitchEmailHtml } from "@/lib/email/pitch-template";
@@ -126,6 +130,15 @@ export function SiteEditor({
   const [domainBusy, setDomainBusy] = useState<null | "save" | "check" | "remove">(
     null,
   );
+  const [maintPrice, setMaintPrice] = useState(
+    initialContent.maintenance?.priceStr || "29 €",
+  );
+  const [maintenance, setMaintenance] = useState<MaintenanceState>({
+    link: initialContent.maintenance?.link,
+    priceStr: initialContent.maintenance?.priceStr,
+    status: initialContent.maintenance?.status ?? "none",
+  });
+  const [maintBusy, setMaintBusy] = useState<null | "save" | "cancel">(null);
   const [offerPrice, setOfferPrice] = useState(
     initialContent.payment?.priceStr || "500 €",
   );
@@ -276,6 +289,29 @@ export function SiteEditor({
         setMessage("Client link ready — copied ✓");
       }
       setClientBusy(false);
+    });
+  }
+  function saveMaintenance() {
+    setMaintBusy("save");
+    startTransition(async () => {
+      const r = await ensureMaintenanceLinkAction(siteId, maintPrice);
+      setMaintenance(r);
+      if (r.error) setMessage(r.error);
+      else {
+        if (r.link) navigator.clipboard?.writeText(r.link).catch(() => {});
+        setMessage("Maintenance link ready — copied ✓");
+      }
+      setMaintBusy(null);
+    });
+  }
+  function cancelMaintenance() {
+    if (!confirm("Cancel this client's maintenance subscription?")) return;
+    setMaintBusy("cancel");
+    startTransition(async () => {
+      const r = await cancelMaintenanceAction(siteId);
+      setMaintenance((prev) => ({ ...prev, ...r }));
+      setMessage(r.error ?? "Maintenance plan canceled.");
+      setMaintBusy(null);
     });
   }
   function runAiEdit() {
@@ -735,6 +771,108 @@ export function SiteEditor({
         )}
       </div>
 
+      {/* Maintenance retainer */}
+      <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          <span className="grid h-6 w-6 place-items-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-500/15 dark:text-amber-300">
+            <Wrench className="h-3.5 w-3.5" />
+          </span>
+          Website maintenance
+          {maintenance.status === "active" ? (
+            <span className="ml-auto rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+              Active
+            </span>
+          ) : maintenance.status === "canceled" ? (
+            <span className="ml-auto rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+              Canceled
+            </span>
+          ) : null}
+        </div>
+        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          After you sell the site, keep earning by offering to manage it: new
+          photos, prices, opening hours and small edits, for a monthly fee. You
+          keep hosting and editing here — they just pay. Cancel anytime from
+          either side.
+        </p>
+        {!pitchAllowed ? (
+          <div className="mt-3 flex flex-wrap items-center gap-3 rounded-lg border border-dashed border-zinc-300 bg-zinc-50 p-3 dark:border-zinc-700 dark:bg-zinc-950">
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-zinc-200 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+              <Lock className="h-4 w-4" />
+            </span>
+            <p className="text-sm text-zinc-600 dark:text-zinc-300">
+              Maintenance plans are a <span className="font-semibold">Pro</span>{" "}
+              feature.
+            </p>
+            <Link
+              href="/dashboard/billing"
+              className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 px-3.5 py-2 text-sm font-medium text-white shadow-sm transition hover:brightness-110"
+            >
+              Upgrade to Pro
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <input
+                value={maintPrice}
+                onChange={(e) => setMaintPrice(e.target.value)}
+                placeholder="29 €/mo"
+                className={cn("w-32", fieldCls)}
+              />
+              <button
+                onClick={saveMaintenance}
+                disabled={maintBusy !== null || isPending || !maintPrice.trim()}
+                className="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-500 disabled:opacity-60"
+              >
+                {maintBusy === "save" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Wrench className="h-4 w-4" />
+                )}
+                {maintenance.link ? "Update link" : "Create link"}
+              </button>
+              {maintenance.status === "active" ? (
+                <button
+                  onClick={cancelMaintenance}
+                  disabled={maintBusy !== null}
+                  className="rounded-lg px-3 py-2 text-sm text-zinc-500 hover:text-red-600 dark:text-zinc-400"
+                >
+                  {maintBusy === "cancel" ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Cancel plan"
+                  )}
+                </button>
+              ) : null}
+            </div>
+            {maintenance.link ? (
+              <div className="mt-2 flex items-center gap-2">
+                <input
+                  readOnly
+                  value={maintenance.link}
+                  onFocus={(e) => e.currentTarget.select()}
+                  className={cn("flex-1 font-mono text-xs", fieldCls)}
+                />
+                <a
+                  href={maintenance.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                >
+                  <ExternalLink className="h-4 w-4" /> Open
+                </a>
+              </div>
+            ) : null}
+            {maintenance.link && maintenance.status !== "active" ? (
+              <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                Share this link with the client (e.g. in a follow-up email) —
+                it activates once they subscribe.
+              </p>
+            ) : null}
+          </>
+        )}
+      </div>
+
       {/* AI editor */}
       <div className="rounded-xl border border-violet-200 bg-gradient-to-br from-violet-50 to-indigo-50 p-4 shadow-sm dark:border-violet-500/25 dark:from-violet-500/10 dark:to-indigo-500/10">
         <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
@@ -960,6 +1098,52 @@ export function SiteEditor({
             Publish the site for the domain to serve it.
           </p>
         ) : null}
+      </div>
+
+      {/* Full ownership transfer */}
+      <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          <span className="grid h-6 w-6 place-items-center rounded-full bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+            <Download className="h-3.5 w-3.5" />
+          </span>
+          Full ownership transfer
+        </div>
+        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          If the client wants the site completely independent of Sitovai — no
+          maintenance plan, no dependency on you — three steps hand it over
+          fully:
+        </p>
+        <ol className="mt-2 space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+          <li>
+            <span className="font-medium text-zinc-900 dark:text-zinc-100">
+              1. Download
+            </span>{" "}
+            (top toolbar) — a single self-contained HTML file with everything
+            built in. It works on any host, forever, with no Sitovai account
+            or subscription needed.
+          </li>
+          <li>
+            <span className="font-medium text-zinc-900 dark:text-zinc-100">
+              2. Domain
+            </span>{" "}
+            — if you connected one above, click Disconnect so they (or their
+            new host) can point it elsewhere.
+          </li>
+          <li>
+            <span className="font-medium text-zinc-900 dark:text-zinc-100">
+              3. Unpublish or delete
+            </span>{" "}
+            here once they&apos;re live elsewhere, if you no longer want
+            Sitovai hosting a copy.
+          </li>
+        </ol>
+        <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-500">
+          Heads up: the contact/booking form on the downloaded file still
+          submits to Sitovai in the background, so it keeps working even after
+          they move host — but only while this site stays here and published.
+          If you fully delete it from Sitovai, tell them to remove or replace
+          the form.
+        </p>
       </div>
 
       <div className="grid gap-5 lg:grid-cols-2">

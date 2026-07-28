@@ -58,13 +58,53 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // A client's maintenance-retainer subscription. Kept strictly separate from
+  // syncSubscription: both write to a "subscription" concept, but this one
+  // must never touch the AGENCY's own Sitovai plan_id.
+  async function syncMaintenance(sub: Stripe.Subscription) {
+    const siteId = sub.metadata?.site_id;
+    if (!siteId) return;
+    const { data: site } = await supabase
+      .from("sites")
+      .select("content")
+      .eq("id", siteId)
+      .maybeSingle();
+    const content = (site as { content?: Record<string, unknown> } | null)
+      ?.content;
+    if (!content || typeof content !== "object") return;
+    const maintenance =
+      (content.maintenance as Record<string, unknown> | undefined) ?? {};
+    const status = mapStripeStatus(sub.status);
+    const active = ["trialing", "active", "past_due"].includes(status);
+    await supabase
+      .from("sites")
+      .update({
+        content: {
+          ...content,
+          maintenance: {
+            ...maintenance,
+            subscriptionId: sub.id,
+            status: active ? "active" : "canceled",
+            startedAt: maintenance.startedAt ?? new Date().toISOString(),
+            canceledAt: active ? null : new Date().toISOString(),
+          },
+        },
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", siteId);
+  }
+
   try {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         if (typeof session.subscription === "string") {
           const sub = await stripe.subscriptions.retrieve(session.subscription);
-          await syncSubscription(sub);
+          if (sub.metadata?.kind === "site_maintenance") {
+            await syncMaintenance(sub);
+          } else {
+            await syncSubscription(sub);
+          }
         } else if (session.mode === "payment") {
           // A business may have bought its website through a pitch-email
           // payment link. Metadata is copied from the link to the session;
@@ -103,7 +143,12 @@ export async function POST(req: NextRequest) {
       case "customer.subscription.created":
       case "customer.subscription.updated":
       case "customer.subscription.deleted": {
-        await syncSubscription(event.data.object as Stripe.Subscription);
+        const sub = event.data.object as Stripe.Subscription;
+        if (sub.metadata?.kind === "site_maintenance") {
+          await syncMaintenance(sub);
+        } else {
+          await syncSubscription(sub);
+        }
         break;
       }
       default:

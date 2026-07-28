@@ -27,7 +27,8 @@ import {
 } from "@/lib/templates/site-kind";
 import { languageForCountry } from "@/lib/templates/i18n";
 import { uploadSiteImage, importPlacePhotos } from "@/lib/sites/images";
-import { ensureSitePaymentLink } from "@/lib/sites/checkout";
+import { ensureSitePaymentLink, ensureMaintenanceLink } from "@/lib/sites/checkout";
+import { getStripe } from "@/lib/stripe";
 import { getConnectStatus } from "@/lib/sites/connect";
 import {
   isDomainsConfigured,
@@ -330,6 +331,7 @@ export async function regenerateContent(
     content.customDomain = existing.customDomain;
     content.customDomainAddedAt = existing.customDomainAddedAt;
   }
+  if (existing?.maintenance) content.maintenance = existing.maintenance;
   // Carry over per-service prices by matching service title.
   if (existing?.services?.length && content.services?.length) {
     const priceByTitle = new Map(
@@ -374,6 +376,7 @@ export async function updateSiteContent(
     content.customDomain = existing.customDomain;
     content.customDomainAddedAt = existing.customDomainAddedAt;
   }
+  if (existing?.maintenance) content.maintenance = existing.maintenance;
 
   const patch: Record<string, any> = {
     content,
@@ -522,6 +525,96 @@ export async function removeSiteDomainAction(
     .eq("id", siteId);
   revalidatePath(`/dashboard/sites/${siteId}`);
   return { domain: null };
+}
+
+export type MaintenanceState = {
+  link?: string;
+  priceStr?: string;
+  status?: "none" | "active" | "canceled";
+  error?: string;
+};
+
+/** Create or update the recurring maintenance-retainer payment link. */
+export async function ensureMaintenanceLinkAction(
+  siteId: string,
+  priceStr: string,
+): Promise<MaintenanceState> {
+  const ctx = await requireTenantContext();
+  if (!hasProFeatures(ctx.planId, ctx.subscriptionStatus, ctx.isPlatformAdmin))
+    return { error: "Maintenance plans are a Pro feature — upgrade in Billing." };
+  if (!isStripeConfigured())
+    return { error: "Billing isn't configured (STRIPE_SECRET_KEY)." };
+
+  const supabase = await createClient();
+  const { data: site } = await supabase
+    .from("sites")
+    .select("content")
+    .eq("id", siteId)
+    .maybeSingle();
+  if (!site) return { error: "Site not found." };
+  const content = (site as any).content as SiteContent;
+
+  const h = await headers();
+  const base = h.get("origin") ?? `https://${h.get("host") ?? "localhost:3000"}`;
+  const connect = ctx.isPlatformAdmin ? null : await getConnectStatus(ctx.tenantId);
+  const r = await ensureMaintenanceLink({
+    siteId,
+    tenantId: ctx.tenantId,
+    content,
+    priceStr,
+    liveUrl: `${base}/s/${siteId}`,
+    platformDirect: ctx.isPlatformAdmin,
+    connectAccountId: connect?.ready ? connect.accountId : null,
+  });
+  if ("error" in r) return { error: r.error };
+
+  if (r.changed) {
+    content.maintenance = r.maintenance;
+    await supabase
+      .from("sites")
+      .update({ content, updated_at: new Date().toISOString() })
+      .eq("id", siteId);
+  }
+  revalidatePath(`/dashboard/sites/${siteId}`);
+  return {
+    link: r.maintenance.link,
+    priceStr: r.maintenance.priceStr,
+    status: r.maintenance.status,
+  };
+}
+
+/** Cancel an active maintenance subscription (agency-initiated). */
+export async function cancelMaintenanceAction(
+  siteId: string,
+): Promise<MaintenanceState> {
+  await requireTenantContext();
+  if (!isStripeConfigured())
+    return { error: "Billing isn't configured (STRIPE_SECRET_KEY)." };
+
+  const supabase = await createClient();
+  const { data: site } = await supabase
+    .from("sites")
+    .select("content")
+    .eq("id", siteId)
+    .maybeSingle();
+  if (!site) return { error: "Site not found." };
+  const content = (site as any).content as SiteContent;
+  const sub = content.maintenance?.subscriptionId;
+  if (!sub) return { error: "No active subscription to cancel." };
+
+  const stripe = getStripe();
+  await stripe.subscriptions.cancel(sub).catch(() => {});
+  content.maintenance = {
+    ...content.maintenance!,
+    status: "canceled",
+    canceledAt: new Date().toISOString(),
+  };
+  await supabase
+    .from("sites")
+    .update({ content, updated_at: new Date().toISOString() })
+    .eq("id", siteId);
+  revalidatePath(`/dashboard/sites/${siteId}`);
+  return { status: "canceled" };
 }
 
 export async function ensureClientLinkAction(
@@ -825,8 +918,16 @@ export async function deleteSite(siteId: string): Promise<void> {
     .select("content")
     .eq("id", siteId)
     .maybeSingle();
-  const host = ((site as any)?.content as SiteContent | undefined)?.customDomain;
+  const delContent = (site as any)?.content as SiteContent | undefined;
+  const host = delContent?.customDomain;
   if (host) await removeProjectDomain(host);
+  const activeSub =
+    delContent?.maintenance?.status === "active"
+      ? delContent.maintenance.subscriptionId
+      : null;
+  if (activeSub && isStripeConfigured()) {
+    await getStripe().subscriptions.cancel(activeSub).catch(() => {});
+  }
 
   await supabase.from("sites").delete().eq("id", siteId);
   revalidatePath("/dashboard/sites");

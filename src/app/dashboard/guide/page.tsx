@@ -8,6 +8,8 @@ import {
   Mail,
   CreditCard,
   Link2,
+  Wrench,
+  Download,
   ArrowRight,
 } from "lucide-react";
 
@@ -72,6 +74,24 @@ const STEPS: Step[] = [
     bullets: [
       "Works for a domain they already own, or one you buy for them and charge on.",
       "The site must be published; hit Check after the DNS is set.",
+    ],
+  },
+  {
+    icon: <Wrench className="h-5 w-5" />,
+    title: "Turn the sale into recurring revenue",
+    body: "Once a site is sold, offer to keep it up to date — new photos, prices, opening hours, small edits — for a monthly fee. Set a price in “Website maintenance” on the site and share the link; it activates the moment they subscribe, and you can cancel it from either side.",
+    bullets: [
+      "€500 once + €20–100/month is a normal local-agency structure — price it however feels right per client.",
+      "This is the highest-leverage step: it turns a one-time sale into ongoing income for work you're already doing.",
+    ],
+  },
+  {
+    icon: <Download className="h-5 w-5" />,
+    title: "If they want it fully theirs",
+    body: "Some clients will want total independence — no ongoing plan, nothing tied to you. The “Full ownership transfer” section on each site covers this: Download gives them one self-contained HTML file that works on any host forever, disconnecting a custom domain frees it to point elsewhere, and unpublishing stops Sitovai serving a copy once they've moved.",
+    bullets: [
+      "There's no “change the account owner” step needed — you're not handing over a login, you're handing over the finished file.",
+      "Good to offer this upfront if a client is hesitant about being locked to a subscription.",
     ],
   },
 ];

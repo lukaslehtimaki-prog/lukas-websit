@@ -143,6 +143,21 @@ export type SiteContent = {
   /** Custom domain this site is served on (lowercase host, no protocol). */
   customDomain?: string | null;
   customDomainAddedAt?: string;
+  /** Recurring monthly maintenance retainer, offered after the site sells. */
+  maintenance?: {
+    productId: string;
+    priceId: string;
+    linkId: string;
+    link: string;
+    priceStr: string;
+    amount: number; // minor units
+    currency: string;
+    dest?: string | null;
+    status: "none" | "active" | "canceled";
+    subscriptionId?: string | null;
+    startedAt?: string | null;
+    canceledAt?: string | null;
+  };
   /** Private key for the shareable client review/buy link (/r/{id}?k=…). */
   reviewKey?: string;
   /** The client's email, for outreach + records (editor-set). */

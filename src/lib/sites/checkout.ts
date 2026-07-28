@@ -138,3 +138,105 @@ export async function ensureSitePaymentLink(opts: {
     changed: true,
   };
 }
+
+export type SiteMaintenance = NonNullable<SiteContent["maintenance"]>;
+
+/**
+ * A recurring monthly payment link for an ongoing maintenance retainer,
+ * pitched after the one-time sale. Same routing rules as the sale link
+ * (platform-direct or Connect destination + commission), but subscription
+ * mode. Verified empirically: the fee/destination fields belong at the TOP
+ * level of the Payment Link, not nested under subscription_data — Stripe
+ * rejects them there ("unknown parameters").
+ */
+export async function ensureMaintenanceLink(opts: {
+  siteId: string;
+  tenantId: string;
+  content: SiteContent;
+  priceStr: string;
+  liveUrl: string;
+  platformDirect: boolean;
+  connectAccountId?: string | null;
+}): Promise<
+  { maintenance: SiteMaintenance; changed: boolean } | { error: string }
+> {
+  if (!isStripeConfigured())
+    return { error: "Stripe is not configured (STRIPE_SECRET_KEY)." };
+  const dest = opts.platformDirect ? null : (opts.connectAccountId ?? null);
+  if (!opts.platformDirect && !dest)
+    return {
+      error:
+        "Connect Stripe payouts in Settings to offer maintenance plans.",
+    };
+  const parsed = parsePrice(opts.priceStr);
+  if (!parsed) return { error: "Enter a valid monthly price (e.g. 29 €)." };
+
+  const existing = opts.content.maintenance;
+  if (
+    existing?.link &&
+    existing.amount === parsed.amount &&
+    existing.currency === parsed.currency &&
+    (existing.dest ?? null) === dest
+  ) {
+    return { maintenance: existing, changed: false };
+  }
+
+  const stripe = getStripe();
+  let productId = existing?.productId;
+  if (!productId) {
+    const product = await stripe.products.create({
+      name: `Website maintenance — ${opts.content.businessName}`.slice(0, 250),
+      metadata: {
+        kind: "site_maintenance",
+        site_id: opts.siteId,
+        tenant_id: opts.tenantId,
+      },
+    });
+    productId = product.id;
+  }
+  const price = await stripe.prices.create({
+    product: productId,
+    unit_amount: parsed.amount,
+    currency: parsed.currency,
+    recurring: { interval: "month" },
+  });
+  const meta = {
+    kind: "site_maintenance",
+    site_id: opts.siteId,
+    tenant_id: opts.tenantId,
+  };
+  const link = await stripe.paymentLinks.create({
+    line_items: [{ price: price.id, quantity: 1 }],
+    metadata: meta,
+    subscription_data: { metadata: meta },
+    after_completion: { type: "redirect", redirect: { url: opts.liveUrl } },
+    ...(dest
+      ? {
+          transfer_data: { destination: dest },
+          application_fee_percent: PLATFORM_COMMISSION_PCT,
+        }
+      : {}),
+  });
+  if (existing?.linkId && existing.linkId !== link.id) {
+    await stripe.paymentLinks
+      .update(existing.linkId, { active: false })
+      .catch(() => {});
+  }
+  return {
+    maintenance: {
+      productId,
+      priceId: price.id,
+      linkId: link.id,
+      link: link.url,
+      priceStr: opts.priceStr.trim(),
+      amount: parsed.amount,
+      currency: parsed.currency,
+      dest,
+      status: existing?.status === "active" ? "active" : "none",
+      subscriptionId: existing?.subscriptionId ?? null,
+      startedAt: existing?.startedAt ?? null,
+      canceledAt: existing?.canceledAt ?? null,
+    },
+    changed: true,
+  };
+}
