@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   Search,
@@ -23,22 +25,25 @@ import {
   ParallaxDrift,
 } from "@/components/ui/wow";
 import { cn } from "@/lib/utils";
+import { LangProvider, LanguagePicker, useLanding } from "@/lib/landing-i18n";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col bg-[#05060a] text-zinc-100 selection:bg-indigo-500/30">
-      <SiteHeader />
-      <main className="flex-1">
-        <Hero />
-        <LogosStrip />
-        <Features />
-        <HowItWorks />
-        <Pricing />
-        <Faq />
-        <CtaBand />
-      </main>
-      <SiteFooter />
-    </div>
+    <LangProvider>
+      <div className="flex min-h-screen flex-col bg-[#05060a] text-zinc-100 selection:bg-indigo-500/30">
+        <SiteHeader />
+        <main className="flex-1">
+          <Hero />
+          <LogosStrip />
+          <Features />
+          <HowItWorks />
+          <Pricing />
+          <Faq />
+          <CtaBand />
+        </main>
+        <SiteFooter />
+      </div>
+    </LangProvider>
   );
 }
 
@@ -100,16 +105,17 @@ function SectionHead({
 /* ---------------------------------- header ---------------------------------- */
 
 function SiteHeader() {
+  const { t } = useLanding();
   return (
     <header className="sticky top-0 z-50 border-b border-white/[0.07] bg-[#05060a]/60 backdrop-blur-xl">
       <Container className="flex h-16 items-center justify-between">
         <Logo />
         <nav className="hidden items-center gap-8 text-sm text-zinc-400 md:flex">
           {[
-            ["#features", "Features"],
-            ["#how", "How it works"],
-            ["#pricing", "Pricing"],
-            ["#faq", "FAQ"],
+            ["#features", t.nav.features],
+            ["#how", t.nav.how],
+            ["#pricing", t.nav.pricing],
+            ["#faq", t.nav.faq],
           ].map(([href, label]) => (
             <a
               key={href}
@@ -121,14 +127,15 @@ function SiteHeader() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
+          <LanguagePicker className="hidden h-9 md:flex" />
           <Link
             href="/login"
             className="hidden h-9 items-center rounded-[10px] px-3.5 text-sm font-medium text-zinc-300 transition hover:text-white sm:inline-flex"
           >
-            Sign in
+            {t.nav.signIn}
           </Link>
           <Link href="/signup" className={cn(btnPrimary, "h-9 px-4 text-sm")}>
-            Get started
+            {t.nav.getStarted}
           </Link>
           <MobileNav />
         </div>
@@ -140,6 +147,8 @@ function SiteHeader() {
 /* ----------------------------------- hero ----------------------------------- */
 
 function Hero() {
+  const { t } = useLanding();
+  const statValues = ["~40", "< 60 s", "10"];
   return (
     <section className="relative overflow-hidden border-b border-white/[0.07]">
       {/* backdrop — animated CSS aurora pushed to the right + grid + scrim */}
@@ -160,7 +169,7 @@ function Hero() {
             <div className="animate-fade-up">
               <span className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-[#0c0e15]/70 px-4 py-1.5 text-[12.5px] font-medium text-zinc-400 backdrop-blur">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_0_3px_rgba(52,211,153,0.15)]" />
-                Live · lead finder + AI website builder
+                {t.hero.badge}
               </span>
             </div>
 
@@ -168,17 +177,15 @@ function Hero() {
               className="font-display animate-fade-up mt-7 text-balance text-5xl font-bold leading-[1.02] tracking-tight sm:text-6xl xl:text-7xl"
               style={{ animationDelay: "60ms" }}
             >
-              Find businesses with no website.{" "}
-              <span className="text-gradient">Build them one with AI.</span>
+              {t.hero.title1}{" "}
+              <span className="text-gradient">{t.hero.title2}</span>
             </h1>
 
             <p
               className="animate-fade-up mt-7 max-w-xl text-lg leading-8 text-zinc-400"
               style={{ animationDelay: "120ms" }}
             >
-              Sitovai scans Google Places worldwide, enriches every lead with
-              registry data, and turns the best ones into ready-to-launch
-              websites — written in the business&apos;s own language.
+              {t.hero.sub}
             </p>
 
             <div
@@ -186,10 +193,10 @@ function Hero() {
               style={{ animationDelay: "180ms" }}
             >
               <Link href="/signup" className={cn(btnPrimary, "h-12 px-7 text-[15px]")}>
-                Get started <ArrowRight className="h-4 w-4" />
+                {t.hero.ctaPrimary} <ArrowRight className="h-4 w-4" />
               </Link>
               <a href="#how" className={cn(btnGhost, "h-12 px-7 text-[15px]")}>
-                See how it works
+                {t.hero.ctaSecondary}
               </a>
             </div>
 
@@ -198,15 +205,11 @@ function Hero() {
               className="animate-fade-up mt-12 flex flex-wrap gap-x-10 gap-y-6 border-t border-white/[0.07] pt-7"
               style={{ animationDelay: "240ms" }}
             >
-              {[
-                ["~40", "leads per search"],
-                ["< 60 s", "lead to draft site"],
-                ["10", "site languages"],
-              ].map(([v, l]) => (
+              {t.hero.stats.map((l, i) => (
                 <div key={l}>
                   <dt className="sr-only">{l}</dt>
                   <dd className="font-display text-2xl font-semibold tracking-tight text-white">
-                    {v}
+                    {statValues[i]}
                   </dd>
                   <dd className="mt-1 text-[13px] text-zinc-500">{l}</dd>
                 </div>
@@ -227,6 +230,7 @@ function Hero() {
 }
 
 function HeroPreview() {
+  const { t } = useLanding();
   const rows = [
     {
       name: "Parturi-Kampaamo Aalto",
@@ -262,19 +266,18 @@ function HeroPreview() {
         <div className="p-5">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-sm font-medium text-zinc-300">
-              <MapPin className="h-4 w-4 text-indigo-400" /> Barbershops · Tampere ·
-              5&nbsp;km
+              <MapPin className="h-4 w-4 text-indigo-400" /> {t.preview.query}
             </div>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-300">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              12 leads found
+              {t.preview.leadsFound}
             </span>
           </div>
 
           <div className="overflow-hidden rounded-xl border border-white/[0.06]">
             <div className="grid grid-cols-[1.5fr_0.8fr_auto] gap-2 border-b border-white/[0.06] bg-white/[0.02] px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-500">
-              <span>Business</span>
-              <span>Registry</span>
+              <span>{t.preview.business}</span>
+              <span>{t.preview.registry}</span>
               <span />
             </div>
             {rows.map((r) => (
@@ -287,13 +290,13 @@ function HeroPreview() {
                   <div className="mt-0.5 flex items-center gap-2 text-xs text-zinc-500">
                     {r.area}
                     <span className="inline-flex items-center rounded-full border border-amber-400/20 bg-amber-500/10 px-2 py-px text-[10.5px] font-medium text-amber-300">
-                      No website
+                      {t.preview.noWebsite}
                     </span>
                   </div>
                 </div>
                 <span className="font-mono text-xs text-emerald-400">{r.yt}</span>
                 <span className="inline-flex items-center gap-1.5 rounded-[8px] bg-zinc-100 px-2.5 py-1.5 text-xs font-semibold text-[#05060a]">
-                  Build site <ArrowUpRight className="h-3 w-3" />
+                  {t.preview.buildSite} <ArrowUpRight className="h-3 w-3" />
                 </span>
               </div>
             ))}
@@ -304,7 +307,7 @@ function HeroPreview() {
             <span className="grid h-6 w-6 place-items-center rounded-md bg-emerald-500/15 text-emerald-300">
               <Check className="h-3.5 w-3.5" />
             </span>
-            kahvila-siilinjarvi.fi drafted in 42 s
+            kahvila-siilinjarvi.fi {t.preview.draftedSuffix}
             <span className="ml-auto font-mono text-[11px] text-zinc-600">
               fi · Moderni
             </span>
@@ -318,6 +321,7 @@ function HeroPreview() {
 /* ------------------------------- logos strip -------------------------------- */
 
 function LogosStrip() {
+  const { t } = useLanding();
   const items = [
     "Google Places API",
     "YTJ / PRH Registry",
@@ -330,7 +334,7 @@ function LogosStrip() {
     <section className="border-b border-white/[0.07] py-8">
       <Container className="flex flex-wrap items-center gap-x-10 gap-y-4">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-600">
-          Powered by
+          {t.logos.poweredBy}
         </p>
         <div
           className="min-w-0 flex-1 overflow-hidden"
@@ -359,83 +363,60 @@ function LogosStrip() {
 
 /* --------------------------------- features --------------------------------- */
 
-const FEATURES = [
-  {
-    icon: Search,
-    title: "Chat-style lead finder",
-    body: "Describe a niche and a location. Sitovai queries Google Places and returns a clean list with website status detected instantly.",
-    wide: true,
-  },
-  {
-    icon: Globe,
-    title: "AI website builder",
-    body: "Turn a lead into a mobile-ready site in seconds — in the business's own language. Preview live, edit inline, export.",
-    wide: true,
-  },
-  {
-    icon: ShieldCheck,
-    title: "Registry cross-check",
-    body: "Finnish leads are matched to the official YTJ registry — business ID, industry code, registration date.",
-  },
-  {
-    icon: Users,
-    title: "Built-in CRM",
-    body: "Track lead status from new to won, invite your team, and keep every workspace isolated.",
-  },
-  {
-    icon: FileSpreadsheet,
-    title: "One-click export",
-    body: "Download any lead list as CSV for your outreach tool, or export a finished site as ready-to-host files.",
-  },
-] as const;
+const FEATURE_ICONS = [Search, Globe, ShieldCheck, Users, FileSpreadsheet] as const;
+const FEATURE_WIDE = [true, true, false, false, false];
 
 function Features() {
+  const { t } = useLanding();
   return (
     <section id="features" className="scroll-mt-20 border-b border-white/[0.07] py-24">
       <Container>
         <Reveal>
           <SectionHead
-            eyebrow="Product"
-            title="From cold search to shipped website"
-            subtitle="The full workflow a freelancer or agency needs to find local businesses and win them as clients."
+            eyebrow={t.features.eyebrow}
+            title={t.features.title}
+            subtitle={t.features.subtitle}
           />
         </Reveal>
 
         <div className="grid gap-4 lg:grid-cols-6">
-          {FEATURES.map((f, i) => (
+          {t.features.cards.map((f, i) => {
+            const FeatureIcon = FEATURE_ICONS[i];
+            return (
             <Reveal
-              key={f.title}
+              key={i}
               delay={i * 70}
-              className={cn("wide" in f && f.wide ? "lg:col-span-3" : "lg:col-span-2")}
+              className={cn(FEATURE_WIDE[i] ? "lg:col-span-3" : "lg:col-span-2")}
             >
               <SpotCard className="group h-full rounded-2xl border border-white/[0.08] bg-[#0b0c12] p-7 transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300/25 hover:bg-[#0d0e16]">
                 <div className="flex items-center justify-between">
                   <span className="grid h-11 w-11 place-items-center rounded-[11px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-transparent text-indigo-300">
-                    <f.icon className="h-5 w-5" />
+                    <FeatureIcon className="h-5 w-5" />
                   </span>
                   <span className="font-display text-[13px] font-semibold text-zinc-700 transition group-hover:text-indigo-400/70">
                     {String(i + 1).padStart(2, "0")}
                   </span>
                 </div>
                 <h3 className="font-display mt-5 text-lg font-semibold tracking-tight text-white">
-                  {f.title}
+                  {f.t}
                 </h3>
-                <p className="mt-2 text-[15px] leading-7 text-zinc-500">{f.body}</p>
+                <p className="mt-2 text-[15px] leading-7 text-zinc-500">{f.b}</p>
               </SpotCard>
             </Reveal>
-          ))}
+            );
+          })}
 
           {/* filler card with CTA to keep the grid balanced */}
-          <Reveal delay={FEATURES.length * 70} className="lg:col-span-2">
+          <Reveal delay={t.features.cards.length * 70} className="lg:col-span-2">
             <Link
               href="/signup"
               className="group relative flex h-full flex-col justify-between rounded-2xl border border-indigo-400/25 bg-gradient-to-b from-indigo-500/[0.12] to-transparent p-7 transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300/40"
             >
               <p className="font-display text-lg font-semibold tracking-tight text-white">
-                Try it on your own town
+                {t.features.tryTitle}
               </p>
               <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-indigo-300">
-                Start a search
+                {t.features.tryCta}
                 <ArrowUpRight className="h-4 w-4 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </span>
             </Link>
@@ -449,41 +430,28 @@ function Features() {
 /* -------------------------------- how it works ------------------------------ */
 
 function HowItWorks() {
-  const steps = [
-    {
-      title: "Describe your target",
-      body: "Type a niche and a town, set a radius. Sitovai queries Google Places behind the scenes.",
-    },
-    {
-      title: "Get qualified leads",
-      body: "See who has no website, enriched with registry data where available. Filter, tag, and export.",
-    },
-    {
-      title: "Ship their website",
-      body: "Generate a polished site in the local language from real business data. Preview, tweak, hand it over.",
-    },
-  ];
+  const { t } = useLanding();
   return (
     <section id="how" className="scroll-mt-20 border-b border-white/[0.07] py-24">
       <Container>
         <Reveal>
           <SectionHead
-            eyebrow="How it works"
-            title="Three steps to a new client"
-            subtitle="No scraping, no spreadsheets — the whole pipeline lives in one dashboard."
+            eyebrow={t.how.eyebrow}
+            title={t.how.title}
+            subtitle={t.how.subtitle}
           />
         </Reveal>
         <div className="grid gap-x-10 gap-y-12 md:grid-cols-3">
-          {steps.map((s, i) => (
-            <Reveal key={s.title} delay={i * 110}>
+          {t.how.steps.map((s, i) => (
+            <Reveal key={i} delay={i * 110}>
               <div className="border-t border-white/[0.09] pt-6">
                 <div className="font-display text-[13px] font-semibold text-indigo-400">
                   {String(i + 1).padStart(2, "0")}
                 </div>
                 <h3 className="font-display mt-3 text-xl font-semibold tracking-tight text-white">
-                  {s.title}
+                  {s.t}
                 </h3>
-                <p className="mt-2.5 text-[15px] leading-7 text-zinc-500">{s.body}</p>
+                <p className="mt-2.5 text-[15px] leading-7 text-zinc-500">{s.b}</p>
               </div>
             </Reveal>
           ))}
@@ -495,90 +463,60 @@ function HowItWorks() {
 
 /* ---------------------------------- pricing --------------------------------- */
 
-const TIERS = [
-  {
-    name: "Standard",
-    price: "€20",
-    period: "/month",
-    desc: "For freelancers and solo marketers.",
-    cta: "Get started",
-    href: "/signup?plan=pro",
-    highlight: true,
-    badge: "Most popular",
-    features: [
-      "50 lead searches / month",
-      "15 AI websites / month",
-      "Website message inbox",
-      "1 seat",
-      "Registry cross-check (FI)",
-      "CSV export",
-    ],
-  },
-  {
-    name: "Pro",
-    price: "€100",
-    period: "/month",
-    desc: "For agencies running at scale.",
-    cta: "Get started",
-    href: "/signup?plan=premium",
-    highlight: false,
-    features: [
-      "5,000 lead searches / month",
-      "500 AI websites / month",
-      "AI pitch emails with one-click buy",
-      "5 team seats",
-      "Priority AI generation",
-      "Everything in Standard",
-    ],
-  },
+const TIER_META = [
+  { price: "€20", href: "/signup?plan=pro", highlight: true },
+  { price: "€100", href: "/signup?plan=premium", highlight: false },
 ] as const;
 
 function Pricing() {
+  const { t } = useLanding();
   return (
     <section id="pricing" className="scroll-mt-20 border-b border-white/[0.07] py-24">
       <Container>
         <Reveal>
           <SectionHead
-            eyebrow="Pricing"
-            title="Simple, transparent plans"
-            subtitle="Pick a plan and start today from €20/month. Cancel whenever you like — payments handled by Stripe."
+            eyebrow={t.pricing.eyebrow}
+            title={t.pricing.title}
+            subtitle={t.pricing.subtitle}
           />
         </Reveal>
         <div className="grid max-w-4xl gap-4 sm:grid-cols-2">
-          {TIERS.map((t, ti) => (
-            <Reveal key={t.name} delay={ti * 120}>
+          {t.pricing.tiers.map((tier, ti) => {
+            const meta = TIER_META[ti];
+            return (
+            <Reveal key={ti} delay={ti * 120}>
             <div
               className={cn(
                 "relative flex h-full flex-col rounded-2xl border p-8",
-                t.highlight
+                meta.highlight
                   ? "grad-border border-indigo-400/35 bg-gradient-to-b from-indigo-500/[0.12] to-transparent"
                   : "border-white/[0.08] bg-[#0b0c12]",
               )}
             >
-              {"badge" in t && t.badge ? (
+              {meta.highlight ? (
                 <span className="absolute -top-3 left-8 rounded-full border border-indigo-400/40 bg-[#0b0c17] px-3 py-1 text-xs font-semibold text-indigo-300">
-                  {t.badge}
+                  {t.pricing.badge}
                 </span>
               ) : null}
-              <h3 className="font-display text-lg font-semibold text-white">{t.name}</h3>
-              <p className="mt-1 text-sm text-zinc-500">{t.desc}</p>
+              <h3 className="font-display text-lg font-semibold text-white">{tier.name}</h3>
+              <p className="mt-1 text-sm text-zinc-500">{tier.desc}</p>
               <div className="mt-6 flex items-baseline gap-1.5">
                 <span className="font-display text-5xl font-semibold tracking-tight text-white">
-                  {t.price}
+                  {meta.price}
                 </span>
-                <span className="text-sm text-zinc-500">{t.period}</span>
+                <span className="text-sm text-zinc-500">{t.pricing.period}</span>
               </div>
               <Link
-                href={t.href}
+                href={meta.href}
                 className={cn(
                   "mt-7 h-11 w-full text-sm",
-                  t.highlight ? btnPrimary : btnGhost,
+                  meta.highlight ? btnPrimary : btnGhost,
                 )}
               >
-                {t.cta}
+                {tier.cta}
               </Link>
               <ul className="mt-8 space-y-3 border-t border-white/[0.07] pt-7 text-sm">
-                {t.features.map((f) => (
+                {tier.features.map((f) => (
                   <li key={f} className="flex items-start gap-2.5 text-zinc-400">
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-indigo-400" />
                     {f}
@@ -587,10 +525,11 @@ function Pricing() {
               </ul>
             </div>
             </Reveal>
-          ))}
+            );
+          })}
         </div>
         <p className="mt-8 text-sm text-zinc-600">
-          Prices in EUR, VAT where applicable.
+          {t.pricing.note}
         </p>
       </Container>
     </section>
@@ -600,50 +539,24 @@ function Pricing() {
 /* ------------------------------------ FAQ ----------------------------------- */
 
 function Faq() {
-  const faqs = [
-    {
-      q: "Where does the lead data come from?",
-      a: "Live from the Google Places API — anywhere in the world. Finnish leads are additionally cross-checked against the official YTJ / PRH business registry. Nothing is scraped.",
-    },
-    {
-      q: "How does Sitovai know a business has no website?",
-      a: "Google Places reports whether a business has a website listed. Sitovai flags the ones without one — and for Finnish companies also verifies they're active in the YTJ registry.",
-    },
-    {
-      q: "Do I own the websites I generate?",
-      a: "Yes. Every generated site can be exported as standard HTML/CSS files that you can host anywhere and sell to your client — no lock-in, no Sitovai branding.",
-    },
-    {
-      q: "What language are the generated sites in?",
-      a: "Sites are written in the business's own language, detected automatically from its location — with 10 languages to pick from (English, Finnish, Swedish, German, Spanish, Mandarin and more). Every text is editable.",
-    },
-    {
-      q: "Can I cancel anytime?",
-      a: "Yes. You can cancel from the billing page in one click; your plan stays active until the end of the current billing period.",
-    },
-    {
-      q: "What happens when I hit my monthly limit?",
-      a: "Searches and site generations pause until your next billing cycle, or you can upgrade to Pro instantly from the dashboard. Your existing leads and sites always stay accessible.",
-    },
-  ];
+  const { t } = useLanding();
   return (
     <section id="faq" className="scroll-mt-20 border-b border-white/[0.07] py-24">
       <Container>
         <div className="grid gap-x-20 gap-y-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <Eyebrow>FAQ</Eyebrow>
+            <Eyebrow>{t.faq.eyebrow}</Eyebrow>
             <h2 className="font-display mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-              Questions, answered
+              {t.faq.title}
             </h2>
             <p className="mt-4 max-w-xs text-[15px] leading-7 text-zinc-500">
-              Anything else? Reach us any time from the dashboard once you&apos;re
-              in.
+              {t.faq.side}
             </p>
           </div>
           <div>
-            {faqs.map((f) => (
+            {t.faq.items.map((f, i) => (
               <details
-                key={f.q}
+                key={i}
                 className="faq group border-b border-white/[0.08] first:border-t"
               >
                 <summary className="flex items-center justify-between gap-4 py-5 text-[15px] font-medium text-zinc-200 transition hover:text-white">
@@ -663,6 +576,7 @@ function Faq() {
 /* --------------------------------- CTA band --------------------------------- */
 
 function CtaBand() {
+  const { t } = useLanding();
   return (
     <section className="py-24">
       <Container>
@@ -674,19 +588,19 @@ function CtaBand() {
           </div>
           <div className="relative">
             <h2 className="font-display mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-              Start finding no-website leads today
+              {t.cta.title}
             </h2>
             <p className="mx-auto mt-5 max-w-xl text-lg text-zinc-400">
-              Spin up your workspace in under a minute. Your first week is on us.
+              {t.cta.sub}
             </p>
             <Link
               href="/signup"
               className={cn(btnPrimary, "mt-9 h-12 px-8 text-[15px]")}
             >
-              Get started <ArrowRight className="h-4 w-4" />
+              {t.cta.button} <ArrowRight className="h-4 w-4" />
             </Link>
             <p className="mt-4 text-sm text-zinc-500">
-              From €20/month · Cancel anytime
+              {t.cta.note}
             </p>
           </div>
         </div>
@@ -699,6 +613,7 @@ function CtaBand() {
 /* ---------------------------------- footer ---------------------------------- */
 
 function SiteFooter() {
+  const { t } = useLanding();
   return (
     <footer className="border-t border-white/[0.07] pb-10 pt-16">
       <Container>
@@ -706,20 +621,19 @@ function SiteFooter() {
           <div>
             <Logo />
             <p className="mt-4 max-w-xs text-sm leading-6 text-zinc-500">
-              Find local businesses without a website and build them one with
-              AI — in their own language, from first search to shipped site.
+              {t.footer.blurb}
             </p>
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
-              Product
+              {t.footer.product}
             </p>
             <ul className="mt-4 space-y-3 text-sm text-zinc-500">
               {[
-                ["#features", "Features"],
-                ["#how", "How it works"],
-                ["#pricing", "Pricing"],
-                ["#faq", "FAQ"],
+                ["#features", t.nav.features],
+                ["#how", t.nav.how],
+                ["#pricing", t.nav.pricing],
+                ["#faq", t.nav.faq],
               ].map(([href, label]) => (
                 <li key={href}>
                   <a href={href} className="transition hover:text-white">
@@ -731,30 +645,33 @@ function SiteFooter() {
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
-              Get started
+              {t.footer.getStarted}
             </p>
             <ul className="mt-4 space-y-3 text-sm text-zinc-500">
               <li>
                 <Link href="/signup" className="transition hover:text-white">
-                  Create account
+                  {t.footer.createAccount}
                 </Link>
               </li>
               <li>
                 <Link href="/login" className="transition hover:text-white">
-                  Sign in
+                  {t.footer.signIn}
                 </Link>
+              </li>
+              <li>
+                <LanguagePicker className="inline-flex" />
               </li>
             </ul>
           </div>
         </div>
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/[0.07] pt-6 text-sm text-zinc-500 sm:flex-row">
-          <p>© {new Date().getFullYear()} Sitovai. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Sitovai. {t.footer.rights}</p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="transition hover:text-white">
-              Privacy
+              {t.footer.privacy}
             </Link>
             <Link href="/terms" className="transition hover:text-white">
-              Terms
+              {t.footer.terms}
             </Link>
             <span className="font-mono text-xs">sitovai.com</span>
           </div>

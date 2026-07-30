@@ -4,13 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { Container } from "@/components/ui/container";
-
-const LINKS: [string, string][] = [
-  ["#features", "Features"],
-  ["#how", "How it works"],
-  ["#pricing", "Pricing"],
-  ["#faq", "FAQ"],
-];
+import { LanguagePicker, useLanding } from "@/lib/landing-i18n";
 
 /**
  * Mobile-only header menu for the marketing site. On phones the desktop nav and
@@ -18,8 +12,16 @@ const LINKS: [string, string][] = [
  * and the login page.
  */
 export function MobileNav() {
+  const { t } = useLanding();
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
+
+  const links: [string, string][] = [
+    ["#features", t.nav.features],
+    ["#how", t.nav.how],
+    ["#pricing", t.nav.pricing],
+    ["#faq", t.nav.faq],
+  ];
 
   // Closing synchronously unmounts the link and can cancel the browser's own
   // anchor jump, so let the native navigation run first and close on the next
@@ -43,7 +45,7 @@ export function MobileNav() {
       {open ? (
         <div className="absolute inset-x-0 top-full border-b border-white/[0.07] bg-[#08090f] shadow-[0_24px_48px_-12px_rgba(0,0,0,0.9)] md:hidden">
           <Container className="flex flex-col py-2">
-            {LINKS.map(([href, label]) => (
+            {links.map(([href, label]) => (
               <a
                 key={href}
                 href={href}
@@ -56,10 +58,13 @@ export function MobileNav() {
             <Link
               href="/login"
               onClick={close}
-              className="py-4 text-[15px] font-medium text-zinc-100 transition hover:text-white"
+              className="border-b border-white/[0.06] py-4 text-[15px] font-medium text-zinc-100 transition hover:text-white"
             >
-              Sign in
+              {t.nav.signIn}
             </Link>
+            <div className="py-3">
+              <LanguagePicker className="w-fit" />
+            </div>
           </Container>
         </div>
       ) : null}
