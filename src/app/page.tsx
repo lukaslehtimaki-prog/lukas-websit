@@ -64,6 +64,8 @@ function Logo({ className }: { className?: string }) {
   );
 }
 
+const SUPPORT_EMAIL = "support@sitovaiagency.com";
+
 const btnPrimary =
   "inline-flex items-center justify-center gap-2 rounded-[10px] bg-zinc-100 font-semibold text-[#05060a] transition-all duration-150 hover:-translate-y-px hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60";
 const btnGhost =
@@ -657,6 +659,11 @@ function SiteFooter() {
                 <Link href="/login" className="transition hover:text-white">
                   {t.footer.signIn}
                 </Link>
+              </li>
+              <li>
+                <a href={`mailto:${SUPPORT_EMAIL}`} className="transition hover:text-white">
+                  {SUPPORT_EMAIL}
+                </a>
               </li>
               <li>
                 <LanguagePicker className="inline-flex" />

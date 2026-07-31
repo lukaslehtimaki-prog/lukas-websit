@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     "The terms governing your use of Sitovai's lead-finding and AI website-building service.",
 };
 
-const CONTACT = "lukas.lehtimaki1@gmail.com";
+const CONTACT = "support@sitovaiagency.com";
 const UPDATED = "19 July 2026";
 
 export default function TermsPage() {

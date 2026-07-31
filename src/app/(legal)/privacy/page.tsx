@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     "How Sitovai collects, uses, and protects your personal data under the EU GDPR.",
 };
 
-const CONTACT = "lukas.lehtimaki1@gmail.com";
+const CONTACT = "support@sitovaiagency.com";
 const UPDATED = "19 July 2026";
 
 export default function PrivacyPage() {
