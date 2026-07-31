@@ -5,6 +5,13 @@ import { env } from "@/lib/env";
 // auth emails go through Supabase's SMTP separately. Always sends a plain-text
 // part alongside any HTML — multipart keeps cold-outreach deliverability decent.
 
+/**
+ * We send from a no-reply address on a send-only domain, so without this a
+ * recipient hitting Reply is writing into a black hole. Callers that have a
+ * better reply target (e.g. the lead's own address) pass `replyTo` and win.
+ */
+const DEFAULT_REPLY_TO = "support@sitovaiagency.com";
+
 export async function sendEmail(opts: {
   to: string;
   subject: string;
@@ -28,7 +35,7 @@ export async function sendEmail(opts: {
         subject: opts.subject,
         text: opts.text,
         html: opts.html,
-        reply_to: opts.replyTo ? [opts.replyTo] : undefined,
+        reply_to: [opts.replyTo ?? DEFAULT_REPLY_TO],
       }),
     });
     if (!res.ok) {
