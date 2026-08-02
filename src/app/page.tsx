@@ -67,9 +67,9 @@ function Logo({ className }: { className?: string }) {
 const SUPPORT_EMAIL = "support@sitovaiagency.com";
 
 const btnPrimary =
-  "inline-flex items-center justify-center gap-2 rounded-[10px] bg-zinc-100 font-semibold text-[#05060a] transition-all duration-150 hover:-translate-y-px hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60";
+  "inline-flex items-center justify-center gap-2 rounded-[10px] bg-zinc-100 font-semibold text-[#05060a] transition-[transform,background-color,border-color] duration-150 ease-out hover:-translate-y-px active:scale-[0.97] active:duration-100 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60";
 const btnGhost =
-  "inline-flex items-center justify-center gap-2 rounded-[10px] border border-white/15 bg-white/[0.04] font-semibold text-zinc-100 backdrop-blur transition-all duration-150 hover:border-white/25 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60";
+  "inline-flex items-center justify-center gap-2 rounded-[10px] border border-white/15 bg-white/[0.04] font-semibold text-zinc-100 backdrop-blur transition-[transform,background-color,border-color] duration-150 ease-out hover:border-white/25 hover:bg-white/[0.08] active:scale-[0.97] active:duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60";
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
@@ -390,7 +390,7 @@ function Features() {
               delay={i * 70}
               className={cn(FEATURE_WIDE[i] ? "lg:col-span-3" : "lg:col-span-2")}
             >
-              <SpotCard className="group h-full rounded-2xl border border-white/[0.08] bg-[#0b0c12] p-7 transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300/25 hover:bg-[#0d0e16]">
+              <SpotCard className="group h-full rounded-2xl border border-white/[0.08] bg-[#0b0c12] p-7 transition-[transform,background-color,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-indigo-300/25 hover:bg-[#0d0e16]">
                 <div className="flex items-center justify-between">
                   <span className="grid h-11 w-11 place-items-center rounded-[11px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-transparent text-indigo-300">
                     <FeatureIcon className="h-5 w-5" />
@@ -412,7 +412,7 @@ function Features() {
           <Reveal delay={t.features.cards.length * 70} className="lg:col-span-2">
             <Link
               href="/signup"
-              className="group relative flex h-full flex-col justify-between rounded-2xl border border-indigo-400/25 bg-gradient-to-b from-indigo-500/[0.12] to-transparent p-7 transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300/40"
+              className="group relative flex h-full flex-col justify-between rounded-2xl border border-indigo-400/25 bg-gradient-to-b from-indigo-500/[0.12] to-transparent p-7 transition-[transform,background-color,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-indigo-300/40"
             >
               <p className="font-display text-lg font-semibold tracking-tight text-white">
                 {t.features.tryTitle}
