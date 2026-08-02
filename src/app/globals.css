@@ -1,4 +1,4 @@
-
+@import "tailwindcss";
 /* Motion tokens — one source of truth for easing.
    Curves from Emil Kowalski's design-engineering catalog: the built-in CSS
    easings are too weak for deliberate motion. Entering/exiting uses --ease-out;
@@ -8,7 +8,6 @@
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
-@import "tailwindcss";
 
 /* Manual (class-based) dark mode: `dark:` utilities apply under a .dark ancestor. */
 @custom-variant dark (&:where(.dark, .dark *));
