@@ -1836,18 +1836,43 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Switching language replaces every string on the page at once. Swapping it
+  // instantly reads as a glitch, so we fade out, swap, and fade back in. Total
+  // round trip ~240ms — a rare action, so it can afford a beat. Opacity only
+  // (plus a hair of blur to mask the double-exposure); nothing moves, so this
+  // stays honest under reduced motion.
+  const [swapping, setSwapping] = useState(false);
+
   const setLang = (code: LangCode) => {
-    setLangState(code);
-    try {
-      localStorage.setItem(STORAGE_KEY, code);
-    } catch {}
+    if (code === lang) return;
+    const commit = () => {
+      setLangState(code);
+      try {
+        localStorage.setItem(STORAGE_KEY, code);
+      } catch {}
+    };
+    if (typeof window === "undefined" || !window.matchMedia) return commit();
+    setSwapping(true);
+    window.setTimeout(() => {
+      commit();
+      setSwapping(false);
+    }, 120);
   };
 
   const dir = (LANGS.find((l) => l.code === lang)?.dir ?? "ltr") as "ltr" | "rtl";
 
   return (
     <LangContext.Provider value={{ lang, setLang, t: DICTS[lang], dir }}>
-      <div dir={dir} lang={lang}>
+      <div
+        dir={dir}
+        lang={lang}
+        style={{
+          opacity: swapping ? 0 : 1,
+          filter: swapping ? "blur(2px)" : "blur(0px)",
+          transition:
+            "opacity 120ms var(--ease-out, ease-out), filter 120ms var(--ease-out, ease-out)",
+        }}
+      >
         {children}
       </div>
     </LangContext.Provider>

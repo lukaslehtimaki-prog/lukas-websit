@@ -405,3 +405,29 @@ details.faq[open] .faq-icon {
     animation: none;
   }
 }
+
+/* FAQ accordions: bridge the height jump instead of snapping open.
+   Progressive enhancement — browsers without ::details-content keep the
+   current instant behaviour. Reduced motion keeps the fade, drops the slide. */
+@supports selector(::details-content) {
+  details::details-content {
+    opacity: 0;
+    transform: translateY(-4px);
+    block-size: 0;
+    overflow: hidden;
+    transition:
+      content-visibility 240ms allow-discrete,
+      opacity 240ms var(--ease-out),
+      transform 240ms var(--ease-out),
+      block-size 240ms var(--ease-out);
+  }
+  details[open]::details-content {
+    opacity: 1;
+    transform: translateY(0);
+    block-size: auto;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    details::details-content { transform: none; transition: opacity 200ms ease, content-visibility 200ms allow-discrete; }
+    details[open]::details-content { transform: none; }
+  }
+}
