@@ -1,3 +1,13 @@
+
+/* Motion tokens — one source of truth for easing.
+   Curves from Emil Kowalski's design-engineering catalog: the built-in CSS
+   easings are too weak for deliberate motion. Entering/exiting uses --ease-out;
+   on-screen movement uses --ease-in-out; sheets and drawers use --ease-drawer. */
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
 @import "tailwindcss";
 
 /* Manual (class-based) dark mode: `dark:` utilities apply under a .dark ancestor. */
@@ -171,7 +181,7 @@ body {
 }
 
 .animate-fade-up {
-  animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fade-up 0.7s var(--ease-out) both;
 }
 
 /* ---------- Floating (hero mockup accents) ---------- */
@@ -343,7 +353,7 @@ details.faq[open] .faq-icon {
   }
 }
 .page-in {
-  animation: page-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: page-in 0.28s var(--ease-out) both;
 }
 
 /* ---------- Toasts ---------- */
@@ -364,7 +374,7 @@ details.faq[open] .faq-icon {
   }
 }
 .toast-in {
-  animation: toast-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: toast-in 0.22s var(--ease-out) both;
 }
 .toast-out {
   animation: toast-out 0.2s ease both;
@@ -380,7 +390,7 @@ details.faq[open] .faq-icon {
   }
 }
 .drawer-in {
-  animation: drawer-in 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: drawer-in 0.24s var(--ease-out) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
