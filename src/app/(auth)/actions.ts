@@ -32,7 +32,12 @@ export async function signInAction(
   const email = field(formData, "email");
   const password = String(formData.get("password") ?? "");
   const requested = field(formData, "redirectTo");
-  const redirectTo = requested.startsWith("/") ? requested : "/dashboard";
+  // startsWith("/") is not enough: "//attacker.example" and "/\attacker.example"
+  // are both protocol-relative URLs that browsers happily follow off-site, which
+  // turns a genuine sitovai.com login page into a credential-phishing landing
+  // pad. Require a single leading slash not followed by another slash or a
+  // backslash.
+  const redirectTo = /^\/(?![/\\])/.test(requested) ? requested : "/dashboard";
   if (!email || !password) return { error: "Enter your email and password." };
 
   const supabase = await createClient();

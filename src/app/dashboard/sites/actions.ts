@@ -375,18 +375,26 @@ export async function updateSiteContent(
     .eq("id", siteId)
     .maybeSingle();
   const existing = (row as any)?.content as SiteContent | undefined;
-  if (existing?.payment) content.payment = existing.payment;
-  if (existing?.pitch) content.pitch = existing.pitch;
-  if (existing?.reviewKey && !content.reviewKey)
-    content.reviewKey = existing.reviewKey;
-  if (existing?.customDomain !== undefined) {
-    content.customDomain = existing.customDomain;
-    content.customDomainAddedAt = existing.customDomainAddedAt;
-  }
-  if (existing?.maintenance) content.maintenance = existing.maintenance;
-  if (existing?.chatbotPayment) content.chatbotPayment = existing.chatbotPayment;
-  if (existing?.chatbotEnabled !== undefined)
-    content.chatbotEnabled = existing.chatbotEnabled;
+  /* These fields are owned by the server and must be taken from the stored row
+     UNCONDITIONALLY, never merged from the client.
+     The previous guards only fired when the field already existed, so on a
+     brand-new site — where every one of them is undefined — the client's value
+     went straight through. That let any signed-up user POST this action with
+     `customDomain` set to a domain another tenant had already attached for a
+     paying client (taking it over or blacking it out), and with
+     `chatbotEnabled: true` to unlock the paid add-on and its public LLM
+     endpoint without paying. They are set only by their own dedicated actions
+     (setSiteDomainAction, setChatbotEnabledAction) and by the Stripe webhook. */
+  content.payment = existing?.payment;
+  content.pitch = existing?.pitch;
+  content.customDomain = existing?.customDomain;
+  content.customDomainAddedAt = existing?.customDomainAddedAt;
+  content.maintenance = existing?.maintenance;
+  content.chatbotPayment = existing?.chatbotPayment;
+  content.chatbotEnabled = existing?.chatbotEnabled;
+  // reviewKey stays first-write-wins: it is generated when a review link is
+  // first shared and must not be rotated by a later save.
+  if (existing?.reviewKey) content.reviewKey = existing.reviewKey;
 
   const patch: Record<string, any> = {
     content,
@@ -757,7 +765,13 @@ export async function aiEditSiteAction(
   instruction: string,
   content: SiteContent,
 ): Promise<{ content?: SiteContent; summary?: string; error?: string }> {
-  await requireTenantContext();
+  /* This action was the only AI entry point with no plan gate and no metering.
+     Server Action ids are discoverable in the client bundle, so any free signup
+     could POST it in a loop with arbitrary JSON as `content` and bill Anthropic
+     usage to us indefinitely. Gate it like every neighbouring AI action. */
+  const ctx = await requireTenantContext();
+  if (!hasProFeatures(ctx.planId, ctx.subscriptionStatus, ctx.isPlatformAdmin))
+    return { error: "The AI editor is a Pro feature — upgrade in Billing." };
   if (!isAIConfigured())
     return { error: "Add ANTHROPIC_API_KEY to use the AI editor." };
   const text = instruction.trim();
