@@ -20,15 +20,15 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 const title =
-  "Sitovai — find local businesses without a website & build them one with AI";
+  "Sitagio — find local businesses without a website & build them one with AI";
 const description =
-  "Sitovai finds local businesses with no website via Google Places and builds them ready-to-launch AI websites in their own language — all from one dashboard.";
+  "Sitagio finds local businesses with no website via Google Places and builds them ready-to-launch AI websites in their own language — all from one dashboard.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title,
   description,
-  applicationName: "Sitovai",
+  applicationName: "Sitagio",
   keywords: [
     "lead generation",
     "local businesses",
@@ -40,13 +40,13 @@ export const metadata: Metadata = {
     "freelancer tools",
     "agency lead finder",
   ],
-  authors: [{ name: "Sitovai" }],
-  creator: "Sitovai",
+  authors: [{ name: "Sitagio" }],
+  creator: "Sitagio",
   category: "business software",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
-    siteName: "Sitovai",
+    siteName: "Sitagio",
     title,
     description,
     url: siteUrl,

@@ -1,6 +1,6 @@
-# 🚀 Sitovai — Launch Checklist
+# 🚀 Sitagio — Launch Checklist
 
-**Live now:** https://sitovai.com (also reachable at lead-finder-saas.vercel.app)
+**Live now:** https://sitagio.com (also reachable at lead-finder-saas.vercel.app)
 Hosted on Vercel (team *Giit up*, auto-deploys from **github.com/lukaslehtimaki-prog/lukas-websit**) · Database on Supabase · Payments via Stripe (**live**)
 
 Legend: **[You]** = you do it · **[Claude]** = ask me and I'll do it · ⏱ = rough time
@@ -22,10 +22,10 @@ Legend: **[You]** = you do it · **[Claude]** = ask me and I'll do it · ⏱ = r
 - [x] All code committed to git, full history on GitHub
 - [x] Real signup + real-card checkout both tested live and working
 - [x] `DATABASE_URL` wired up — admin analytics page shows real data
-- [x] Custom domain **sitovai.com** — bought via Porkbun, DNS configured, live and verified: DNS resolves to Vercel, HTTPS 200, SSL issued, all core pages + sitemap + robots checked
-- [x] Stripe webhook moved to `https://sitovai.com/api/stripe/webhook` — same signing secret, verified reachable
-- [x] Supabase Site URL + redirect URLs updated to `https://sitovai.com` (per user, 2026-07-06 — not independently verified via API, no Supabase management access from here; low-stakes if off, only affects reset-link targets)
-- [x] Branded password-reset emails via Resend — domain `contact.sitovai.com` verified (DKIM/SPF/MX), custom SMTP wired in Supabase, branded HTML template + subject line live. Confirmed via Resend's own send log: `subject: "Reset your Sitovai password"`, `last_event: delivered`.
+- [x] Custom domain **sitagio.com** — bought via Porkbun, DNS configured, live and verified: DNS resolves to Vercel, HTTPS 200, SSL issued, all core pages + sitemap + robots checked
+- [x] Stripe webhook moved to `https://sitagio.com/api/stripe/webhook` — same signing secret, verified reachable
+- [x] Supabase Site URL + redirect URLs updated to `https://sitagio.com` (per user, 2026-07-06 — not independently verified via API, no Supabase management access from here; low-stakes if off, only affects reset-link targets)
+- [x] Branded password-reset emails via Resend — domain `contact.sitagio.com` verified (DKIM/SPF/MX), custom SMTP wired in Supabase, branded HTML template + subject line live. Confirmed via Resend's own send log: `subject: "Reset your Sitagio password"`, `last_event: delivered`.
 
 ---
 
@@ -44,7 +44,7 @@ Legend: **[You]** = you do it · **[Claude]** = ask me and I'll do it · ⏱ = r
 ## 📌 Quick reference
 | Item | Value |
 |------|-------|
-| Live URL | https://sitovai.com |
+| Live URL | https://sitagio.com |
 | GitHub repo | github.com/lukaslehtimaki-prog/lukas-websit (auto-deploys `main`) |
 | Vercel project | `giit-up/lead-finder-saas` |
 | Supabase project ref | `ttnafrcwvcomqsmqicji` |
@@ -52,4 +52,4 @@ Legend: **[You]** = you do it · **[Claude]** = ask me and I'll do it · ⏱ = r
 | Plan IDs (internal) | `pro` = €20 "Standard" · `premium` = €100 "Pro" |
 | Helper scripts | `scripts/setup-stripe.mjs`, `rename-stripe-products.mjs`, `verify-billing.mjs`, `provision-trial.mjs` |
 
-**Status:** Sitovai is fully live at its real domain, with billing, tax, dark mode, the full website builder, and CI/CD all working. Everything left is optional polish.
+**Status:** Sitagio is fully live at its real domain, with billing, tax, dark mode, the full website builder, and CI/CD all working. Everything left is optional polish.

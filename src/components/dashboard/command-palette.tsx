@@ -28,7 +28,7 @@ import {
 import { cn } from "@/lib/utils";
 
 /** Fired by the header hint button; the palette also opens on ⌘K / Ctrl+K. */
-export const PALETTE_OPEN_EVENT = "sitovai:palette";
+export const PALETTE_OPEN_EVENT = "sitagio:palette";
 
 type Item = {
   key: string;

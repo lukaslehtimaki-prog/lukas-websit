@@ -1,4 +1,4 @@
-// Localization for GENERATED sites (not the Sitovai app UI). The AI writes the body
+// Localization for GENERATED sites (not the Sitagio app UI). The AI writes the body
 // copy in the target language; this table covers the fixed UI strings the renderer
 // emits (nav, form labels, section headings). Legacy sites without content.language
 // default to Finnish so nothing already sold changes underneath its owner.

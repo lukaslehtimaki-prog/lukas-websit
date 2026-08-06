@@ -5,7 +5,7 @@ import { requireTenantContext } from "@/lib/auth/tenant";
 import { createClient } from "@/lib/supabase/server";
 import { CountUp } from "@/components/dashboard/count-up";
 
-export const metadata = { title: "Overview · Sitovai" };
+export const metadata = { title: "Overview · Sitagio" };
 
 export default async function DashboardOverview() {
   const ctx = await requireTenantContext();

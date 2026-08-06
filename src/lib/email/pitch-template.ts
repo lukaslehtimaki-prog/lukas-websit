@@ -225,8 +225,8 @@ export function renderPitchEmailHtml(opts: {
         </td></tr>
         <tr><td style="padding:18px 34px 20px;border-top:1px solid #f0f0f2;" align="center">
           <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto 8px;"><tr>
-            <td style="vertical-align:middle;"><img src="https://sitovai.com/brand-mark.png" width="18" height="18" alt="Sitovai" style="display:block;width:18px;height:18px;border:0;border-radius:5px;" /></td>
-            <td style="padding-left:7px;font-family:${font};font-size:14px;font-weight:700;color:#3f3f46;vertical-align:middle;">Sitovai</td>
+            <td style="vertical-align:middle;"><img src="https://sitagio.com/brand-mark.png" width="18" height="18" alt="Sitagio" style="display:block;width:18px;height:18px;border:0;border-radius:5px;" /></td>
+            <td style="padding-left:7px;font-family:${font};font-size:14px;font-weight:700;color:#3f3f46;vertical-align:middle;">Sitagio</td>
           </tr></table>
           <p style="margin:0;font-family:${font};font-size:12px;color:#a1a1aa;">${esc(s.footer.replace("{sender}", opts.senderName))}</p>
         </td></tr>

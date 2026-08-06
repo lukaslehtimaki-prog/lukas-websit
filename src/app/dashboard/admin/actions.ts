@@ -58,7 +58,7 @@ export async function createAffiliateAction(input: {
         : error.message,
     };
   }
-  // If the email belongs to a Sitovai account, link their workspace so the
+  // If the email belongs to a Sitagio account, link their workspace so the
   // partner discount kicks in on their own subscription.
   if (email && created) await tryLinkAffiliateTenant(created.id, email);
   revalidatePath("/dashboard/admin");
@@ -114,7 +114,7 @@ export async function linkAffiliateAccountAction(
   if (!linked)
     return {
       error:
-        "No Sitovai account found with that email (or its workspace already backs another affiliate).",
+        "No Sitagio account found with that email (or its workspace already backs another affiliate).",
     };
   revalidatePath("/dashboard/admin");
   return { ok: true };

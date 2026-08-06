@@ -7,15 +7,15 @@ import { env } from "@/lib/env";
 // capture affiliate referrals. Authoritative auth checks live in the dashboard layout and
 // in each Server Action.
 
-const REF_COOKIE = "sitovai_ref";
+const REF_COOKIE = "sitagio_ref";
 const REF_RE = /^[a-z0-9-]{3,32}$/;
 
-/** Hosts that serve the Sitovai app itself (everything else is a client domain). */
+/** Hosts that serve the Sitagio app itself (everything else is a client domain). */
 function isAppHost(host: string): boolean {
   const h = host.split(":")[0];
   return (
-    h === "sitovai.com" ||
-    h.endsWith(".sitovai.com") ||
+    h === "sitagio.com" ||
+    h.endsWith(".sitagio.com") ||
     h.endsWith(".vercel.app") ||
     h === "localhost" ||
     h === "127.0.0.1"

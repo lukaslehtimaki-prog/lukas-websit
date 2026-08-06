@@ -63,7 +63,7 @@ export async function startCheckout(plan: PlanId): Promise<ActionResult> {
     const customerId = await ensureCustomer(
       ctx.tenantId,
       ctx.email,
-      ctx.tenantName || "Sitovai workspace",
+      ctx.tenantName || "Sitagio workspace",
     );
     const stripe = getStripe();
     const base = await origin();

@@ -67,7 +67,7 @@ export function Payouts({
     <div className="space-y-3">
       <p className="text-sm text-zinc-500 dark:text-zinc-400">
         Connect your own Stripe account to sell websites with the one-click Buy
-        button. Customers pay you directly — Sitovai keeps a {commissionPct}%
+        button. Customers pay you directly — Sitagio keeps a {commissionPct}%
         platform fee per sale. Without this, pitch emails still work, but
         buyers reply to you instead of paying online.
       </p>

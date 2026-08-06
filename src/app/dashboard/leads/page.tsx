@@ -5,7 +5,7 @@ import { isPlacesConfigured } from "@/lib/env";
 import { SearchComposer } from "@/components/leads/search-composer";
 import { LeadsTable, type LeadRow } from "@/components/leads/leads-table";
 
-export const metadata = { title: "Lead Finder · Sitovai" };
+export const metadata = { title: "Lead Finder · Sitagio" };
 
 export default async function LeadsPage({
   searchParams,

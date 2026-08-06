@@ -261,7 +261,7 @@ function HeroPreview() {
           <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
           <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
           <span className="ml-3 rounded-md bg-white/5 px-3 py-1 font-mono text-[11px] text-zinc-500 ring-1 ring-white/10">
-            sitovai.com/dashboard/leads
+            sitagio.com/dashboard/leads
           </span>
         </div>
 
@@ -672,7 +672,7 @@ function SiteFooter() {
           </div>
         </div>
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/[0.07] pt-6 text-sm text-zinc-500 sm:flex-row">
-          <p>© {new Date().getFullYear()} Sitovai. {t.footer.rights}</p>
+          <p>© {new Date().getFullYear()} Sitagio. {t.footer.rights}</p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="transition hover:text-white">
               {t.footer.privacy}
@@ -680,7 +680,7 @@ function SiteFooter() {
             <Link href="/terms" className="transition hover:text-white">
               {t.footer.terms}
             </Link>
-            <span className="font-mono text-xs">sitovai.com</span>
+            <span className="font-mono text-xs">sitagio.com</span>
           </div>
         </div>
       </Container>

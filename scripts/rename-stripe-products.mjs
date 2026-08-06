@@ -1,4 +1,4 @@
-// Renames the existing Stripe products to the Sitovai brand (Standard €20, Pro €100).
+// Renames the existing Stripe products to the Sitagio brand (Standard €20, Pro €100).
 //   node scripts/rename-stripe-products.mjs
 import { readFileSync } from "node:fs";
 import Stripe from "stripe";
@@ -18,11 +18,11 @@ async function rename(priceId, name, description) {
 
 await rename(
   get("STRIPE_PRICE_PRO"),
-  "Sitovai Standard",
+  "Sitagio Standard",
   "50 lead searches + 15 AI websites / month",
 );
 await rename(
   get("STRIPE_PRICE_PREMIUM"),
-  "Sitovai Pro",
+  "Sitagio Pro",
   "5,000 lead searches + 500 AI websites / month",
 );

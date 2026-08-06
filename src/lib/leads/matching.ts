@@ -77,7 +77,7 @@ async function probeOnce(
       redirect: "follow",
       signal: AbortSignal.timeout(timeoutMs),
       cache: "no-store",
-      headers: { "user-agent": "Mozilla/5.0 (compatible; SitovaiBot/1.0)" },
+      headers: { "user-agent": "Mozilla/5.0 (compatible; SitagioBot/1.0)" },
     });
     if (res.url && isSocialOrDirectoryUrl(res.url)) return "social";
     // 5xx is often transient (overloaded/maintenance) — worth one retry before
@@ -225,7 +225,7 @@ async function findOwnWebsite(
         redirect: "follow",
         signal: AbortSignal.timeout(4500),
         cache: "no-store",
-        headers: { "user-agent": "Mozilla/5.0 (compatible; SitovaiBot/1.0)" },
+        headers: { "user-agent": "Mozilla/5.0 (compatible; SitagioBot/1.0)" },
       });
       if (!res.ok) continue;
       if (res.url && isSocialOrDirectoryUrl(res.url)) continue;

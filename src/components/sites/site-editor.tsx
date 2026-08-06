@@ -180,7 +180,7 @@ export function SiteEditor({
     // payment link is per-site (auto-created by Stripe), so it is not shared.
     try {
       const saved = JSON.parse(
-        localStorage.getItem("sitovai.pitch.offer") ?? "{}",
+        localStorage.getItem("sitagio.pitch.offer") ?? "{}",
       ) as { price?: string };
       if (saved.price && !initialContent.payment?.priceStr)
          
@@ -191,7 +191,7 @@ export function SiteEditor({
   useEffect(() => {
     try {
       localStorage.setItem(
-        "sitovai.pitch.offer",
+        "sitagio.pitch.offer",
         JSON.stringify({ price: offerPrice }),
       );
     } catch {}
@@ -1276,7 +1276,7 @@ export function SiteEditor({
           Full ownership transfer
         </div>
         <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-          If the client wants the site completely independent of Sitovai — no
+          If the client wants the site completely independent of Sitagio — no
           maintenance plan, no dependency on you — three steps hand it over
           fully:
         </p>
@@ -1286,7 +1286,7 @@ export function SiteEditor({
               1. Download
             </span>{" "}
             (top toolbar) — a single self-contained HTML file with everything
-            built in. It works on any host, forever, with no Sitovai account
+            built in. It works on any host, forever, with no Sitagio account
             or subscription needed.
           </li>
           <li>
@@ -1301,14 +1301,14 @@ export function SiteEditor({
               3. Unpublish or delete
             </span>{" "}
             here once they&apos;re live elsewhere, if you no longer want
-            Sitovai hosting a copy.
+            Sitagio hosting a copy.
           </li>
         </ol>
         <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-500">
           Heads up: the contact/booking form on the downloaded file still
-          submits to Sitovai in the background, so it keeps working even after
+          submits to Sitagio in the background, so it keeps working even after
           they move host — but only while this site stays here and published.
-          If you fully delete it from Sitovai, tell them to remove or replace
+          If you fully delete it from Sitagio, tell them to remove or replace
           the form.
         </p>
       </div>

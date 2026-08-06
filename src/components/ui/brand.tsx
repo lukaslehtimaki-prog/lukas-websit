@@ -1,7 +1,7 @@
 import React from "react";
 
 /**
- * SitovAI brand mark — a browser window (the website builder) filled with the
+ * Sitagio brand mark — a browser window (the website builder) filled with the
  * indigo→violet→cyan gradient. Server-safe (no hooks); the gradient id is
  * static because every instance renders the same gradient, so a shared def is
  * fine. Full-bleed 32×32 so it reads at favicon size and existing rounded/
@@ -25,7 +25,7 @@ export function BrandMark({
     >
       <defs>
         <linearGradient
-          id="sitovai-mark"
+          id="sitagio-mark"
           x1="4"
           y1="3"
           x2="28"
@@ -37,7 +37,7 @@ export function BrandMark({
           <stop offset="1" stopColor="#22d3ee" />
         </linearGradient>
       </defs>
-      <rect width="32" height="32" rx="8" fill="url(#sitovai-mark)" />
+      <rect width="32" height="32" rx="8" fill="url(#sitagio-mark)" />
       {/* browser toolbar dots + divider */}
       <circle cx="6.5" cy="6" r="1.15" fill="#fff" fillOpacity=".9" />
       <circle cx="10" cy="6" r="1.15" fill="#fff" fillOpacity=".9" />
@@ -52,17 +52,15 @@ export function BrandMark({
 }
 
 /**
- * SitovAI wordmark — the name with the trailing "AI" set in brand cyan so the
- * "AI" reads out of "Sitovai". Renders as a single inline element: inherits
- * font/size/weight from the parent, only the "AI" overrides colour. Drop in
- * next to <BrandMark/> where the logo lockup appears.
+ * Sitagio wordmark — plain text, no colour-split trick (the old "Sitov" +
+ * cyan "AI" treatment only worked because the name ended in "ai"; Sitagio
+ * doesn't, and this product's whole brief is calm/unshouty, so a plain
+ * wordmark fits better than forcing a new gimmick). Renders as a single
+ * inline element inheriting font/size/weight from the parent. Drop in next
+ * to <BrandMark/> where the logo lockup appears.
  */
 export function Wordmark({ className }: { className?: string }) {
-  return (
-    <span className={className}>
-      Sitov<span className="text-[#22d3ee]">AI</span>
-    </span>
-  );
+  return <span className={className}>Sitagio</span>;
 }
 
 export default BrandMark;

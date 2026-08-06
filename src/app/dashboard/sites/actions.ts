@@ -833,7 +833,7 @@ export async function generatePitchAction(
       location: content.source?.location ?? content.contact?.address ?? null,
       language: content.language ?? "fi",
       liveUrl: `${base}/s/${siteId}`,
-      senderName: ctx.tenantName || ctx.email || "Sitovai",
+      senderName: ctx.tenantName || ctx.email || "Sitagio",
     });
 
     // Auto-create the Stripe payment link for the asking price so the email's
@@ -963,7 +963,7 @@ export async function sendPitchAction(
       tagline: content.tagline,
       language: content.language ?? "fi",
       liveUrl,
-      senderName: ctx.tenantName || ctx.email || "Sitovai",
+      senderName: ctx.tenantName || ctx.email || "Sitagio",
       heroImage: content.heroImage,
       offer: cleanOffer,
     }),

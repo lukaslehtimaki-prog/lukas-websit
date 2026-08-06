@@ -3,7 +3,7 @@ import { requireTenantContext } from "@/lib/auth/tenant";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
-export const metadata = { title: "Messages · Sitovai" };
+export const metadata = { title: "Messages · Sitagio" };
 export const dynamic = "force-dynamic";
 
 type MessageRow = {

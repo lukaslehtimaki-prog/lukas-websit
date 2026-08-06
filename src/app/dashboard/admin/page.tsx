@@ -9,7 +9,7 @@ import {
   type AffiliateRow,
 } from "@/components/admin/affiliates-panel";
 
-export const metadata = { title: "Admin · Sitovai" };
+export const metadata = { title: "Admin · Sitagio" };
 export const dynamic = "force-dynamic";
 
 type TenantRow = {

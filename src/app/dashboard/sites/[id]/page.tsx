@@ -6,7 +6,7 @@ import { hasProFeatures } from "@/lib/subscription";
 import { SiteEditor } from "@/components/sites/site-editor";
 import type { SiteContent } from "@/lib/templates/types";
 
-export const metadata = { title: "Edit website · Sitovai" };
+export const metadata = { title: "Edit website · Sitagio" };
 
 export default async function SiteEditorPage({
   params,
@@ -40,7 +40,7 @@ export default async function SiteEditorPage({
       initialContent={s.content}
       aiEnabled={isAIConfigured()}
       emailEnabled={isResendConfigured()}
-      senderName={ctx.tenantName || ctx.email || "Sitovai"}
+      senderName={ctx.tenantName || ctx.email || "Sitagio"}
       pitchAllowed={hasProFeatures(
         ctx.planId,
         ctx.subscriptionStatus,

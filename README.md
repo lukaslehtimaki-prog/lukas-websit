@@ -1,4 +1,4 @@
-# Sitovai
+# Sitagio
 
 Find Finnish local businesses that **don't have a website**, then **generate one for them with AI** — a multi-tenant SaaS for freelancers, agencies, and marketers.
 

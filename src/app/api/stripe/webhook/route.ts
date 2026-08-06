@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
 
   // A client's maintenance-retainer subscription. Kept strictly separate from
   // syncSubscription: both write to a "subscription" concept, but this one
-  // must never touch the AGENCY's own Sitovai plan_id.
+  // must never touch the AGENCY's own Sitagio plan_id.
   async function syncMaintenance(sub: Stripe.Subscription) {
     const siteId = sub.metadata?.site_id;
     if (!siteId) return;

@@ -24,7 +24,7 @@ export const LANGS = [
 
 export type LangCode = (typeof LANGS)[number]["code"];
 
-const STORAGE_KEY = "sitovai-landing-lang";
+const STORAGE_KEY = "sitagio-landing-lang";
 
 const en = {
   nav: {
@@ -39,7 +39,7 @@ const en = {
     badge: "Live · lead finder + AI website builder",
     title1: "Find businesses with no website.",
     title2: "Build them one with AI.",
-    sub: "Sitovai scans Google Places worldwide, enriches every lead with registry data, and turns the best ones into ready-to-launch websites — written in the business's own language.",
+    sub: "Sitagio scans Google Places worldwide, enriches every lead with registry data, and turns the best ones into ready-to-launch websites — written in the business's own language.",
     ctaPrimary: "Get started",
     ctaSecondary: "See how it works",
     stats: ["leads per search", "lead to draft site", "site languages"],
@@ -61,7 +61,7 @@ const en = {
     cards: [
       {
         t: "Chat-style lead finder",
-        b: "Describe a niche and a location. Sitovai queries Google Places and returns a clean list with website status detected instantly.",
+        b: "Describe a niche and a location. Sitagio queries Google Places and returns a clean list with website status detected instantly.",
       },
       {
         t: "AI website builder",
@@ -90,7 +90,7 @@ const en = {
     steps: [
       {
         t: "Describe your target",
-        b: "Type a niche and a town, set a radius. Sitovai queries Google Places behind the scenes.",
+        b: "Type a niche and a town, set a radius. Sitagio queries Google Places behind the scenes.",
       },
       {
         t: "Get qualified leads",
@@ -148,12 +148,12 @@ const en = {
         a: "Live from the Google Places API — anywhere in the world. Finnish leads are additionally cross-checked against the official YTJ / PRH business registry. Nothing is scraped.",
       },
       {
-        q: "How does Sitovai know a business has no website?",
-        a: "Google Places reports whether a business has a website listed. Sitovai flags the ones without one — and for Finnish companies also verifies they're active in the YTJ registry.",
+        q: "How does Sitagio know a business has no website?",
+        a: "Google Places reports whether a business has a website listed. Sitagio flags the ones without one — and for Finnish companies also verifies they're active in the YTJ registry.",
       },
       {
         q: "Do I own the websites I generate?",
-        a: "Yes. Every generated site can be exported as standard HTML/CSS files that you can host anywhere and sell to your client — no lock-in, no Sitovai branding.",
+        a: "Yes. Every generated site can be exported as standard HTML/CSS files that you can host anywhere and sell to your client — no lock-in, no Sitagio branding.",
       },
       {
         q: "What language are the generated sites in?",
@@ -202,7 +202,7 @@ const fi: LandingDict = {
     badge: "Live · liidihaku + AI-kotisivukone",
     title1: "Löydä yritykset ilman kotisivuja.",
     title2: "Rakenna niille sivut tekoälyllä.",
-    sub: "Sitovai skannaa Google Placesin maailmanlaajuisesti, rikastaa jokaisen liidin rekisteridatalla ja muuttaa parhaat julkaisuvalmiiksi kotisivuiksi — kirjoitettuna yrityksen omalla kielellä.",
+    sub: "Sitagio skannaa Google Placesin maailmanlaajuisesti, rikastaa jokaisen liidin rekisteridatalla ja muuttaa parhaat julkaisuvalmiiksi kotisivuiksi — kirjoitettuna yrityksen omalla kielellä.",
     ctaPrimary: "Aloita",
     ctaSecondary: "Katso miten se toimii",
     stats: ["liidiä per haku", "liidistä sivuluonnokseen", "sivukieltä"],
@@ -224,7 +224,7 @@ const fi: LandingDict = {
     cards: [
       {
         t: "Chat-tyylinen liidihaku",
-        b: "Kuvaile toimiala ja sijainti. Sitovai kysyy Google Placesia ja palauttaa siistin listan, jossa kotisivutilanne tunnistetaan heti.",
+        b: "Kuvaile toimiala ja sijainti. Sitagio kysyy Google Placesia ja palauttaa siistin listan, jossa kotisivutilanne tunnistetaan heti.",
       },
       {
         t: "AI-kotisivukone",
@@ -253,7 +253,7 @@ const fi: LandingDict = {
     steps: [
       {
         t: "Kuvaile kohteesi",
-        b: "Kirjoita toimiala ja paikkakunta, aseta säde. Sitovai kysyy Google Placesia taustalla.",
+        b: "Kirjoita toimiala ja paikkakunta, aseta säde. Sitagio kysyy Google Placesia taustalla.",
       },
       {
         t: "Saat laadukkaat liidit",
@@ -311,12 +311,12 @@ const fi: LandingDict = {
         a: "Suoraan Google Places -rajapinnasta — mistä päin maailmaa tahansa. Suomalaiset liidit ristiintarkistetaan lisäksi virallisesta YTJ/PRH-rekisteristä. Mitään ei scrapeta.",
       },
       {
-        q: "Mistä Sitovai tietää, ettei yrityksellä ole kotisivuja?",
-        a: "Google Places kertoo, onko yritykselle listattu verkkosivu. Sitovai merkitsee ne, joilta se puuttuu — ja suomalaisilta yrityksiltä varmistetaan lisäksi, että ne ovat aktiivisia YTJ-rekisterissä.",
+        q: "Mistä Sitagio tietää, ettei yrityksellä ole kotisivuja?",
+        a: "Google Places kertoo, onko yritykselle listattu verkkosivu. Sitagio merkitsee ne, joilta se puuttuu — ja suomalaisilta yrityksiltä varmistetaan lisäksi, että ne ovat aktiivisia YTJ-rekisterissä.",
       },
       {
         q: "Omistanko generoimani sivustot?",
-        a: "Kyllä. Jokainen generoitu sivusto voidaan viedä tavallisina HTML/CSS-tiedostoina, jotka voit hostata missä vain ja myydä asiakkaallesi — ei lukkiutumista, ei Sitovai-brändäystä.",
+        a: "Kyllä. Jokainen generoitu sivusto voidaan viedä tavallisina HTML/CSS-tiedostoina, jotka voit hostata missä vain ja myydä asiakkaallesi — ei lukkiutumista, ei Sitagio-brändäystä.",
       },
       {
         q: "Millä kielellä generoidut sivut ovat?",
@@ -363,7 +363,7 @@ const es: LandingDict = {
     badge: "En vivo · buscador de leads + creador de webs con IA",
     title1: "Encuentra negocios sin sitio web.",
     title2: "Créales uno con IA.",
-    sub: "Sitovai escanea Google Places en todo el mundo, enriquece cada lead con datos registrales y convierte los mejores en sitios web listos para lanzar — escritos en el idioma del propio negocio.",
+    sub: "Sitagio escanea Google Places en todo el mundo, enriquece cada lead con datos registrales y convierte los mejores en sitios web listos para lanzar — escritos en el idioma del propio negocio.",
     ctaPrimary: "Empezar",
     ctaSecondary: "Ver cómo funciona",
     stats: ["leads por búsqueda", "de lead a borrador de web", "idiomas de sitio"],
@@ -385,7 +385,7 @@ const es: LandingDict = {
     cards: [
       {
         t: "Buscador de leads tipo chat",
-        b: "Describe un nicho y una ubicación. Sitovai consulta Google Places y devuelve una lista limpia con el estado del sitio web detectado al instante.",
+        b: "Describe un nicho y una ubicación. Sitagio consulta Google Places y devuelve una lista limpia con el estado del sitio web detectado al instante.",
       },
       {
         t: "Creador de webs con IA",
@@ -414,7 +414,7 @@ const es: LandingDict = {
     steps: [
       {
         t: "Describe tu objetivo",
-        b: "Escribe un nicho y una ciudad, define un radio. Sitovai consulta Google Places entre bastidores.",
+        b: "Escribe un nicho y una ciudad, define un radio. Sitagio consulta Google Places entre bastidores.",
       },
       {
         t: "Recibe leads cualificados",
@@ -472,12 +472,12 @@ const es: LandingDict = {
         a: "En vivo desde la API de Google Places — en cualquier parte del mundo. Los leads finlandeses se cruzan además con el registro mercantil oficial YTJ / PRH. No se scrapea nada.",
       },
       {
-        q: "¿Cómo sabe Sitovai que un negocio no tiene web?",
-        a: "Google Places indica si un negocio tiene sitio web listado. Sitovai marca los que no lo tienen — y en las empresas finlandesas verifica además que estén activas en el registro YTJ.",
+        q: "¿Cómo sabe Sitagio que un negocio no tiene web?",
+        a: "Google Places indica si un negocio tiene sitio web listado. Sitagio marca los que no lo tienen — y en las empresas finlandesas verifica además que estén activas en el registro YTJ.",
       },
       {
         q: "¿Soy dueño de las webs que genero?",
-        a: "Sí. Cada sitio generado puede exportarse como archivos HTML/CSS estándar que puedes alojar donde quieras y vender a tu cliente — sin ataduras, sin marca de Sitovai.",
+        a: "Sí. Cada sitio generado puede exportarse como archivos HTML/CSS estándar que puedes alojar donde quieras y vender a tu cliente — sin ataduras, sin marca de Sitagio.",
       },
       {
         q: "¿En qué idioma están las webs generadas?",
@@ -524,7 +524,7 @@ const zh: LandingDict = {
     badge: "已上线 · 客户挖掘 + AI 建站",
     title1: "找到没有网站的商家。",
     title2: "用 AI 为他们建一个。",
-    sub: "Sitovai 在全球范围扫描 Google Places，用工商注册数据丰富每条线索，并把最优质的线索变成随时可上线的网站——用商家自己的语言撰写。",
+    sub: "Sitagio 在全球范围扫描 Google Places，用工商注册数据丰富每条线索，并把最优质的线索变成随时可上线的网站——用商家自己的语言撰写。",
     ctaPrimary: "开始使用",
     ctaSecondary: "看看它如何工作",
     stats: ["条线索/每次搜索", "从线索到网站草稿", "种网站语言"],
@@ -546,7 +546,7 @@ const zh: LandingDict = {
     cards: [
       {
         t: "对话式线索搜索",
-        b: "描述行业和地点。Sitovai 查询 Google Places，返回一份干净的列表，并即时检测网站状态。",
+        b: "描述行业和地点。Sitagio 查询 Google Places，返回一份干净的列表，并即时检测网站状态。",
       },
       {
         t: "AI 建站工具",
@@ -575,7 +575,7 @@ const zh: LandingDict = {
     steps: [
       {
         t: "描述你的目标",
-        b: "输入行业和城市，设置半径。Sitovai 在后台查询 Google Places。",
+        b: "输入行业和城市，设置半径。Sitagio 在后台查询 Google Places。",
       },
       {
         t: "获得优质线索",
@@ -633,12 +633,12 @@ const zh: LandingDict = {
         a: "实时来自 Google Places API——覆盖全球任何地方。芬兰线索还会与官方 YTJ / PRH 工商注册库交叉核验。没有任何爬取。",
       },
       {
-        q: "Sitovai 怎么知道商家没有网站？",
-        a: "Google Places 会报告商家是否列出了网站。Sitovai 标记没有网站的商家——对芬兰公司还会验证其在 YTJ 注册库中处于活跃状态。",
+        q: "Sitagio 怎么知道商家没有网站？",
+        a: "Google Places 会报告商家是否列出了网站。Sitagio 标记没有网站的商家——对芬兰公司还会验证其在 YTJ 注册库中处于活跃状态。",
       },
       {
         q: "我生成的网站归我所有吗？",
-        a: "是的。每个生成的网站都可以导出为标准 HTML/CSS 文件，你可以托管在任何地方并卖给客户——没有锁定，没有 Sitovai 品牌标识。",
+        a: "是的。每个生成的网站都可以导出为标准 HTML/CSS 文件，你可以托管在任何地方并卖给客户——没有锁定，没有 Sitagio 品牌标识。",
       },
       {
         q: "生成的网站用什么语言？",
@@ -685,7 +685,7 @@ const hi: LandingDict = {
     badge: "लाइव · लीड फ़ाइंडर + AI वेबसाइट बिल्डर",
     title1: "बिना वेबसाइट वाले व्यवसाय ढूंढें।",
     title2: "AI से उनकी वेबसाइट बनाएं।",
-    sub: "Sitovai दुनिया भर में Google Places स्कैन करता है, हर लीड को रजिस्ट्री डेटा से समृद्ध करता है, और सबसे अच्छे लीड्स को लॉन्च-रेडी वेबसाइटों में बदलता है — व्यवसाय की अपनी भाषा में लिखी हुई।",
+    sub: "Sitagio दुनिया भर में Google Places स्कैन करता है, हर लीड को रजिस्ट्री डेटा से समृद्ध करता है, और सबसे अच्छे लीड्स को लॉन्च-रेडी वेबसाइटों में बदलता है — व्यवसाय की अपनी भाषा में लिखी हुई।",
     ctaPrimary: "शुरू करें",
     ctaSecondary: "देखें यह कैसे काम करता है",
     stats: ["लीड प्रति खोज", "लीड से ड्राफ़्ट साइट तक", "साइट भाषाएं"],
@@ -707,7 +707,7 @@ const hi: LandingDict = {
     cards: [
       {
         t: "चैट-स्टाइल लीड फ़ाइंडर",
-        b: "एक निच और लोकेशन बताएं। Sitovai Google Places से पूछता है और वेबसाइट स्टेटस तुरंत पहचान कर साफ़ सूची देता है।",
+        b: "एक निच और लोकेशन बताएं। Sitagio Google Places से पूछता है और वेबसाइट स्टेटस तुरंत पहचान कर साफ़ सूची देता है।",
       },
       {
         t: "AI वेबसाइट बिल्डर",
@@ -736,7 +736,7 @@ const hi: LandingDict = {
     steps: [
       {
         t: "अपना लक्ष्य बताएं",
-        b: "निच और शहर लिखें, रेडियस सेट करें। Sitovai पर्दे के पीछे Google Places से पूछता है।",
+        b: "निच और शहर लिखें, रेडियस सेट करें। Sitagio पर्दे के पीछे Google Places से पूछता है।",
       },
       {
         t: "क्वालिफ़ाइड लीड पाएं",
@@ -794,12 +794,12 @@ const hi: LandingDict = {
         a: "Google Places API से लाइव — दुनिया में कहीं भी। फ़िनिश लीड्स को आधिकारिक YTJ / PRH बिज़नेस रजिस्ट्री से भी क्रॉस-चेक किया जाता है। कुछ भी स्क्रैप नहीं होता।",
       },
       {
-        q: "Sitovai को कैसे पता चलता है कि व्यवसाय की वेबसाइट नहीं है?",
-        a: "Google Places बताता है कि व्यवसाय की वेबसाइट सूचीबद्ध है या नहीं। Sitovai बिना वेबसाइट वालों को फ़्लैग करता है — और फ़िनिश कंपनियों के लिए YTJ रजिस्ट्री में सक्रिय होने की पुष्टि भी करता है।",
+        q: "Sitagio को कैसे पता चलता है कि व्यवसाय की वेबसाइट नहीं है?",
+        a: "Google Places बताता है कि व्यवसाय की वेबसाइट सूचीबद्ध है या नहीं। Sitagio बिना वेबसाइट वालों को फ़्लैग करता है — और फ़िनिश कंपनियों के लिए YTJ रजिस्ट्री में सक्रिय होने की पुष्टि भी करता है।",
       },
       {
         q: "क्या जनरेट की गई वेबसाइटें मेरी होती हैं?",
-        a: "हां। हर जनरेट की गई साइट स्टैंडर्ड HTML/CSS फ़ाइलों के रूप में एक्सपोर्ट हो सकती है, जिन्हें आप कहीं भी होस्ट कर सकते हैं और क्लाइंट को बेच सकते हैं — कोई लॉक-इन नहीं, कोई Sitovai ब्रांडिंग नहीं।",
+        a: "हां। हर जनरेट की गई साइट स्टैंडर्ड HTML/CSS फ़ाइलों के रूप में एक्सपोर्ट हो सकती है, जिन्हें आप कहीं भी होस्ट कर सकते हैं और क्लाइंट को बेच सकते हैं — कोई लॉक-इन नहीं, कोई Sitagio ब्रांडिंग नहीं।",
       },
       {
         q: "जनरेट की गई साइटें किस भाषा में होती हैं?",
@@ -846,7 +846,7 @@ const fr: LandingDict = {
     badge: "En ligne · chasseur de leads + créateur de sites IA",
     title1: "Trouvez les entreprises sans site web.",
     title2: "Créez-leur-en un avec l'IA.",
-    sub: "Sitovai scanne Google Places dans le monde entier, enrichit chaque lead avec des données de registre et transforme les meilleurs en sites web prêts à lancer — rédigés dans la langue de l'entreprise.",
+    sub: "Sitagio scanne Google Places dans le monde entier, enrichit chaque lead avec des données de registre et transforme les meilleurs en sites web prêts à lancer — rédigés dans la langue de l'entreprise.",
     ctaPrimary: "Commencer",
     ctaSecondary: "Voir comment ça marche",
     stats: ["leads par recherche", "du lead au brouillon de site", "langues de site"],
@@ -868,7 +868,7 @@ const fr: LandingDict = {
     cards: [
       {
         t: "Recherche de leads façon chat",
-        b: "Décrivez un créneau et un lieu. Sitovai interroge Google Places et renvoie une liste propre avec le statut du site web détecté instantanément.",
+        b: "Décrivez un créneau et un lieu. Sitagio interroge Google Places et renvoie une liste propre avec le statut du site web détecté instantanément.",
       },
       {
         t: "Créateur de sites IA",
@@ -897,7 +897,7 @@ const fr: LandingDict = {
     steps: [
       {
         t: "Décrivez votre cible",
-        b: "Tapez un créneau et une ville, définissez un rayon. Sitovai interroge Google Places en coulisses.",
+        b: "Tapez un créneau et une ville, définissez un rayon. Sitagio interroge Google Places en coulisses.",
       },
       {
         t: "Recevez des leads qualifiés",
@@ -955,12 +955,12 @@ const fr: LandingDict = {
         a: "En direct de l'API Google Places — partout dans le monde. Les leads finlandais sont en plus croisés avec le registre officiel YTJ / PRH. Rien n'est scrapé.",
       },
       {
-        q: "Comment Sitovai sait-il qu'une entreprise n'a pas de site ?",
-        a: "Google Places indique si une entreprise a un site web répertorié. Sitovai signale celles qui n'en ont pas — et vérifie en plus, pour les entreprises finlandaises, qu'elles sont actives au registre YTJ.",
+        q: "Comment Sitagio sait-il qu'une entreprise n'a pas de site ?",
+        a: "Google Places indique si une entreprise a un site web répertorié. Sitagio signale celles qui n'en ont pas — et vérifie en plus, pour les entreprises finlandaises, qu'elles sont actives au registre YTJ.",
       },
       {
         q: "Suis-je propriétaire des sites que je génère ?",
-        a: "Oui. Chaque site généré peut être exporté en fichiers HTML/CSS standard que vous pouvez héberger n'importe où et vendre à votre client — sans verrouillage, sans marque Sitovai.",
+        a: "Oui. Chaque site généré peut être exporté en fichiers HTML/CSS standard que vous pouvez héberger n'importe où et vendre à votre client — sans verrouillage, sans marque Sitagio.",
       },
       {
         q: "Dans quelle langue sont les sites générés ?",
@@ -1007,7 +1007,7 @@ const ar: LandingDict = {
     badge: "مباشر · باحث عملاء + منشئ مواقع بالذكاء الاصطناعي",
     title1: "اعثر على الأنشطة التجارية بلا موقع إلكتروني.",
     title2: "وابنِ لها موقعًا بالذكاء الاصطناعي.",
-    sub: "يمسح Sitovai خرائط Google Places حول العالم، ويثري كل عميل محتمل ببيانات السجلات، ويحوّل الأفضل منها إلى مواقع جاهزة للإطلاق — مكتوبة بلغة النشاط التجاري نفسه.",
+    sub: "يمسح Sitagio خرائط Google Places حول العالم، ويثري كل عميل محتمل ببيانات السجلات، ويحوّل الأفضل منها إلى مواقع جاهزة للإطلاق — مكتوبة بلغة النشاط التجاري نفسه.",
     ctaPrimary: "ابدأ الآن",
     ctaSecondary: "شاهد كيف يعمل",
     stats: ["عميل محتمل لكل بحث", "من العميل إلى مسودة الموقع", "لغات للمواقع"],
@@ -1029,7 +1029,7 @@ const ar: LandingDict = {
     cards: [
       {
         t: "باحث عملاء بأسلوب المحادثة",
-        b: "صف مجالًا وموقعًا. يستعلم Sitovai من Google Places ويعيد قائمة نظيفة مع كشف حالة الموقع فورًا.",
+        b: "صف مجالًا وموقعًا. يستعلم Sitagio من Google Places ويعيد قائمة نظيفة مع كشف حالة الموقع فورًا.",
       },
       {
         t: "منشئ مواقع بالذكاء الاصطناعي",
@@ -1058,7 +1058,7 @@ const ar: LandingDict = {
     steps: [
       {
         t: "صف هدفك",
-        b: "اكتب مجالًا ومدينة وحدد نصف القطر. يستعلم Sitovai من Google Places في الخلفية.",
+        b: "اكتب مجالًا ومدينة وحدد نصف القطر. يستعلم Sitagio من Google Places في الخلفية.",
       },
       {
         t: "احصل على عملاء مؤهلين",
@@ -1116,12 +1116,12 @@ const ar: LandingDict = {
         a: "مباشرة من واجهة Google Places — في أي مكان في العالم. ويُدقَّق العملاء الفنلنديون إضافيًا مع سجل YTJ / PRH الرسمي. لا شيء يُكشط.",
       },
       {
-        q: "كيف يعرف Sitovai أن النشاط بلا موقع؟",
-        a: "تُبلغ Google Places عمّا إذا كان للنشاط موقع مُدرج. يعلّم Sitovai الأنشطة التي بلا موقع — وللشركات الفنلندية يتحقق أيضًا من نشاطها في سجل YTJ.",
+        q: "كيف يعرف Sitagio أن النشاط بلا موقع؟",
+        a: "تُبلغ Google Places عمّا إذا كان للنشاط موقع مُدرج. يعلّم Sitagio الأنشطة التي بلا موقع — وللشركات الفنلندية يتحقق أيضًا من نشاطها في سجل YTJ.",
       },
       {
         q: "هل أملك المواقع التي أنشئها؟",
-        a: "نعم. كل موقع مُنشأ يمكن تصديره كملفات HTML/CSS قياسية تستضيفها أينما شئت وتبيعها لعميلك — بلا قيود وبلا علامة Sitovai.",
+        a: "نعم. كل موقع مُنشأ يمكن تصديره كملفات HTML/CSS قياسية تستضيفها أينما شئت وتبيعها لعميلك — بلا قيود وبلا علامة Sitagio.",
       },
       {
         q: "بأي لغة تُكتب المواقع المُنشأة؟",
@@ -1168,7 +1168,7 @@ const pt: LandingDict = {
     badge: "No ar · localizador de leads + criador de sites com IA",
     title1: "Encontre negócios sem site.",
     title2: "Crie um para eles com IA.",
-    sub: "O Sitovai varre o Google Places no mundo todo, enriquece cada lead com dados de registro e transforma os melhores em sites prontos para lançar — escritos no idioma do próprio negócio.",
+    sub: "O Sitagio varre o Google Places no mundo todo, enriquece cada lead com dados de registro e transforma os melhores em sites prontos para lançar — escritos no idioma do próprio negócio.",
     ctaPrimary: "Começar",
     ctaSecondary: "Ver como funciona",
     stats: ["leads por busca", "do lead ao rascunho do site", "idiomas de site"],
@@ -1190,7 +1190,7 @@ const pt: LandingDict = {
     cards: [
       {
         t: "Busca de leads estilo chat",
-        b: "Descreva um nicho e um local. O Sitovai consulta o Google Places e devolve uma lista limpa com o status do site detectado na hora.",
+        b: "Descreva um nicho e um local. O Sitagio consulta o Google Places e devolve uma lista limpa com o status do site detectado na hora.",
       },
       {
         t: "Criador de sites com IA",
@@ -1219,7 +1219,7 @@ const pt: LandingDict = {
     steps: [
       {
         t: "Descreva seu alvo",
-        b: "Digite um nicho e uma cidade, defina um raio. O Sitovai consulta o Google Places nos bastidores.",
+        b: "Digite um nicho e uma cidade, defina um raio. O Sitagio consulta o Google Places nos bastidores.",
       },
       {
         t: "Receba leads qualificados",
@@ -1277,12 +1277,12 @@ const pt: LandingDict = {
         a: "Ao vivo da API do Google Places — em qualquer lugar do mundo. Leads finlandeses ainda são cruzados com o registro oficial YTJ / PRH. Nada é raspado.",
       },
       {
-        q: "Como o Sitovai sabe que um negócio não tem site?",
-        a: "O Google Places informa se o negócio tem site listado. O Sitovai marca os que não têm — e, para empresas finlandesas, ainda verifica se estão ativas no registro YTJ.",
+        q: "Como o Sitagio sabe que um negócio não tem site?",
+        a: "O Google Places informa se o negócio tem site listado. O Sitagio marca os que não têm — e, para empresas finlandesas, ainda verifica se estão ativas no registro YTJ.",
       },
       {
         q: "Os sites que eu gero são meus?",
-        a: "Sim. Todo site gerado pode ser exportado como arquivos HTML/CSS padrão, que você hospeda onde quiser e vende ao seu cliente — sem lock-in, sem marca Sitovai.",
+        a: "Sim. Todo site gerado pode ser exportado como arquivos HTML/CSS padrão, que você hospeda onde quiser e vende ao seu cliente — sem lock-in, sem marca Sitagio.",
       },
       {
         q: "Em que idioma ficam os sites gerados?",
@@ -1329,7 +1329,7 @@ const ru: LandingDict = {
     badge: "Работает · поиск лидов + ИИ-конструктор сайтов",
     title1: "Находите бизнесы без сайта.",
     title2: "Создавайте им сайт с ИИ.",
-    sub: "Sitovai сканирует Google Places по всему миру, обогащает каждый лид данными реестра и превращает лучшие в готовые к запуску сайты — написанные на языке самого бизнеса.",
+    sub: "Sitagio сканирует Google Places по всему миру, обогащает каждый лид данными реестра и превращает лучшие в готовые к запуску сайты — написанные на языке самого бизнеса.",
     ctaPrimary: "Начать",
     ctaSecondary: "Посмотреть, как это работает",
     stats: ["лидов за поиск", "от лида до черновика сайта", "языков сайтов"],
@@ -1351,7 +1351,7 @@ const ru: LandingDict = {
     cards: [
       {
         t: "Поиск лидов в формате чата",
-        b: "Опишите нишу и локацию. Sitovai запрашивает Google Places и возвращает чистый список с мгновенно определённым статусом сайта.",
+        b: "Опишите нишу и локацию. Sitagio запрашивает Google Places и возвращает чистый список с мгновенно определённым статусом сайта.",
       },
       {
         t: "ИИ-конструктор сайтов",
@@ -1380,7 +1380,7 @@ const ru: LandingDict = {
     steps: [
       {
         t: "Опишите цель",
-        b: "Введите нишу и город, задайте радиус. Sitovai запрашивает Google Places за кулисами.",
+        b: "Введите нишу и город, задайте радиус. Sitagio запрашивает Google Places за кулисами.",
       },
       {
         t: "Получите качественные лиды",
@@ -1438,12 +1438,12 @@ const ru: LandingDict = {
         a: "Напрямую из API Google Places — в любой точке мира. Финские лиды дополнительно сверяются с официальным бизнес-реестром YTJ / PRH. Ничего не скрейпится.",
       },
       {
-        q: "Как Sitovai понимает, что у бизнеса нет сайта?",
-        a: "Google Places сообщает, указан ли у бизнеса сайт. Sitovai помечает тех, у кого его нет — а у финских компаний дополнительно проверяет активность в реестре YTJ.",
+        q: "Как Sitagio понимает, что у бизнеса нет сайта?",
+        a: "Google Places сообщает, указан ли у бизнеса сайт. Sitagio помечает тех, у кого его нет — а у финских компаний дополнительно проверяет активность в реестре YTJ.",
       },
       {
         q: "Принадлежат ли мне сгенерированные сайты?",
-        a: "Да. Каждый сгенерированный сайт можно экспортировать как стандартные HTML/CSS-файлы, разместить где угодно и продать клиенту — без привязки и без брендинга Sitovai.",
+        a: "Да. Каждый сгенерированный сайт можно экспортировать как стандартные HTML/CSS-файлы, разместить где угодно и продать клиенту — без привязки и без брендинга Sitagio.",
       },
       {
         q: "На каком языке создаются сайты?",
@@ -1490,7 +1490,7 @@ const de: LandingDict = {
     badge: "Live · Lead-Finder + KI-Website-Builder",
     title1: "Finde Unternehmen ohne Website.",
     title2: "Bau ihnen eine mit KI.",
-    sub: "Sitovai scannt Google Places weltweit, reichert jeden Lead mit Registerdaten an und verwandelt die besten in startklare Websites — geschrieben in der Sprache des Unternehmens.",
+    sub: "Sitagio scannt Google Places weltweit, reichert jeden Lead mit Registerdaten an und verwandelt die besten in startklare Websites — geschrieben in der Sprache des Unternehmens.",
     ctaPrimary: "Loslegen",
     ctaSecondary: "So funktioniert's",
     stats: ["Leads pro Suche", "vom Lead zum Website-Entwurf", "Website-Sprachen"],
@@ -1512,7 +1512,7 @@ const de: LandingDict = {
     cards: [
       {
         t: "Lead-Finder im Chat-Stil",
-        b: "Beschreibe Nische und Ort. Sitovai fragt Google Places ab und liefert eine saubere Liste mit sofort erkanntem Website-Status.",
+        b: "Beschreibe Nische und Ort. Sitagio fragt Google Places ab und liefert eine saubere Liste mit sofort erkanntem Website-Status.",
       },
       {
         t: "KI-Website-Builder",
@@ -1541,7 +1541,7 @@ const de: LandingDict = {
     steps: [
       {
         t: "Beschreibe dein Ziel",
-        b: "Nische und Stadt eintippen, Radius festlegen. Sitovai fragt im Hintergrund Google Places ab.",
+        b: "Nische und Stadt eintippen, Radius festlegen. Sitagio fragt im Hintergrund Google Places ab.",
       },
       {
         t: "Erhalte qualifizierte Leads",
@@ -1599,12 +1599,12 @@ const de: LandingDict = {
         a: "Live aus der Google-Places-API — überall auf der Welt. Finnische Leads werden zusätzlich mit dem offiziellen YTJ/PRH-Handelsregister abgeglichen. Nichts wird gescrapt.",
       },
       {
-        q: "Woher weiß Sitovai, dass ein Unternehmen keine Website hat?",
-        a: "Google Places meldet, ob eine Website hinterlegt ist. Sitovai markiert die ohne — und prüft bei finnischen Firmen zusätzlich, ob sie im YTJ-Register aktiv sind.",
+        q: "Woher weiß Sitagio, dass ein Unternehmen keine Website hat?",
+        a: "Google Places meldet, ob eine Website hinterlegt ist. Sitagio markiert die ohne — und prüft bei finnischen Firmen zusätzlich, ob sie im YTJ-Register aktiv sind.",
       },
       {
         q: "Gehören mir die generierten Websites?",
-        a: "Ja. Jede generierte Website lässt sich als Standard-HTML/CSS-Dateien exportieren, die du überall hosten und an deinen Kunden verkaufen kannst — kein Lock-in, kein Sitovai-Branding.",
+        a: "Ja. Jede generierte Website lässt sich als Standard-HTML/CSS-Dateien exportieren, die du überall hosten und an deinen Kunden verkaufen kannst — kein Lock-in, kein Sitagio-Branding.",
       },
       {
         q: "In welcher Sprache sind die generierten Websites?",
@@ -1651,7 +1651,7 @@ const ja: LandingDict = {
     badge: "稼働中 · リード検索 + AIサイトビルダー",
     title1: "ウェブサイトのないビジネスを見つける。",
     title2: "AIでサイトを作ってあげる。",
-    sub: "Sitovaiは世界中のGoogle Placesをスキャンし、各リードを登記データで補強し、有望なものを公開準備済みのウェブサイトに変えます — そのビジネス自身の言語で書かれたサイトです。",
+    sub: "Sitagioは世界中のGoogle Placesをスキャンし、各リードを登記データで補強し、有望なものを公開準備済みのウェブサイトに変えます — そのビジネス自身の言語で書かれたサイトです。",
     ctaPrimary: "始める",
     ctaSecondary: "仕組みを見る",
     stats: ["件のリード/検索", "リードからサイト草案まで", "のサイト言語"],
@@ -1673,7 +1673,7 @@ const ja: LandingDict = {
     cards: [
       {
         t: "チャット式リード検索",
-        b: "業種と場所を書くだけ。SitovaiがGoogle Placesに問い合わせ、サイト有無を即座に判定したクリーンなリストを返します。",
+        b: "業種と場所を書くだけ。SitagioがGoogle Placesに問い合わせ、サイト有無を即座に判定したクリーンなリストを返します。",
       },
       {
         t: "AIサイトビルダー",
@@ -1702,7 +1702,7 @@ const ja: LandingDict = {
     steps: [
       {
         t: "ターゲットを記述",
-        b: "業種と街を入力し、半径を設定。Sitovaiが裏でGoogle Placesに問い合わせます。",
+        b: "業種と街を入力し、半径を設定。Sitagioが裏でGoogle Placesに問い合わせます。",
       },
       {
         t: "有望リードを取得",
@@ -1761,11 +1761,11 @@ const ja: LandingDict = {
       },
       {
         q: "サイトがないことをどう判定していますか？",
-        a: "Google Placesはビジネスにサイトが登録されているかを報告します。Sitovaiはサイトのないビジネスをフラグし、フィンランド企業についてはYTJ登記簿で活動中であることも確認します。",
+        a: "Google Placesはビジネスにサイトが登録されているかを報告します。Sitagioはサイトのないビジネスをフラグし、フィンランド企業についてはYTJ登記簿で活動中であることも確認します。",
       },
       {
         q: "生成したサイトの所有権は私にありますか？",
-        a: "はい。生成されたサイトはすべて標準のHTML/CSSファイルとしてエクスポートでき、どこでもホスティングしてクライアントに販売できます — ロックインなし、Sitovaiのブランド表示なし。",
+        a: "はい。生成されたサイトはすべて標準のHTML/CSSファイルとしてエクスポートでき、どこでもホスティングしてクライアントに販売できます — ロックインなし、Sitagioのブランド表示なし。",
       },
       {
         q: "生成されるサイトは何語ですか？",
@@ -1821,6 +1821,7 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved && LANGS.some((l) => l.code === saved)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time restore of the saved language on mount
       setLangState(saved as LangCode);
       return;
     }

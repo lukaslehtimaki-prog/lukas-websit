@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { H2, P, UL, A } from "@/components/legal/prose";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy · Sitovai",
+  title: "Privacy Policy · Sitagio",
   description:
-    "How Sitovai collects, uses, and protects your personal data under the EU GDPR.",
+    "How Sitagio collects, uses, and protects your personal data under the EU GDPR.",
 };
 
 const CONTACT = "support@sitovaiagency.com";
@@ -22,7 +22,7 @@ export default function PrivacyPage() {
       <p className="mt-2 text-sm text-zinc-500">Last updated: {UPDATED}</p>
 
       <P>
-        This Privacy Policy explains how Sitovai (&ldquo;we&rdquo;,
+        This Privacy Policy explains how Sitagio (&ldquo;we&rdquo;,
         &ldquo;us&rdquo;) collects, uses, and protects your personal data when
         you use our website and services (the &ldquo;Service&rdquo;). We process
         personal data in accordance with the EU General Data Protection
@@ -99,7 +99,7 @@ export default function PrivacyPage() {
         </li>
         <li>
           <strong className="text-zinc-200">Referral</strong>{" "}
-          (<code className="text-xs">sitovai_ref</code>, functional) — set for
+          (<code className="text-xs">sitagio_ref</code>, functional) — set for
           60 days when you visit through a partner link, so your sign-up gets
           the partner discount. It contains only the partner&rsquo;s code and
           is not used to track you across other sites.

@@ -11,7 +11,7 @@ import {
   tenantReferralCode,
 } from "@/lib/affiliates";
 
-export const metadata = { title: "Billing · Sitovai" };
+export const metadata = { title: "Billing · Sitagio" };
 
 export default async function BillingPage({
   searchParams,
@@ -89,7 +89,7 @@ export default async function BillingPage({
 
       {(await getAffiliateForTenant(ctx.tenantId)) ? (
         <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4 text-sm text-indigo-800 dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-300">
-          ⭐ You&apos;re a Sitovai partner — a 20% partner discount is applied
+          ⭐ You&apos;re a Sitagio partner — a 20% partner discount is applied
           automatically at checkout, on every invoice.
         </div>
       ) : (await getActiveAffiliate(await tenantReferralCode(ctx.tenantId))) ? (

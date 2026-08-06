@@ -11,7 +11,7 @@ import { Appearance } from "@/components/settings/appearance";
 import { Payouts } from "@/components/settings/payouts";
 import { AccountForm } from "@/components/settings/account-form";
 
-export const metadata = { title: "Settings · Sitovai" };
+export const metadata = { title: "Settings · Sitagio" };
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage({
@@ -48,7 +48,7 @@ export default async function SettingsPage({
           Appearance
         </h2>
         <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-          Choose how the Sitovai dashboard looks. Saved on this device.
+          Choose how the Sitagio dashboard looks. Saved on this device.
         </p>
         <div className="mt-4">
           <Appearance />

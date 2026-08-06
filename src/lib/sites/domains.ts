@@ -38,7 +38,7 @@ export function normalizeDomain(input: string): string | null {
   if (!host || host.length > 253) return null;
   if (!HOST_RE.test(host)) return null;
   // Reject our own hosts so a site can't hijack the app.
-  if (host === "sitovai.com" || host.endsWith(".sitovai.com")) return null;
+  if (host === "sitagio.com" || host.endsWith(".sitagio.com")) return null;
   if (host.endsWith(".vercel.app")) return null;
   return host;
 }

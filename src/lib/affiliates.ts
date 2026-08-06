@@ -19,7 +19,7 @@ export type Affiliate = {
   commission_bps: number;
   clicks: number;
   active: boolean;
-  /** Their own Sitovai workspace, when linked — grants the partner discount. */
+  /** Their own Sitagio workspace, when linked — grants the partner discount. */
   tenant_id: string | null;
   created_at: string;
 };
@@ -105,6 +105,6 @@ export function ensurePartnerCoupon(stripe: Stripe): Promise<string> {
     stripe,
     PARTNER_COUPON_ID,
     PARTNER_DISCOUNT_PCT,
-    "Sitovai partner 20% off",
+    "Sitagio partner 20% off",
   );
 }

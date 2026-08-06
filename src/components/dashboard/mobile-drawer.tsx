@@ -17,7 +17,7 @@ import { BrandMark, Wordmark } from "@/components/ui/brand";
  * (next to the command palette) where `fixed inset-0` really means the
  * viewport.
  */
-const DRAWER_OPEN_EVENT = "sitovai:mobilenav";
+const DRAWER_OPEN_EVENT = "sitagio:mobilenav";
 
 export function MobileNavButton() {
   return (

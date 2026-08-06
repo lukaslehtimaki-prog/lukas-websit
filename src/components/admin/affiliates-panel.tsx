@@ -122,7 +122,7 @@ export function AffiliatesPanel({
         <code className="font-mono text-xs">{baseUrl}/?ref=code</code> — sign-ups
         through them get 10% off every invoice, and the affiliate earns their
         commission share of referred revenue (paid out manually). Affiliates
-        with a linked Sitovai account also get 20% off their own subscription.
+        with a linked Sitagio account also get 20% off their own subscription.
       </p>
 
       {showForm ? (
@@ -222,7 +222,7 @@ export function AffiliatesPanel({
                         disabled={isPending}
                         className="mt-1 text-[11px] font-medium text-indigo-600 hover:underline dark:text-indigo-400"
                       >
-                        Link Sitovai account → partner −20%
+                        Link Sitagio account → partner −20%
                       </button>
                     ) : null}
                   </td>

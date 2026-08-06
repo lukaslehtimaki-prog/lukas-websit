@@ -34,7 +34,7 @@ export async function signInAction(
   const requested = field(formData, "redirectTo");
   // startsWith("/") is not enough: "//attacker.example" and "/\attacker.example"
   // are both protocol-relative URLs that browsers happily follow off-site, which
-  // turns a genuine sitovai.com login page into a credential-phishing landing
+  // turns a genuine sitagio.com login page into a credential-phishing landing
   // pad. Require a single leading slash not followed by another slash or a
   // backslash.
   const redirectTo = /^\/(?![/\\])/.test(requested) ? requested : "/dashboard";
@@ -65,7 +65,7 @@ export async function signUpAction(
   // Affiliate referral captured by the proxy from a ?ref= link; the
   // handle_new_user() trigger stores it on the new tenant for attribution.
   const jar = await cookies();
-  const refCookie = jar.get("sitovai_ref")?.value?.toLowerCase() ?? "";
+  const refCookie = jar.get("sitagio_ref")?.value?.toLowerCase() ?? "";
   const refCode = /^[a-z0-9-]{3,32}$/.test(refCookie) ? refCookie : "";
 
   const supabase = await createClient();

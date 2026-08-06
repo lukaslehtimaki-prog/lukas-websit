@@ -14,7 +14,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-export const metadata = { title: "How to sell · Sitovai" };
+export const metadata = { title: "How to sell · Sitagio" };
 
 type Step = {
   icon: ReactNode;
@@ -38,7 +38,7 @@ const STEPS: Step[] = [
   {
     icon: <Sparkles className="h-5 w-5" />,
     title: "Build their website in one click",
-    body: "Pick a lead and hit build. Sitovai writes a complete website in the business’s own language, pulls in their real Google photos and reviews, and picks a design that fits their trade — in about 20 seconds.",
+    body: "Pick a lead and hit build. Sitagio writes a complete website in the business’s own language, pulls in their real Google photos and reviews, and picks a design that fits their trade — in about 20 seconds.",
     href: { label: "Your websites", to: "/dashboard/sites" },
   },
   {
@@ -52,14 +52,14 @@ const STEPS: Step[] = [
   {
     icon: <Globe className="h-5 w-5" />,
     title: "Publish it",
-    body: "Hit Publish and the site gets a live link you can share instantly (sitovai.com/s/…). No hosting setup, nothing to configure.",
+    body: "Hit Publish and the site gets a live link you can share instantly (sitagio.com/s/…). No hosting setup, nothing to configure.",
   },
   {
     icon: <Mail className="h-5 w-5" />,
     title: "Pitch it to the business",
     body: "Use “Pitch it to the business”. The AI writes a friendly sales email in their language, with the live preview and a one-click Buy button. Send it from the app or your own mail — replies come straight to you.",
     bullets: [
-      "Set your price (default 500 €) — Sitovai creates the Stripe pay link automatically.",
+      "Set your price (default 500 €) — Sitagio creates the Stripe pay link automatically.",
     ],
   },
   {
@@ -71,7 +71,7 @@ const STEPS: Step[] = [
   {
     icon: <Link2 className="h-5 w-5" />,
     title: "Put it on their own domain (optional)",
-    body: "Want it on their own address like theirbusiness.com? Open the site, paste the domain in “Custom domain”, and hit Connect. Sitovai shows the exact DNS record to give the client (or their registrar) — once it’s pointed, the site serves on their domain with HTTPS handled automatically.",
+    body: "Want it on their own address like theirbusiness.com? Open the site, paste the domain in “Custom domain”, and hit Connect. Sitagio shows the exact DNS record to give the client (or their registrar) — once it’s pointed, the site serves on their domain with HTTPS handled automatically.",
     bullets: [
       "Works for a domain they already own, or one you buy for them and charge on.",
       "The site must be published; hit Check after the DNS is set.",
@@ -100,7 +100,7 @@ const STEPS: Step[] = [
   {
     icon: <Download className="h-5 w-5" />,
     title: "If they want it fully theirs",
-    body: "Some clients will want total independence — no ongoing plan, nothing tied to you. The “Full ownership transfer” section on each site covers this: Download gives them one self-contained HTML file that works on any host forever, disconnecting a custom domain frees it to point elsewhere, and unpublishing stops Sitovai serving a copy once they've moved.",
+    body: "Some clients will want total independence — no ongoing plan, nothing tied to you. The “Full ownership transfer” section on each site covers this: Download gives them one self-contained HTML file that works on any host forever, disconnecting a custom domain frees it to point elsewhere, and unpublishing stops Sitagio serving a copy once they've moved.",
     bullets: [
       "There's no “change the account owner” step needed — you're not handing over a login, you're handing over the finished file.",
       "Good to offer this upfront if a client is hesitant about being locked to a subscription.",

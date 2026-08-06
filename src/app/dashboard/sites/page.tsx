@@ -6,7 +6,7 @@ import { isAIConfigured } from "@/lib/env";
 import { templateMeta } from "@/lib/templates/types";
 import { cn } from "@/lib/utils";
 
-export const metadata = { title: "Websites · Sitovai" };
+export const metadata = { title: "Websites · Sitagio" };
 
 type SiteRow = {
   id: string;

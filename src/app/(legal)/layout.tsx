@@ -31,7 +31,7 @@ export default function LegalLayout({ children }: { children: ReactNode }) {
 
       <footer className="border-t border-white/5 py-8">
         <Container className="flex flex-col items-center justify-between gap-3 text-sm text-zinc-500 sm:flex-row">
-          <p>© {new Date().getFullYear()} Sitovai. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Sitagio. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="transition hover:text-white">
               Privacy
