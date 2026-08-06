@@ -26,7 +26,7 @@ export const env = {
   // Resend (outbound pitch emails from the app)
   RESEND_API_KEY: process.env.RESEND_API_KEY ?? "",
   RESEND_FROM_EMAIL:
-    process.env.RESEND_FROM_EMAIL ?? "Sitagio <noreply@contact.sitagio.com>",
+    process.env.RESEND_FROM_EMAIL ?? "Sitagio <noreply@contact.sitovaiagency.com>",
 
   // Platform admin allowlist (comma-separated emails)
   PLATFORM_ADMIN_EMAILS: process.env.PLATFORM_ADMIN_EMAILS ?? "",
