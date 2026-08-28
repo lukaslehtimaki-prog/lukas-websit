@@ -43,6 +43,8 @@ export const env = {
   WHOP_WEBHOOK_SECRET: process.env.WHOP_WEBHOOK_SECRET ?? "",
   WHOP_PLAN_PRO: process.env.WHOP_PLAN_PRO ?? "",
   WHOP_PLAN_PREMIUM: process.env.WHOP_PLAN_PREMIUM ?? "",
+  WHOP_APP_ID: process.env.WHOP_APP_ID ?? "",
+  WHOP_OAUTH_REDIRECT_URI: process.env.WHOP_OAUTH_REDIRECT_URI ?? "",
 };
 
 export function isSupabaseConfigured(): boolean {
