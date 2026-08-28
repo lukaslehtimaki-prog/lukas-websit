@@ -38,6 +38,11 @@ export const env = {
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "",
   STRIPE_PRICE_PRO: process.env.STRIPE_PRICE_PRO ?? "",
   STRIPE_PRICE_PREMIUM: process.env.STRIPE_PRICE_PREMIUM ?? "",
+
+  // Whop (marketplace listing -> app access)
+  WHOP_WEBHOOK_SECRET: process.env.WHOP_WEBHOOK_SECRET ?? "",
+  WHOP_PLAN_PRO: process.env.WHOP_PLAN_PRO ?? "",
+  WHOP_PLAN_PREMIUM: process.env.WHOP_PLAN_PREMIUM ?? "",
 };
 
 export function isSupabaseConfigured(): boolean {
