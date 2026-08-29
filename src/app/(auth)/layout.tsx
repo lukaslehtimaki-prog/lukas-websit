@@ -20,9 +20,12 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           <BrandMark size={36} className="rounded-xl shadow-[0_0_24px_-4px_rgba(99,102,241,0.8)]" />
           <Wordmark />
         </Link>
-        <div className="rounded-2xl border border-white/10 bg-white p-8 shadow-[0_0_0_1px_rgba(165,180,252,0.15),0_0_80px_-16px_rgba(99,102,241,0.45),0_40px_100px_-32px_rgba(0,0,0,0.9)]">
+        <main
+          id="main"
+          className="rounded-2xl border border-white/10 bg-white p-8 shadow-[0_0_0_1px_rgba(165,180,252,0.15),0_0_80px_-16px_rgba(99,102,241,0.45),0_40px_100px_-32px_rgba(0,0,0,0.9)]"
+        >
           {children}
-        </div>
+        </main>
         <p className="mt-6 text-center text-xs text-zinc-500">
           Cancel anytime
         </p>

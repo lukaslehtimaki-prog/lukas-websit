@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { requireTenantContext } from "@/lib/auth/tenant";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripe, priceIdForPlan, isStripeConfigured } from "@/lib/stripe";
 import { type PlanId } from "@/lib/plans";
 import {
@@ -41,7 +42,11 @@ async function ensureCustomer(
     name,
     metadata: { tenant_id: tenantId },
   });
-  await supabase
+  // Billing columns on `tenants` are service-role-only (migration 0011): the
+  // authenticated role may only write `name`/`updated_at`, so a user-scoped
+  // client cannot persist the Stripe customer id. The caller has already
+  // proven owner/admin membership of this tenant.
+  await createAdminClient()
     .from("tenants")
     .update({ stripe_customer_id: customer.id })
     .eq("id", tenantId);
@@ -99,7 +104,9 @@ export async function startCheckout(plan: PlanId): Promise<ActionResult> {
         plan,
         ...(affiliate ? { affiliate_code: affiliate.code } : {}),
       },
-      success_url: `${base}/dashboard/billing?success=1`,
+      // A distinct URL so the paid conversion is measurable (the old
+      // ?success=1 form still works for sessions already in flight).
+      success_url: `${base}/dashboard/billing/success`,
       cancel_url: `${base}/dashboard/billing?canceled=1`,
       ...(discounts ? { discounts } : { allow_promotion_codes: true }),
       // Stripe Tax: calculates VAT once a tax registration exists (none yet — the

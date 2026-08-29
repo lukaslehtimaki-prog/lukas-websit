@@ -94,7 +94,7 @@ export default async function BillingPage({
         </div>
       ) : (await getActiveAffiliate(await tenantReferralCode(ctx.tenantId))) ? (
         <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
-          🎉 You joined through a partner link — a 10% discount is applied
+          You joined through a partner link — a 10% discount is applied
           automatically at checkout, on every invoice.
         </div>
       ) : null}

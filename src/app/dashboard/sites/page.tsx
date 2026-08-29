@@ -94,7 +94,7 @@ export default async function SitesPage() {
                       : (statusStyles[s.status] ?? statusStyles.draft),
                   )}
                 >
-                  {s.paid_at ? "sold 🎉" : s.status}
+                  {s.paid_at ? "sold" : s.status}
                 </span>
                 <span className="text-xs text-zinc-400 dark:text-zinc-500">
                   {templateMeta(s.template_id).name}

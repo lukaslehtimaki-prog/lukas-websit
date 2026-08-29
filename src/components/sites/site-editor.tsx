@@ -612,7 +612,7 @@ export function SiteEditor({
           </button>
           <button
             onClick={onDelete}
-            className="rounded-lg p-1.5 text-zinc-400 dark:text-zinc-500 transition hover:bg-red-50 hover:text-red-600"
+            className="rounded-lg border border-red-200 p-1.5 text-red-600 transition hover:bg-red-50 dark:border-red-500/40 dark:text-red-400 dark:hover:bg-red-500/10"
             title="Delete site"
           >
             <Trash2 className="h-4 w-4" />
@@ -901,7 +901,7 @@ export function SiteEditor({
                 <button
                   onClick={cancelMaintenance}
                   disabled={maintBusy !== null}
-                  className="rounded-lg px-3 py-2 text-sm text-zinc-500 hover:text-red-600 dark:text-zinc-400"
+                  className="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-600 transition hover:bg-red-50 dark:border-red-500/40 dark:text-red-400 dark:hover:bg-red-500/10"
                 >
                   {maintBusy === "cancel" ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -1220,7 +1220,7 @@ export function SiteEditor({
               <button
                 onClick={removeDomain}
                 disabled={domainBusy !== null}
-                className="rounded-lg px-3 py-2 text-sm text-zinc-500 hover:text-red-600 dark:text-zinc-400"
+                className="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-600 transition hover:bg-red-50 dark:border-red-500/40 dark:text-red-400 dark:hover:bg-red-500/10"
               >
                 Disconnect
               </button>
@@ -1234,7 +1234,8 @@ export function SiteEditor({
               Add this DNS record at the domain&apos;s registrar (GoDaddy,
               Porkbun, Namecheap…):
             </p>
-            <table className="mt-2 w-full text-left text-xs">
+            <div className="mt-2 overflow-x-auto">
+            <table className="w-full min-w-[380px] text-left text-xs">
               <thead className="text-zinc-500 dark:text-zinc-400">
                 <tr>
                   <th className="pb-1 pr-4 font-medium">Type</th>
@@ -1252,6 +1253,7 @@ export function SiteEditor({
                 ))}
               </tbody>
             </table>
+            </div>
             <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
               Delete any existing A/CNAME record on that name first. DNS usually
               updates within minutes (can take up to an hour), then hit{" "}

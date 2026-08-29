@@ -1,5 +1,5 @@
 import "server-only";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   getStripe,
   planForPriceId,
@@ -15,7 +15,7 @@ import {
 export async function syncTenantSubscription(tenantId: string): Promise<void> {
   if (!isStripeConfigured()) return;
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("tenants")
     .select("stripe_customer_id")

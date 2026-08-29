@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { headers, cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/env";
+import { checkAuthRateLimit } from "@/lib/rate-limit";
 
 export type AuthState = { error?: string; message?: string };
 
@@ -40,6 +41,9 @@ export async function signInAction(
   const redirectTo = /^\/(?![/\\])/.test(requested) ? requested : "/dashboard";
   if (!email || !password) return { error: "Enter your email and password." };
 
+  const limited = await checkAuthRateLimit("signin", email);
+  if (limited) return { error: limited };
+
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: error.message };
@@ -61,6 +65,9 @@ export async function signUpAction(
   if (!email || !password) return { error: "Enter your email and a password." };
   if (password.length < 8)
     return { error: "Password must be at least 8 characters." };
+
+  const limited = await checkAuthRateLimit("signup", email);
+  if (limited) return { error: limited };
 
   // Affiliate referral captured by the proxy from a ?ref= link; the
   // handle_new_user() trigger stores it on the new tenant for attribution.
@@ -100,6 +107,15 @@ export async function requestPasswordResetAction(
 
   const email = field(formData, "email");
   if (!email) return { error: "Enter your email." };
+
+  // Reset floods are an email-reputation problem as much as a security one:
+  // every accepted request sends real mail from the shared agency domain.
+  const limited = await checkAuthRateLimit("reset", email);
+  if (limited)
+    return {
+      message:
+        "If an account exists for that email, a reset link is on its way.",
+    };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {

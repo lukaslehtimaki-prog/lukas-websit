@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 
-export const metadata: Metadata = { title: "Set new password · Sitagio" };
+export const metadata: Metadata = {
+  title: "Set new password · Sitagio",
+  description:
+    "Choose a new password for your Sitagio workspace. This page opens from the reset link we emailed you and expires once the password is changed.",
+  alternates: { canonical: "/reset-password" },
+};
 
 export default function ResetPasswordPage() {
   return (

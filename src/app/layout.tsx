@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { siteUrl } from "@/lib/site";
+import { PLAN_LIMITS } from "@/lib/plans";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -43,7 +45,6 @@ export const metadata: Metadata = {
   authors: [{ name: "Sitagio" }],
   creator: "Sitagio",
   category: "business software",
-  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     siteName: "Sitagio",
@@ -64,6 +65,63 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Organization + SoftwareApplication structured data, emitted once from the
+ * root layout so every public page carries it.
+ *
+ * Prices are read from PLAN_LIMITS (src/lib/plans.ts), the same source the
+ * pricing section renders from, so schema can never drift from the page.
+ * No LocalBusiness and no street address: Sitagio sells software remotely.
+ */
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${siteUrl}/#organization`,
+      name: "Sitovai Agency",
+      legalName: "Sitovai Agency",
+      url: siteUrl,
+      logo: `${siteUrl}/icon-512.png`,
+      email: "support@sitovaiagency.com",
+      vatID: "3638129-8",
+      taxID: "3638129-8",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Helsinki",
+        addressCountry: "FI",
+      },
+      sameAs: [],
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": `${siteUrl}/#software`,
+      name: "Sitagio",
+      url: siteUrl,
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      description,
+      publisher: { "@id": `${siteUrl}/#organization` },
+      offers: [
+        {
+          "@type": "Offer",
+          name: PLAN_LIMITS.pro.label,
+          price: String(PLAN_LIMITS.pro.priceCents / 100),
+          priceCurrency: "EUR",
+          url: `${siteUrl}/signup?plan=pro`,
+        },
+        {
+          "@type": "Offer",
+          name: PLAN_LIMITS.premium.label,
+          price: String(PLAN_LIMITS.premium.priceCents / 100),
+          priceCurrency: "EUR",
+          url: `${siteUrl}/signup?plan=premium`,
+        },
+      ],
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -74,7 +132,23 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {/* Keyboard users must be able to jump the header nav on every page. */}
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-[#05060a] focus:shadow-lg"
+        >
+          Skip to content
+        </a>
+        {children}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
+          }}
+        />
+        <Analytics />
+      </body>
     </html>
   );
 }

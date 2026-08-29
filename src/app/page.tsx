@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import {
   Search,
@@ -17,6 +18,8 @@ import { Container } from "@/components/ui/container";
 import { AuroraBackdrop } from "@/components/ui/aether-hero";
 import { BrandMark, Wordmark } from "@/components/ui/brand";
 import { MobileNav } from "@/components/ui/mobile-nav";
+import { BackToTop } from "@/components/ui/back-to-top";
+import { ScrollProgress } from "@/components/ui/scroll-progress";
 import {
   Tilt3D,
   ParticleField,
@@ -32,7 +35,7 @@ export default function Home() {
     <LangProvider>
       <div className="flex min-h-screen flex-col bg-[#05060a] text-zinc-100 selection:bg-indigo-500/30">
         <SiteHeader />
-        <main className="flex-1">
+        <main id="main" className="flex-1">
           <Hero />
           <LogosStrip />
           <Features />
@@ -42,6 +45,7 @@ export default function Home() {
           <CtaBand />
         </main>
         <SiteFooter />
+        <BackToTop />
       </div>
     </LangProvider>
   );
@@ -65,6 +69,33 @@ function Logo({ className }: { className?: string }) {
 }
 
 const SUPPORT_EMAIL = "support@sitovaiagency.com";
+
+/**
+ * Renders a localised string that mentions the support address, turning the
+ * address itself into a real mailto link. Every locale embeds the same literal
+ * address, so one split works for all eleven.
+ */
+function WithSupportLink({ text }: { text: string }) {
+  const parts = text.split(SUPPORT_EMAIL);
+  if (parts.length === 1) return <>{text}</>;
+  return (
+    <>
+      {parts.map((part, i) => (
+        <React.Fragment key={i}>
+          {part}
+          {i < parts.length - 1 ? (
+            <a
+              href={`mailto:${SUPPORT_EMAIL}`}
+              className="text-zinc-300 underline underline-offset-4 transition hover:text-white"
+            >
+              {SUPPORT_EMAIL}
+            </a>
+          ) : null}
+        </React.Fragment>
+      ))}
+    </>
+  );
+}
 
 const btnPrimary =
   "inline-flex items-center justify-center gap-2 rounded-[10px] bg-zinc-100 font-semibold text-[#05060a] transition-[transform,background-color,border-color] duration-150 ease-[var(--ease-out)] hover:-translate-y-px active:scale-[0.97] active:duration-100 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60";
@@ -142,6 +173,7 @@ function SiteHeader() {
           <MobileNav />
         </div>
       </Container>
+      <ScrollProgress />
     </header>
   );
 }
@@ -552,7 +584,7 @@ function Faq() {
               {t.faq.title}
             </h2>
             <p className="mt-4 max-w-xs text-[15px] leading-7 text-zinc-500">
-              {t.faq.side}
+              <WithSupportLink text={t.faq.side} />
             </p>
           </div>
           <div>
@@ -664,6 +696,9 @@ function SiteFooter() {
                 <a href={`mailto:${SUPPORT_EMAIL}`} className="transition hover:text-white">
                   {SUPPORT_EMAIL}
                 </a>
+                <span className="mt-1 block text-xs text-zinc-600">
+                  {t.footer.responseTime}
+                </span>
               </li>
               <li>
                 <LanguagePicker className="inline-flex" />

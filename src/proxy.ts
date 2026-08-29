@@ -69,6 +69,7 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
       path: "/",
       sameSite: "lax",
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
     });
     if (env.NEXT_PUBLIC_SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY) {
       event.waitUntil(

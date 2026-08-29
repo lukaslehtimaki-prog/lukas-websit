@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { LoginForm } from "@/components/auth/login-form";
 
-export const metadata: Metadata = { title: "Sign in · Sitagio" };
+export const metadata: Metadata = {
+  title: "Sign in · Sitagio",
+  description:
+    "Sign in to your Sitagio workspace to run lead searches, review no-website businesses and manage the AI sites you have built for them.",
+  alternates: { canonical: "/login" },
+};
 
 export default async function LoginPage({
   searchParams,

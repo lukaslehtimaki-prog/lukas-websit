@@ -431,3 +431,85 @@ details.faq[open] .faq-icon {
     details[open]::details-content { transform: none; }
   }
 }
+
+/* ─────────────────────────── print ───────────────────────────
+   /privacy and /terms are the two pages a business customer actually saves
+   or prints, and both are dark-on-dark: printed as-is they either burn a
+   page of toner or come out near-white on white. Force a document look,
+   drop the chrome, and expose link targets since a printed link is dead. */
+@media print {
+  html,
+  body {
+    background: #fff !important;
+    color: #18181b !important;
+  }
+
+  /* Backdrops, glows, grids and the sticky/legal chrome carry no meaning. */
+  header,
+  footer,
+  nav,
+  .no-print,
+  [class*="bg-grid"],
+  [class*="animate-aurora"],
+  [aria-hidden="true"] {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  strong {
+    color: #000 !important;
+  }
+
+  p,
+  li,
+  td,
+  th,
+  span,
+  div {
+    color: #18181b !important;
+  }
+
+  a {
+    color: #18181b !important;
+    text-decoration: underline;
+  }
+
+  /* A printed hyperlink is unusable unless its target is spelled out. */
+  a[href^="http"]::after,
+  a[href^="mailto:"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    word-break: break-all;
+  }
+
+  /* Keep headings attached to the text they introduce. */
+  h1,
+  h2,
+  h3 {
+    break-after: avoid-page;
+  }
+
+  details {
+    break-inside: avoid-page;
+  }
+
+  details > summary {
+    list-style: none;
+  }
+
+  /* Expand every accordion so a printed FAQ is complete. */
+  details::details-content {
+    content-visibility: visible !important;
+    opacity: 1 !important;
+    block-size: auto !important;
+    transform: none !important;
+  }
+}

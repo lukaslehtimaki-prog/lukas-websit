@@ -213,6 +213,16 @@ export default function PrivacyPage() {
         transmission or storage is completely secure, but we work to protect
         your data using appropriate technical and organisational measures.
       </P>
+      <P>
+        Data at rest is protected by the encryption our infrastructure
+        providers apply at the storage layer (Supabase/AWS for the database and
+        file storage, Vercel for hosting). We do not apply an additional
+        application-level encryption layer to individual database columns, so
+        lead details, website-visitor messages and chatbot transcripts are
+        stored in readable form inside that encrypted database and are
+        reachable only through the access controls and row-level security
+        described above.
+      </P>
 
       <H2>10. Changes to this policy</H2>
       <P>
@@ -224,7 +234,8 @@ export default function PrivacyPage() {
       <H2>11. Contact</H2>
       <P>
         Questions about this policy or your data? Email{" "}
-        <A href={`mailto:${CONTACT}`}>{CONTACT}</A>.
+        <A href={`mailto:${CONTACT}`}>{CONTACT}</A> — we reply within 1
+        business day.
       </P>
     </article>
   );

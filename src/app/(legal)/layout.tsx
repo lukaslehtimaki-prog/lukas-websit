@@ -25,7 +25,7 @@ export default function LegalLayout({ children }: { children: ReactNode }) {
         </Container>
       </header>
 
-      <main className="flex-1 py-16">
+      <main id="main" className="flex-1 py-16">
         <Container className="max-w-3xl">{children}</Container>
       </main>
 

@@ -289,9 +289,27 @@ export async function createSiteFromInput(
 export async function regenerateContent(
   siteId: string,
 ): Promise<{ content?: SiteContent; error?: string }> {
-  await requireTenantContext();
+  const ctx = await requireTenantContext();
   if (!isAIConfigured())
     return { error: "Add ANTHROPIC_API_KEY to regenerate AI copy." };
+
+  // A regeneration is a full AI website build — it must be gated and metered
+  // exactly like createSiteFromInput, otherwise it is an unbounded Anthropic
+  // bill that any free-tier account can run in a loop.
+  const limit = await checkLimit(
+    ctx.planId,
+    ctx.subscriptionStatus,
+    ctx.isPlatformAdmin,
+    "site_generation",
+  );
+  if (!limit.allowed) {
+    return {
+      error:
+        limit.limit === 0
+          ? "Your workspace has no active plan. Subscribe from Billing to regenerate copy."
+          : `You've used all ${limit.limit} site generations on your plan this month.`,
+    };
+  }
 
   const supabase = await createClient();
   const { data: site } = await supabase
@@ -355,8 +373,36 @@ export async function regenerateContent(
     .from("sites")
     .update({ content, updated_at: new Date().toISOString() })
     .eq("id", siteId);
+  await recordUsage(ctx.tenantId, ctx.userId, "site_generation");
   revalidatePath(`/dashboard/sites/${siteId}`);
   return { content };
+}
+
+/**
+ * Shape + size guard for the client-supplied SiteContent blob.
+ *
+ * updateSiteContent and aiEditSiteAction both accept an arbitrary object from
+ * the browser: one writes it into the sites.content jsonb, the other feeds it
+ * to an LLM. Server-owned keys are stripped downstream, but nothing bounded
+ * the payload itself — a single Server Action POST could store megabytes or
+ * blow up the AI prompt. 256 KB is ~10x the largest real generated site.
+ */
+const MAX_CONTENT_BYTES = 256 * 1024;
+
+function contentPayloadError(content: unknown): string | null {
+  if (!content || typeof content !== "object" || Array.isArray(content))
+    return "Invalid website content.";
+  let serialized: string;
+  try {
+    serialized = JSON.stringify(content);
+  } catch {
+    return "Invalid website content.";
+  }
+  if (Buffer.byteLength(serialized, "utf8") > MAX_CONTENT_BYTES)
+    return "This website is too large to save. Remove some content and try again.";
+  if (typeof (content as { businessName?: unknown }).businessName !== "string")
+    return "Invalid website content.";
+  return null;
 }
 
 export async function updateSiteContent(
@@ -365,6 +411,8 @@ export async function updateSiteContent(
   templateId?: string,
 ): Promise<{ ok?: boolean; error?: string }> {
   await requireTenantContext();
+  const payloadError = contentPayloadError(content);
+  if (payloadError) return { error: payloadError };
   const supabase = await createClient();
 
   // Server-managed records (Stripe sale info incl. the webhook's paidAt, and
@@ -778,6 +826,8 @@ export async function aiEditSiteAction(
   if (!text) return { error: "Tell the AI what to change." };
   if (text.length > 1000)
     return { error: "Keep the instruction under 1000 characters." };
+  const payloadError = contentPayloadError(content);
+  if (payloadError) return { error: payloadError };
   try {
     const r = await editSiteContentAI(content, text);
     return { content: r.content, summary: r.summary };

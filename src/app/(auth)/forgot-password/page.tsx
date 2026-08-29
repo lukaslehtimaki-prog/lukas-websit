@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 
-export const metadata: Metadata = { title: "Forgot password · Sitagio" };
+export const metadata: Metadata = {
+  title: "Forgot password · Sitagio",
+  description:
+    "Request a password reset link for your Sitagio workspace. Enter the email you signed up with and we will send you a link to set a new password.",
+  alternates: { canonical: "/forgot-password" },
+};
 
 export default function ForgotPasswordPage() {
   return (

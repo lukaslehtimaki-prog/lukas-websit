@@ -43,10 +43,36 @@ const SOCIAL_META: Record<
   whatsapp: { label: "WhatsApp", icon: `<path d="M12 3a9 9 0 0 0-7.7 13.6L3 21l4.5-1.2A9 9 0 1 0 12 3zm0 1.8a7.2 7.2 0 0 1 6.1 11 7.2 7.2 0 0 1-9.1 2.6l-.32-.16-2.67.7.72-2.6-.2-.33A7.2 7.2 0 0 1 12 4.8zm-2.5 3c-.16 0-.42.06-.64.3-.22.24-.85.83-.85 2s.87 2.32 1 2.48c.12.16 1.7 2.7 4.2 3.68 2.08.82 2.5.66 2.95.62.45-.04 1.45-.6 1.65-1.17.2-.58.2-1.07.14-1.17-.06-.1-.22-.16-.46-.28-.24-.12-1.45-.72-1.67-.8-.22-.08-.38-.12-.54.12-.16.24-.62.8-.76.96-.14.16-.28.18-.52.06-.24-.12-1.03-.38-1.96-1.2-.72-.65-1.2-1.44-1.35-1.68-.14-.24-.02-.37.1-.5.11-.1.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.33-.76-1.82-.2-.48-.4-.42-.54-.42z"/>` },
 };
 
+/**
+ * Scheme allowlist for every href we interpolate from stored content.
+ *
+ * HTML-escaping a URL does NOT make it safe to put in an href: `javascript:`
+ * survives escaping untouched and becomes click-to-execute script on the
+ * page's own origin (sitagio.com, or the client's custom domain). Anything
+ * that isn't a plain navigable link is dropped.
+ */
+export function safeUrl(raw: string | null | undefined): string | null {
+  const value = String(raw ?? "").trim();
+  if (!value) return null;
+  // Strip the control characters browsers ignore while resolving a scheme —
+  // "java\tscript:alert(1)" is a live URL in every engine.
+  const probe = value.replace(/[\u0000-\u0020]/g, "").toLowerCase();
+  // Relative links and same-page anchors carry no scheme and are always safe.
+  if (probe.startsWith("/") || probe.startsWith("#") || probe.startsWith("?"))
+    return value;
+  const scheme = /^([a-z][a-z0-9+.-]*):/.exec(probe)?.[1];
+  if (!scheme) return value; // schemeless relative URL
+  return ["http", "https", "mailto", "tel"].includes(scheme) ? value : null;
+}
+
 function socialLinks(socials: SiteSocial[] | undefined, cls: string): string {
-  const items = (socials ?? []).filter(
-    (x) => x && x.url && SOCIAL_META[x.platform],
-  );
+  const items = (socials ?? [])
+    .filter((x) => x && x.url && SOCIAL_META[x.platform])
+    .map((x) => {
+      const url = safeUrl(x.url);
+      return url ? { ...x, url } : null;
+    })
+    .filter((x): x is SiteSocial => x !== null);
   if (!items.length) return "";
   return `<div class="${cls}">${items
     .map((x) => {
@@ -304,7 +330,7 @@ export function renderSiteToHtml(
 
     if (t.heroStyle === "split") {
       const art = content.heroImage
-        ? `<img class="hero-img" src="${esc(content.heroImage)}" alt="" />`
+        ? `<img class="hero-img" src="${esc(content.heroImage)}" alt="${esc(content.businessName)}" />`
         : `<div class="monogram">${esc(initials(content.businessName))}</div>`;
       return `<div class="hero hero-split"><div class="wrap split">
         <div class="split-text">${inner}</div>
@@ -363,7 +389,7 @@ export function renderSiteToHtml(
     <div class="gallery">${galleryImgs
       .map(
         (u) =>
-          `<div class="gitem"><img src="${esc(u)}" alt="" loading="lazy" /></div>`,
+          `<div class="gitem"><img src="${esc(u)}" alt="${esc(content.businessName)}" loading="lazy" /></div>`,
       )
       .join("")}</div>
   </div></section>`
@@ -476,7 +502,7 @@ export function renderSiteToHtml(
             .join(""),
         );
         const avatar = m.photo
-          ? `<img class="tm-photo" src="${esc(m.photo)}" alt="" loading="lazy" />`
+          ? `<img class="tm-photo" src="${esc(m.photo)}" alt="${esc(m.name)}" loading="lazy" />`
           : `<span class="tm-avatar">${initials}</span>`;
         return `<article class="card team-card">${avatar}<h3>${esc(m.name)}</h3>${m.role ? `<p>${esc(m.role)}</p>` : ""}</article>`;
       })

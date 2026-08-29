@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { renderSiteToHtml } from "@/lib/templates/render";
+import { renderSiteToHtml, safeUrl } from "@/lib/templates/render";
 import type { SiteContent } from "@/lib/templates/types";
 
 // Private client review + buy link: /r/<siteId>?k=<reviewKey>. Renders the
@@ -64,7 +64,8 @@ export async function GET(
   // Floating purchase bar.
   const paid = Boolean(content.payment?.paidAt);
   const price = content.payment?.priceStr?.trim();
-  const buyLink = content.payment?.link;
+  // Scheme-allowlisted: an href is never safe on HTML-escaping alone.
+  const buyLink = safeUrl(content.payment?.link);
   const bar = paid
     ? `<div class="sv-bar sv-bar-paid"><span>✓ This website has been purchased — thank you!</span></div>`
     : `<div class="sv-bar">

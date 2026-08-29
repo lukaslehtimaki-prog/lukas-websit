@@ -94,7 +94,8 @@ export default async function AdminPage() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-        <table className="w-full text-left text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[640px] text-left text-sm">
           <thead className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
             <tr>
               <th className="px-4 py-3">Workspace</th>
@@ -129,6 +130,7 @@ export default async function AdminPage() {
             ) : null}
           </tbody>
         </table>
+        </div>
       </div>
 
       <AffiliatesSection />

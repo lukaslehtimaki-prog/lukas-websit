@@ -31,7 +31,7 @@ export function SignupForm() {
       {state.error ? <p className="text-sm text-red-600">{state.error}</p> : null}
       {state.message ? (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
-          <p className="font-medium">Check your inbox ✉️</p>
+          <p className="font-medium">Check your inbox</p>
           <p className="mt-0.5">{state.message}</p>
         </div>
       ) : null}

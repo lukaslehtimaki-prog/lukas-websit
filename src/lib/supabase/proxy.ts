@@ -22,6 +22,15 @@ export async function updateSession(request: NextRequest) {
     env.NEXT_PUBLIC_SUPABASE_URL,
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
+      // The app never reads the auth cookie from JavaScript (there is no
+      // browser Supabase client), so it can be httpOnly — that removes
+      // document.cookie session theft from the XSS blast radius. `secure` is
+      // production-only so http://localhost still works in development.
+      cookieOptions: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+      },
       cookies: {
         getAll() {
           return request.cookies.getAll();

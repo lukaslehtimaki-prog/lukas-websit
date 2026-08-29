@@ -19,6 +19,11 @@ const variants = {
     "bg-white text-zinc-800 border border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300 shadow-sm dark:bg-zinc-900 dark:text-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800 dark:hover:border-zinc-600",
   ghost:
     "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100",
+  // Destructive controls must READ as destructive at rest, not only on hover:
+  // a touch device never produces a hover state, so hover-only red signalling
+  // does not exist on a phone at all.
+  destructive:
+    "bg-white text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300 shadow-sm dark:bg-transparent dark:text-red-400 dark:border-red-500/40 dark:hover:bg-red-500/10 dark:hover:border-red-500/60",
 } as const;
 
 export type ButtonVariant = keyof typeof variants;

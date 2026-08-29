@@ -141,7 +141,7 @@ const en = {
   faq: {
     eyebrow: "FAQ",
     title: "Questions, answered",
-    side: "Anything else? Reach us any time from the dashboard once you're in.",
+    side: "Anything else? Email support@sitovaiagency.com — we reply within 1 business day.",
     items: [
       {
         q: "Where does the lead data come from?",
@@ -184,6 +184,8 @@ const en = {
     rights: "All rights reserved.",
     privacy: "Privacy",
     terms: "Terms",
+    responseTime: "We reply within 1 business day.",
+    backToTop: "Back to top",
   },
 };
 
@@ -304,7 +306,7 @@ const fi: LandingDict = {
   faq: {
     eyebrow: "UKK",
     title: "Kysymykset, vastattu",
-    side: "Jotain muuta? Tavoitat meidät milloin vain dashboardista, kun olet sisällä.",
+    side: "Muuta kysyttävää? Lähetä sähköpostia osoitteeseen support@sitovaiagency.com — vastaamme yhden arkipäivän kuluessa.",
     items: [
       {
         q: "Mistä liididata tulee?",
@@ -347,6 +349,8 @@ const fi: LandingDict = {
     rights: "Kaikki oikeudet pidätetään.",
     privacy: "Tietosuoja",
     terms: "Käyttöehdot",
+    responseTime: "Vastaamme yhden arkipäivän kuluessa.",
+    backToTop: "Takaisin ylös",
   },
 };
 
@@ -465,7 +469,7 @@ const es: LandingDict = {
   faq: {
     eyebrow: "FAQ",
     title: "Preguntas, respondidas",
-    side: "¿Algo más? Contáctanos en cualquier momento desde el panel una vez dentro.",
+    side: "¿Algo más? Escríbenos a support@sitovaiagency.com: respondemos en un día hábil.",
     items: [
       {
         q: "¿De dónde vienen los datos de leads?",
@@ -508,6 +512,8 @@ const es: LandingDict = {
     rights: "Todos los derechos reservados.",
     privacy: "Privacidad",
     terms: "Términos",
+    responseTime: "Respondemos en un día hábil.",
+    backToTop: "Volver arriba",
   },
 };
 
@@ -626,7 +632,7 @@ const zh: LandingDict = {
   faq: {
     eyebrow: "常见问题",
     title: "有问必答",
-    side: "还有其他问题？进入后随时可从仪表盘联系我们。",
+    side: "还有其他问题？请发邮件至 support@sitovaiagency.com，我们会在一个工作日内回复。",
     items: [
       {
         q: "线索数据从哪里来？",
@@ -669,6 +675,8 @@ const zh: LandingDict = {
     rights: "保留所有权利。",
     privacy: "隐私",
     terms: "条款",
+    responseTime: "我们会在一个工作日内回复。",
+    backToTop: "回到顶部",
   },
 };
 
@@ -787,7 +795,7 @@ const hi: LandingDict = {
   faq: {
     eyebrow: "FAQ",
     title: "सवाल, जवाब के साथ",
-    side: "कुछ और? अंदर आने के बाद डैशबोर्ड से कभी भी संपर्क करें।",
+    side: "कुछ और? support@sitovaiagency.com पर ईमेल करें — हम एक कार्यदिवस के भीतर जवाब देते हैं।",
     items: [
       {
         q: "लीड डेटा कहां से आता है?",
@@ -830,6 +838,8 @@ const hi: LandingDict = {
     rights: "सर्वाधिकार सुरक्षित।",
     privacy: "गोपनीयता",
     terms: "शर्तें",
+    responseTime: "हम एक कार्यदिवस के भीतर जवाब देते हैं।",
+    backToTop: "ऊपर जाएँ",
   },
 };
 
@@ -948,7 +958,7 @@ const fr: LandingDict = {
   faq: {
     eyebrow: "FAQ",
     title: "Vos questions, nos réponses",
-    side: "Autre chose ? Contactez-nous à tout moment depuis le tableau de bord une fois connecté.",
+    side: "Autre chose ? Écrivez à support@sitovaiagency.com — nous répondons sous un jour ouvré.",
     items: [
       {
         q: "D'où viennent les données de leads ?",
@@ -991,6 +1001,8 @@ const fr: LandingDict = {
     rights: "Tous droits réservés.",
     privacy: "Confidentialité",
     terms: "Conditions",
+    responseTime: "Nous répondons sous un jour ouvré.",
+    backToTop: "Retour en haut",
   },
 };
 
@@ -1109,7 +1121,7 @@ const ar: LandingDict = {
   faq: {
     eyebrow: "الأسئلة الشائعة",
     title: "أسئلة وأجوبة",
-    side: "شيء آخر؟ تواصل معنا في أي وقت من لوحة التحكم بعد الدخول.",
+    side: "شيء آخر؟ راسلنا على support@sitovaiagency.com — نرد خلال يوم عمل واحد.",
     items: [
       {
         q: "من أين تأتي بيانات العملاء؟",
@@ -1152,6 +1164,8 @@ const ar: LandingDict = {
     rights: "جميع الحقوق محفوظة.",
     privacy: "الخصوصية",
     terms: "الشروط",
+    responseTime: "نرد خلال يوم عمل واحد.",
+    backToTop: "العودة إلى الأعلى",
   },
 };
 
@@ -1270,7 +1284,7 @@ const pt: LandingDict = {
   faq: {
     eyebrow: "FAQ",
     title: "Perguntas, respondidas",
-    side: "Algo mais? Fale conosco a qualquer momento pelo painel depois de entrar.",
+    side: "Algo mais? Escreva para support@sitovaiagency.com — respondemos em um dia útil.",
     items: [
       {
         q: "De onde vêm os dados de leads?",
@@ -1313,6 +1327,8 @@ const pt: LandingDict = {
     rights: "Todos os direitos reservados.",
     privacy: "Privacidade",
     terms: "Termos",
+    responseTime: "Respondemos em um dia útil.",
+    backToTop: "Voltar ao topo",
   },
 };
 
@@ -1431,7 +1447,7 @@ const ru: LandingDict = {
   faq: {
     eyebrow: "FAQ",
     title: "Вопросы и ответы",
-    side: "Что-то ещё? Свяжитесь с нами в любой момент из дашборда после входа.",
+    side: "Остались вопросы? Напишите на support@sitovaiagency.com — отвечаем в течение одного рабочего дня.",
     items: [
       {
         q: "Откуда берутся данные о лидах?",
@@ -1474,6 +1490,8 @@ const ru: LandingDict = {
     rights: "Все права защищены.",
     privacy: "Конфиденциальность",
     terms: "Условия",
+    responseTime: "Отвечаем в течение одного рабочего дня.",
+    backToTop: "Наверх",
   },
 };
 
@@ -1592,7 +1610,7 @@ const de: LandingDict = {
   faq: {
     eyebrow: "FAQ",
     title: "Fragen, beantwortet",
-    side: "Noch etwas? Erreich uns jederzeit über das Dashboard, sobald du drin bist.",
+    side: "Noch etwas? Schreib an support@sitovaiagency.com — wir antworten innerhalb eines Werktags.",
     items: [
       {
         q: "Woher kommen die Lead-Daten?",
@@ -1635,6 +1653,8 @@ const de: LandingDict = {
     rights: "Alle Rechte vorbehalten.",
     privacy: "Datenschutz",
     terms: "AGB",
+    responseTime: "Wir antworten innerhalb eines Werktags.",
+    backToTop: "Nach oben",
   },
 };
 
@@ -1753,7 +1773,7 @@ const ja: LandingDict = {
   faq: {
     eyebrow: "FAQ",
     title: "よくある質問",
-    side: "他にご質問は？ログイン後、ダッシュボードからいつでもご連絡ください。",
+    side: "他にご質問は？ support@sitovaiagency.com までメールでお寄せください。1営業日以内に返信します。",
     items: [
       {
         q: "リードデータはどこから来ますか？",
@@ -1796,6 +1816,8 @@ const ja: LandingDict = {
     rights: "All rights reserved.",
     privacy: "プライバシー",
     terms: "利用規約",
+    responseTime: "1営業日以内に返信します。",
+    backToTop: "トップへ戻る",
   },
 };
 
