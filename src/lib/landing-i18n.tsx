@@ -27,6 +27,10 @@ export type LangCode = (typeof LANGS)[number]["code"];
 const STORAGE_KEY = "sitagio-landing-lang";
 
 const en = {
+  meta: {
+    title: "Sitagio — find businesses with no website, build them one with AI",
+    description: "Sitagio finds local businesses with no website via Google Places and builds them ready-to-launch AI websites in their own language, all from one dashboard.",
+  },
   nav: {
     features: "Features",
     how: "How it works",
@@ -192,6 +196,10 @@ const en = {
 export type LandingDict = typeof en;
 
 const fi: LandingDict = {
+  meta: {
+    title: "Sitagio — löydä yritykset ilman kotisivuja, rakenna sivut tekoälyllä",
+    description: "Sitagio löytää Google Placesista paikalliset yritykset ilman kotisivuja ja rakentaa niille julkaisuvalmiit tekoälysivut niiden omalla kielellä — yhdestä näkymästä.",
+  },
   nav: {
     features: "Ominaisuudet",
     how: "Miten se toimii",
@@ -355,6 +363,10 @@ const fi: LandingDict = {
 };
 
 const es: LandingDict = {
+  meta: {
+    title: "Sitagio — encuentra negocios sin web y créales una con IA",
+    description: "Sitagio encuentra negocios locales sin sitio web a través de Google Places y les crea webs con IA listas para publicar en su propio idioma, desde un único panel.",
+  },
   nav: {
     features: "Funciones",
     how: "Cómo funciona",
@@ -518,6 +530,10 @@ const es: LandingDict = {
 };
 
 const zh: LandingDict = {
+  meta: {
+    title: "Sitagio — 找到没有网站的商家，用 AI 为他们建站",
+    description: "Sitagio 通过 Google Places 找出没有网站的本地商家，并用他们自己的语言生成可直接上线的 AI 网站，全部在一个后台完成。",
+  },
   nav: {
     features: "功能",
     how: "工作原理",
@@ -681,6 +697,10 @@ const zh: LandingDict = {
 };
 
 const hi: LandingDict = {
+  meta: {
+    title: "Sitagio — बिना वेबसाइट वाले व्यवसाय ढूंढें, AI से साइट बनाएं",
+    description: "Sitagio गूगल प्लेसेस से उन स्थानीय व्यवसायों को ढूंढता है जिनकी वेबसाइट नहीं है, और उनकी अपनी भाषा में लॉन्च-तैयार AI वेबसाइट बनाता है।",
+  },
   nav: {
     features: "फ़ीचर्स",
     how: "यह कैसे काम करता है",
@@ -844,6 +864,10 @@ const hi: LandingDict = {
 };
 
 const fr: LandingDict = {
+  meta: {
+    title: "Sitagio — trouvez les entreprises sans site et créez-le avec l'IA",
+    description: "Sitagio repère via Google Places les entreprises locales sans site web et leur crée des sites IA prêts à publier, dans leur propre langue, depuis un seul tableau de bord.",
+  },
   nav: {
     features: "Fonctionnalités",
     how: "Comment ça marche",
@@ -1007,6 +1031,10 @@ const fr: LandingDict = {
 };
 
 const ar: LandingDict = {
+  meta: {
+    title: "Sitagio — اعثر على الأنشطة بلا موقع وابنِ لها موقعًا بالذكاء الاصطناعي",
+    description: "يعثر Sitagio عبر Google Places على الأنشطة التجارية المحلية التي لا تملك موقعًا، ويبني لها مواقع جاهزة للنشر بالذكاء الاصطناعي وبلغتها، من لوحة واحدة.",
+  },
   nav: {
     features: "المميزات",
     how: "كيف يعمل",
@@ -1170,6 +1198,10 @@ const ar: LandingDict = {
 };
 
 const pt: LandingDict = {
+  meta: {
+    title: "Sitagio — encontre negócios sem site e crie um com IA",
+    description: "O Sitagio encontra negócios locais sem site através do Google Places e cria-lhes sites com IA prontos a publicar, no idioma deles, a partir de um único painel.",
+  },
   nav: {
     features: "Recursos",
     how: "Como funciona",
@@ -1333,6 +1365,10 @@ const pt: LandingDict = {
 };
 
 const ru: LandingDict = {
+  meta: {
+    title: "Sitagio — находите бизнесы без сайта и создавайте им сайт с ИИ",
+    description: "Sitagio находит через Google Places локальные компании без сайта и создаёт им готовые к запуску сайты на ИИ на их языке — всё из одной панели.",
+  },
   nav: {
     features: "Возможности",
     how: "Как это работает",
@@ -1496,6 +1532,10 @@ const ru: LandingDict = {
 };
 
 const de: LandingDict = {
+  meta: {
+    title: "Sitagio — Unternehmen ohne Website finden und ihnen eine mit KI bauen",
+    description: "Sitagio findet über Google Places lokale Unternehmen ohne Website und baut ihnen startklare KI-Websites in ihrer eigenen Sprache, alles aus einem Dashboard.",
+  },
   nav: {
     features: "Funktionen",
     how: "So funktioniert's",
@@ -1659,6 +1699,10 @@ const de: LandingDict = {
 };
 
 const ja: LandingDict = {
+  meta: {
+    title: "Sitagio — ウェブサイトのないビジネスを見つけ、AI でサイトを作る",
+    description: "Sitagio は Google Places からウェブサイトを持たない地域のビジネスを見つけ、その言語のまま公開できる AI サイトを一つの管理画面から作成します。",
+  },
   nav: {
     features: "機能",
     how: "仕組み",
@@ -1883,6 +1927,20 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
   };
 
   const dir = (LANGS.find((l) => l.code === lang)?.dir ?? "ltr") as "ltr" | "rtl";
+
+  // Mirror the active language onto the document itself. The provider marks up
+  // its own subtree, but <html lang>, the tab title and the meta description
+  // live outside it — so a Finnish visitor was served Finnish body copy under
+  // lang="en" with an English title, which is what search engines and screen
+  // readers actually read.
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    document.documentElement.dir = dir;
+    const m = DICTS[lang].meta;
+    document.title = m.title;
+    const el = document.querySelector('meta[name="description"]');
+    if (el) el.setAttribute("content", m.description);
+  }, [lang, dir]);
 
   return (
     <LangContext.Provider value={{ lang, setLang, t: DICTS[lang], dir }}>
