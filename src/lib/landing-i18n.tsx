@@ -1928,18 +1928,21 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
 
   const dir = (LANGS.find((l) => l.code === lang)?.dir ?? "ltr") as "ltr" | "rtl";
 
-  // Mirror the active language onto the document itself. The provider marks up
-  // its own subtree, but <html lang>, the tab title and the meta description
-  // live outside it — so a Finnish visitor was served Finnish body copy under
-  // lang="en" with an English title, which is what search engines and screen
-  // readers actually read.
+  // Mirror the active language onto <html> itself. The provider marks up its
+  // own subtree, but the document element sits above it, so a Finnish visitor
+  // was served Finnish body copy under lang="en" — which is what screen readers
+  // and search engines actually read.
+  //
+  // Deliberately NOT touching <title> or the meta description here. Next
+  // re-renders the head after this effect, which restores the title and leaves
+  // a SECOND, conflicting description tag behind. Localising those correctly
+  // needs locale-prefixed routes with their own metadata export (the way the
+  // Vandio landing ships a server-rendered /fi), not imperative DOM edits.
+  // The translated strings for that work already exist: every dictionary
+  // carries a `meta: { title, description }` block, unused until then.
   useEffect(() => {
     document.documentElement.lang = lang;
     document.documentElement.dir = dir;
-    const m = DICTS[lang].meta;
-    document.title = m.title;
-    const el = document.querySelector('meta[name="description"]');
-    if (el) el.setAttribute("content", m.description);
   }, [lang, dir]);
 
   return (
